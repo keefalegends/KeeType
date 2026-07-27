@@ -99,8 +99,8 @@ onMounted(updateCaret)
     <!-- Words Display -->
     <div
       ref="wordsContainer"
-      class="relative text-2xl leading-relaxed overflow-hidden select-none"
-      style="max-height: 7.2em;"
+      class="relative text-2xl leading-relaxed overflow-hidden select-none pb-4"
+      style="max-height: 8.5em;"
     >
       <!-- Caret -->
       <div
@@ -119,7 +119,7 @@ onMounted(updateCaret)
         v-for="(word, wi) in words"
         :key="wi"
         :data-word="wi"
-        class="inline-block mr-2.5 mb-1"
+        class="word inline-block mb-2"
         :class="getWordClass(wi)"
       >
         <!-- Characters -->
@@ -142,3 +142,10 @@ onMounted(updateCaret)
     </div>
   </div>
 </template>
+
+<style scoped>
+.word {
+  /* margin-right set to exactly width of one character space in monospace font */
+  margin-right: 0.65em;
+}
+</style>
