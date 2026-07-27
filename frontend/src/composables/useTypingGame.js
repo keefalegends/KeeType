@@ -166,8 +166,15 @@ export function useTypingGame() {
         // Within word bounds — just clear status so char goes back to "untyped"
         typedChars.value[wi][newCi] = undefined
       }
+    } else if (ci === 0 && currentWordIndex.value > 0) {
+      // Go back to previous word
+      currentWordIndex.value--
+      const prevWordIndex = currentWordIndex.value
+      const prevWordTyped = typedChars.value[prevWordIndex] || []
+      
+      // Set char index to the end of the previous word's typed characters
+      currentCharIndex.value = prevWordTyped.length
     }
-    // Don't allow backspace to previous word (like Monkeytype default behavior)
   }
 
   // ============ FINISH ============
