@@ -27,6 +27,10 @@ const {
 const gameContainer = ref(null)
 
 function onKeyDown(e) {
+  // If game is finished, Tab should NOT restart the game automatically (especially since user might type in inputs)
+  if (isFinished.value && e.key === 'Tab') {
+    return
+  }
   handleKeyDown(e)
 }
 

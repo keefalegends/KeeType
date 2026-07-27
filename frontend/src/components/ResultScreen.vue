@@ -164,28 +164,23 @@ async function submitScore() {
           <span>✓</span> <span>Score successfully submitted!</span>
         </div>
       </div>
-
-      <!-- Restart Hint -->
-      <div class="text-xs text-editor-sub">
-        press <span class="text-editor-text underline cursor-pointer hover:text-editor-accent" @click="emit('restart')">tab</span> (or click here) to restart
-      </div>
     </div>
 
     <!-- Right: Leaderboard Display -->
-    <div class="w-full lg:w-80 border-t lg:border-t-0 lg:border-l border-editor-sub/10 pt-10 lg:pt-0 lg:pl-12">
-      <div class="text-xs uppercase tracking-widest text-editor-accent font-semibold mb-6">
+    <div class="w-full lg:w-80 border-t lg:border-t-0 lg:border-l border-editor-sub/10 pt-10 lg:pt-0 lg:pl-12 flex flex-col">
+      <div class="text-xs uppercase tracking-widest text-editor-accent font-semibold mb-6 flex-shrink-0">
         leaderboard <span class="text-editor-sub font-light">({{ testModeString }})</span>
       </div>
       
-      <div v-if="isLoadingLeaderboard" class="text-xs text-editor-sub">
+      <div v-if="isLoadingLeaderboard" class="text-xs text-editor-sub flex-shrink-0">
         Loading scores...
       </div>
       
-      <div v-else-if="leaderboards.length === 0" class="text-xs text-editor-sub">
+      <div v-else-if="leaderboards.length === 0" class="text-xs text-editor-sub flex-shrink-0">
         No scores recorded yet. Be the first!
       </div>
       
-      <div v-else class="flex flex-col gap-2">
+      <div v-else class="flex flex-col gap-2 overflow-y-auto flex-1 custom-scrollbar pr-2" style="max-height: 250px;">
         <div
           v-for="(score, index) in leaderboards"
           :key="score.id"
@@ -201,6 +196,29 @@ async function submitScore() {
           </div>
         </div>
       </div>
+
+      <!-- Restart Hint (Moved here) -->
+      <div class="text-xs text-editor-sub mt-8 pt-6 border-t border-editor-sub/10 flex-shrink-0">
+        <span class="text-editor-text hover:text-editor-accent cursor-pointer transition-colors duration-200" @click="emit('restart')">> click here to restart</span>
+      </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Custom Scrollbar for Leaderboard */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--color-editor-sub);
+  opacity: 0.3;
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-editor-text);
+}
+</style>
