@@ -30,12 +30,11 @@ function calculateLineHeight() {
 function getCharClass(wordIndex, charIndex) {
   const typed = props.typedChars[wordIndex]?.[charIndex]
   if (!typed) {
-    // Not yet typed
     return 'text-editor-sub'
   }
-  if (typed.status === 'correct') return 'text-editor-correct'
-  if (typed.status === 'incorrect') return 'text-editor-error underline decoration-editor-error/50'
-  if (typed.status === 'extra') return 'text-editor-error-extra'
+  if (typed.status === 'correct') return 'text-editor-correct char-typed'
+  if (typed.status === 'incorrect') return 'text-editor-error underline decoration-editor-error/50 char-typed char-error'
+  if (typed.status === 'extra') return 'text-editor-error-extra char-typed'
   if (typed.status === 'missed') return 'text-editor-error opacity-50'
   return 'text-editor-sub'
 }
@@ -152,11 +151,12 @@ onMounted(updateCaret)
         <div
           v-if="!isFinished"
           ref="caretRef"
-          class="absolute w-0.5 bg-editor-caret rounded-full transition-all duration-75 z-10"
+          class="absolute w-0.5 bg-editor-caret rounded-full z-10"
           :class="isActive ? 'caret-no-blink' : 'caret-blink'"
           :style="{
             ...caretStyle,
             height: '1.6em',
+            transition: 'top 80ms cubic-bezier(0.4,0,0.2,1), left 80ms cubic-bezier(0.4,0,0.2,1)',
           }"
         ></div>
 
@@ -192,7 +192,34 @@ onMounted(updateCaret)
 
 <style scoped>
 .word {
-  /* margin-right set to exactly width of one character space in monospace font */
   margin-right: 0.65em;
+  transition: opacity 0.2s ease, filter 0.2s ease;
+}
+
+@keyframes char-pop {
+  0% {
+    transform: scale(0.85);
+  }
+  60% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes char-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-1.5px); }
+  75% { transform: translateX(1.5px); }
+}
+
+.char-typed {
+  display: inline-block;
+  animation: char-pop 0.12s cubic-bezier(0.17, 0.89, 0.32, 1.49) forwards;
+}
+
+.char-error {
+  animation: char-pop 0.12s cubic-bezier(0.17, 0.89, 0.32, 1.49) forwards, char-shake 0.15s ease-in-out;
 }
 </style>
