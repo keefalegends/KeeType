@@ -11,8 +11,21 @@ const props = defineProps({
 })
 
 const wordsContainer = ref(null)
+const wordsWrapper = ref(null)
 const caretRef = ref(null)
+
 const caretStyle = ref({ top: '0px', left: '0px' })
+const wrapperTranslateY = ref(0)
+const lineHeightPx = ref(0)
+
+// Helper: Calculate standard line height based on first word height
+function calculateLineHeight() {
+  if (!wordsContainer.value) return
+  const firstWord = wordsContainer.value.querySelector('[data-word="0"]')
+  if (firstWord) {
+    lineHeightPx.value = firstWord.getBoundingClientRect().height
+  }
+}
 
 function getCharClass(wordIndex, charIndex) {
   const typed = props.typedChars[wordIndex]?.[charIndex]
@@ -51,44 +64,71 @@ function getWordClass(wordIndex) {
   return ''
 }
 
-// Update caret position
+// Update caret and scroll position
 function updateCaret() {
-  if (!wordsContainer.value || props.isFinished) return
+  if (!wordsWrapper.value || !wordsContainer.value || props.isFinished) return
 
   nextTick(() => {
-    const wordEl = wordsContainer.value?.querySelector(`[data-word="${props.currentWordIndex}"]`)
+    if (!lineHeightPx.value) calculateLineHeight()
+
+    const wordEl = wordsWrapper.value.querySelector(`[data-word="${props.currentWordIndex}"]`)
     if (!wordEl) return
 
     const charEl = wordEl.querySelector(`[data-char="${props.currentCharIndex}"]`)
+    
+    // We use wrapper for positioning relative to the moving content
+    const wrapperRect = wordsWrapper.value.getBoundingClientRect()
+    // We use container for absolute offset tracking
     const containerRect = wordsContainer.value.getBoundingClientRect()
+
+    // 1. Calculate relative positions
+    let targetTop = 0
+    let targetLeft = 0
+    let absWordTop = 0
 
     if (charEl) {
       const charRect = charEl.getBoundingClientRect()
-      caretStyle.value = {
-        top: `${charRect.top - containerRect.top}px`,
-        left: `${charRect.left - containerRect.left}px`,
-      }
+      targetTop = charRect.top - wrapperRect.top
+      targetLeft = charRect.left - wrapperRect.left
+      absWordTop = charRect.top - containerRect.top
     } else {
-      // After last char — position at end of last typed char
       const lastCharIndex = props.currentCharIndex - 1
       const lastEl = wordEl.querySelector(`[data-char="${lastCharIndex}"]`)
       if (lastEl) {
         const lastRect = lastEl.getBoundingClientRect()
-        caretStyle.value = {
-          top: `${lastRect.top - containerRect.top}px`,
-          left: `${lastRect.right - containerRect.left}px`,
-        }
+        targetTop = lastRect.top - wrapperRect.top
+        targetLeft = lastRect.right - wrapperRect.left
+        absWordTop = lastRect.top - containerRect.top
       } else {
-        // Beginning of word
         const wordRect = wordEl.getBoundingClientRect()
-        caretStyle.value = {
-          top: `${wordRect.top - containerRect.top}px`,
-          left: `${wordRect.left - containerRect.left}px`,
-        }
+        targetTop = wordRect.top - wrapperRect.top
+        targetLeft = wordRect.left - wrapperRect.left
+        absWordTop = wordRect.top - containerRect.top
       }
+    }
+
+    caretStyle.value = {
+      top: `${targetTop}px`,
+      left: `${targetLeft}px`,
+    }
+
+    // 2. Handle Scrolling (Keep active line in 2nd row max)
+    // If word's top position relative to viewable container is >= line height * 2 
+    // (meaning it's on the 3rd line or lower visually)
+    if (absWordTop > lineHeightPx.value * 1.5) {
+      // Shift wrapper up by one line height
+      wrapperTranslateY.value -= lineHeightPx.value
+    } else if (absWordTop < -lineHeightPx.value * 0.5) {
+      // Shift wrapper down if we backspaced up past the visible area
+      wrapperTranslateY.value += lineHeightPx.value
     }
   })
 }
+
+// Reset scroll on game restart
+watch(() => props.isActive, (active) => {
+  if (!active) wrapperTranslateY.value = 0
+})
 
 watch(() => [props.currentWordIndex, props.currentCharIndex, props.typedChars], updateCaret, { deep: true })
 onMounted(updateCaret)
@@ -102,43 +142,50 @@ onMounted(updateCaret)
       class="relative text-3xl leading-loose overflow-hidden select-none pb-2"
       style="max-height: 6.6em;"
     >
-      <!-- Caret -->
-      <div
-        v-if="!isFinished"
-        ref="caretRef"
-        class="absolute w-0.5 bg-editor-caret rounded-full transition-all duration-75 z-10"
-        :class="isActive ? 'caret-no-blink' : 'caret-blink'"
-        :style="{
-          ...caretStyle,
-          height: '1.6em',
-        }"
-      ></div>
-
-      <!-- Words -->
-      <span
-        v-for="(word, wi) in words"
-        :key="wi"
-        :data-word="wi"
-        class="word inline-block mb-2"
-        :class="getWordClass(wi)"
+      <!-- Moving Wrapper -->
+      <div 
+        ref="wordsWrapper"
+        class="relative transition-transform duration-200 ease-out"
+        :style="{ transform: `translateY(${wrapperTranslateY}px)` }"
       >
-        <!-- Characters -->
-        <span
-          v-for="(char, ci) in word.split('')"
-          :key="ci"
-          :data-char="ci"
-          class="inline-block transition-colors duration-75"
-          :class="getCharClass(wi, ci)"
-        >{{ char }}</span>
+        <!-- Caret -->
+        <div
+          v-if="!isFinished"
+          ref="caretRef"
+          class="absolute w-0.5 bg-editor-caret rounded-full transition-all duration-75 z-10"
+          :class="isActive ? 'caret-no-blink' : 'caret-blink'"
+          :style="{
+            ...caretStyle,
+            height: '1.6em',
+          }"
+        ></div>
 
-        <!-- Extra characters (overtyped) -->
+        <!-- Words -->
         <span
-          v-for="(extra, ei) in getExtraChars(wi)"
-          :key="'extra-' + ei"
-          :data-char="word.length + ei"
-          class="inline-block text-editor-error-extra transition-colors duration-75"
-        >{{ extra.char }}</span>
-      </span>
+          v-for="(word, wi) in words"
+          :key="wi"
+          :data-word="wi"
+          class="word inline-block mb-2"
+          :class="getWordClass(wi)"
+        >
+          <!-- Characters -->
+          <span
+            v-for="(char, ci) in word.split('')"
+            :key="ci"
+            :data-char="ci"
+            class="inline-block transition-colors duration-75"
+            :class="getCharClass(wi, ci)"
+          >{{ char }}</span>
+
+          <!-- Extra characters (overtyped) -->
+          <span
+            v-for="(extra, ei) in getExtraChars(wi)"
+            :key="'extra-' + ei"
+            :data-char="word.length + ei"
+            class="inline-block text-editor-error-extra transition-colors duration-75"
+          >{{ extra.char }}</span>
+        </span>
+      </div>
     </div>
   </div>
 </template>
