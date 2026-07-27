@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('leaderboards', function (Blueprint $table) {
             $table->id();
+            $table->string('nickname', 15);
+            $table->integer('wpm');
+            $table->decimal('accuracy', 5, 2);
+            $table->string('mode'); // e.g. 'time-15', 'time-30', 'words-25'
             $table->timestamps();
         });
     }

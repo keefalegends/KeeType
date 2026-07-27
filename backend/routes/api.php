@@ -1,8 +1,7 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\LeaderboardController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::get('/leaderboard', [LeaderboardController::class, 'index']);
+Route::post('/leaderboard', [LeaderboardController::class, 'store']);
