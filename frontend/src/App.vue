@@ -9,6 +9,7 @@ const {
   mode,
   timeOption,
   wordOption,
+  language,
   words,
   currentWordIndex,
   currentCharIndex,
@@ -61,10 +62,12 @@ onUnmounted(() => {
             :mode="mode"
             :timeOption="timeOption"
             :wordOption="wordOption"
+            :language="language"
             :isActive="isActive"
             @update:mode="mode = $event"
             @update:timeOption="timeOption = $event"
             @update:wordOption="wordOption = $event"
+            @update:language="language = $event"
           />
 
           <!-- Timer Display -->

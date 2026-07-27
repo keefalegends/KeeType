@@ -6,6 +6,7 @@ export function useTypingGame() {
   const mode = ref('time')           // 'time' or 'words'
   const timeOption = ref(30)         // seconds: 15, 30, 60, 120
   const wordOption = ref(25)         // word count: 10, 25, 50, 100
+  const language = ref('english')    // 'english' or 'indonesian'
 
   const words = ref([])              // array of word strings
   const currentWordIndex = ref(0)
@@ -30,7 +31,7 @@ export function useTypingGame() {
     timerInterval = null
 
     const wordCount = mode.value === 'time' ? 200 : wordOption.value
-    words.value = generateWords(wordCount)
+    words.value = generateWords(wordCount, language.value)
     currentWordIndex.value = 0
     currentCharIndex.value = 0
     typedChars.value = words.value.map(() => [])
@@ -256,7 +257,7 @@ export function useTypingGame() {
   })
 
   // Watch mode changes
-  watch([mode, timeOption, wordOption], () => {
+  watch([mode, timeOption, wordOption, language], () => {
     initGame()
   })
 
@@ -265,6 +266,7 @@ export function useTypingGame() {
     mode,
     timeOption,
     wordOption,
+    language,
     words,
     currentWordIndex,
     currentCharIndex,
