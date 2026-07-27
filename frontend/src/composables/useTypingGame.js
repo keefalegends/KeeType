@@ -7,6 +7,7 @@ export function useTypingGame() {
   const timeOption = ref(30)         // seconds: 15, 30, 60, 120
   const wordOption = ref(25)         // word count: 10, 25, 50, 100
   const language = ref('english')    // 'english' or 'indonesian'
+  const theme = ref('theme-default') // Current theme
 
   const words = ref([])              // array of word strings
   const currentWordIndex = ref(0)
@@ -247,9 +248,21 @@ export function useTypingGame() {
     return timeLeft.value
   })
 
+  // ============ THEME HANDLING ============
+  function applyTheme(newTheme) {
+    document.documentElement.className = newTheme
+    localStorage.setItem('keetype_theme', newTheme)
+  }
+
   // ============ LIFECYCLE ============
   onMounted(() => {
     initGame()
+    // Restore theme from storage
+    const savedTheme = localStorage.getItem('keetype_theme')
+    if (savedTheme) {
+      theme.value = savedTheme
+    }
+    applyTheme(theme.value)
   })
 
   onUnmounted(() => {
@@ -261,12 +274,18 @@ export function useTypingGame() {
     initGame()
   })
 
+  // Watch theme changes
+  watch(theme, (newTheme) => {
+    applyTheme(newTheme)
+  })
+
   return {
     // State
     mode,
     timeOption,
     wordOption,
     language,
+    theme,
     words,
     currentWordIndex,
     currentCharIndex,

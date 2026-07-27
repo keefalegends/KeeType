@@ -1,18 +1,65 @@
 @import "tailwindcss";
 
-/* Theme Variables for Hyper-minimalist (Monkeytype-ish) */
+/* 
+  Dynamic CSS Variables for Theming 
+  Instead of hardcoding Tailwind colors, we map Tailwind classes to these variables 
+*/
 @theme {
-  --color-editor-bg: #323437;
-  --color-editor-sub: #646669;
-  --color-editor-text: #d1d0c5;
-  --color-editor-error: #ca4754;
-  --color-editor-error-extra: #7e2a33;
-  --color-editor-correct: #d1d0c5;
-  --color-editor-accent: #e2b714;
-  --color-editor-accent-dim: #b89a0f;
-  --color-editor-caret: #e2b714;
+  --color-editor-bg: var(--bg);
+  --color-editor-sub: var(--sub);
+  --color-editor-text: var(--text);
+  --color-editor-error: var(--error);
+  --color-editor-error-extra: var(--error-extra);
+  --color-editor-correct: var(--correct);
+  --color-editor-accent: var(--accent);
+  --color-editor-accent-dim: var(--accent-dim);
+  --color-editor-caret: var(--caret);
   --font-mono: 'JetBrains Mono', monospace;
 }
+
+/* 
+  THEMES
+*/
+
+/* 1. Default (Charcoal & Amber) - Refined dark mode */
+:root, .theme-default {
+  --bg: #1e1e1e;
+  --sub: #5c5c5c;
+  --text: #d4d4d4;
+  --error: #f44747;
+  --error-extra: #7e2a33;
+  --correct: #d4d4d4;
+  --accent: #d7ba7d;
+  --accent-dim: #b89a0f;
+  --caret: #d7ba7d;
+}
+
+/* 2. Retro CRT (Pure Black & Phosphor Green) - Hacker terminal vibe */
+.theme-retro-crt {
+  --bg: #000000;
+  --sub: #005a00;
+  --text: #00ff00;
+  --error: #ff0000;
+  --error-extra: #8b0000;
+  --correct: #00ff00;
+  --accent: #00ff00;
+  --accent-dim: #00aa00;
+  --caret: #00ff00;
+}
+
+/* 3. Paper (Off-White & Ink) - Elegant editorial light mode */
+.theme-paper {
+  --bg: #f4f4f0;
+  --sub: #a0a09e;
+  --text: #2a2a2a;
+  --error: #d13030;
+  --error-extra: #ffb3b3;
+  --correct: #2a2a2a;
+  --accent: #225ccb;
+  --accent-dim: #1848a6;
+  --caret: #225ccb;
+}
+
 
 * {
   margin: 0;
@@ -26,6 +73,7 @@ body {
   font-family: var(--font-mono);
   min-height: 100vh;
   overflow-x: hidden;
+  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 /* Blinking caret animation */
@@ -41,6 +89,14 @@ body {
 .caret-no-blink {
   animation: none;
   opacity: 1;
+}
+
+/* Specific styling for Retro CRT caret (block instead of line) */
+.theme-retro-crt .caret-blink,
+.theme-retro-crt .caret-no-blink {
+  width: 0.6em !important;
+  opacity: 0.8;
+  margin-left: 0.05em;
 }
 
 /* Smooth fade transitions */

@@ -10,6 +10,7 @@ const {
   timeOption,
   wordOption,
   language,
+  theme,
   words,
   currentWordIndex,
   currentCharIndex,
@@ -108,12 +109,43 @@ onUnmounted(() => {
       </Transition>
     </div>
 
-    <!-- Footer -->
+    <!-- Footer & Theme Switcher -->
     <div
-      class="absolute bottom-6 text-xs text-editor-sub transition-opacity duration-300"
+      class="absolute bottom-6 w-full flex flex-col items-center justify-center gap-3 text-xs text-editor-sub transition-opacity duration-300"
       :class="isActive ? 'opacity-0' : 'opacity-100'"
     >
-      open source · built for speed
+      <div class="flex items-center gap-4">
+        <!-- Theme Default -->
+        <button 
+          @click="theme = 'theme-default'"
+          class="flex items-center gap-1.5 cursor-pointer transition-colors duration-200"
+          :class="theme === 'theme-default' ? 'text-editor-accent' : 'hover:text-editor-text'"
+        >
+          <div class="w-3 h-3 rounded-full border border-editor-sub/30" style="background-color: #1e1e1e; border-color: #d7ba7d;"></div>
+          charcoal
+        </button>
+
+        <!-- Theme Retro CRT -->
+        <button 
+          @click="theme = 'theme-retro-crt'"
+          class="flex items-center gap-1.5 cursor-pointer transition-colors duration-200"
+          :class="theme === 'theme-retro-crt' ? 'text-editor-accent' : 'hover:text-editor-text'"
+        >
+          <div class="w-3 h-3 rounded-none border border-editor-sub/30" style="background-color: #000000; border-color: #00ff00;"></div>
+          crt
+        </button>
+
+        <!-- Theme Paper -->
+        <button 
+          @click="theme = 'theme-paper'"
+          class="flex items-center gap-1.5 cursor-pointer transition-colors duration-200"
+          :class="theme === 'theme-paper' ? 'text-editor-accent' : 'hover:text-editor-text'"
+        >
+          <div class="w-3 h-3 rounded-sm shadow-sm border border-editor-sub/30" style="background-color: #f4f4f0; border-color: #225ccb;"></div>
+          paper
+        </button>
+      </div>
+      <div class="font-light opacity-50">open source · built for speed</div>
     </div>
   </div>
 </template>
