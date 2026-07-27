@@ -1,61 +1,70 @@
-# KeeType
+# KeeType ⚡
 
-A hyper-minimalist typing speed test — inspired by Monkeytype and 10fastfingers.
-No login. No bloat. Just open and type.
+A hyper-minimalist, distraction-free typing speed test application. 
+No login required. Zero bloat. Pure typing focus.
 
-Built with **Laravel** (REST API) and **Vue 3 + Vite** (SPA frontend), styled with **Tailwind CSS v4** and **JetBrains Mono**.
+Built with **Laravel 13** (REST API) and **Vue 3 + Vite** (SPA Frontend), styled with **Tailwind CSS v4** and **JetBrains Mono**.
 
 ---
 
-## Features
+## ✨ Features
 
-- **Time mode** — 15 / 30 / 60 / 120 seconds countdown
-- **Words mode** — 10 / 25 / 50 / 100 words
-- **Live stats** — WPM, raw WPM, accuracy, character breakdown
-- **WPM chart** — per-second speed graph after each test
-- **Leaderboard** — submit your score with a nickname (no account needed)
-- **Keyboard sound-free** — distraction-free by design
-- **Dark theme** — code-editor palette, monospace font, zero visual noise
+- 🎯 **Multiple Modes** — Choose between **Time mode** (`15s`, `30s`, `60s`, `120s`) or **Words mode** (`10`, `25`, `50`, `100` words).
+- 🌍 **Multi-Language Support** — Practice in **English** (Top 200 common words) or **Indonesian** (Top 300 daily common words).
+- 🎨 **Dynamic Themes** — Switch instantly between 3 carefully crafted color palettes:
+  - `charcoal` — Refined dark mode with warm amber accents (Default).
+  - `crt` — Retro hacker terminal with pure black background, phosphor green text, and a solid block caret.
+  - `paper` — Editorial off-white light mode with ink text and cobalt blue accents.
+- 🌊 **Smooth Animations & UX** — Gliding cubic-bezier caret, character pop-in on keystroke, subtle error shake feedback, and automatic smooth vertical scrolling as you progress through lines.
+- 🏆 **Frictionless Leaderboard** — Finished a fast run? Submit your score to the global/local leaderboard instantly using just a nickname—no registration or account setup needed.
+- 📊 **Detailed Post-Game Analytics** — Track your WPM, raw WPM, accuracy %, character breakdown (`correct` / `incorrect` / `extra` / `missed`), and visualize your per-second typing consistency with an aesthetic bar chart.
+- ⚡ **Smart Keydown Handling** — Press `Tab` anywhere during gameplay to instantly restart. Disabled automatically on the results screen so you can navigate the score submission form safely.
 
-## Tech Stack
+---
+
+## 🛠️ Tech Stack
 
 | Layer    | Stack                          |
 |----------|--------------------------------|
 | Frontend | Vue 3, Vite, Tailwind CSS v4   |
-| Backend  | Laravel (SQLite), REST API     |
+| Backend  | Laravel 13 (SQLite), REST API  |
 | Font     | JetBrains Mono (Google Fonts)  |
 
-## Project Structure
+---
+
+## 📁 Project Structure
 
 ```
 KeeType/
-├── backend/          # Laravel API
+├── backend/          # Laravel API Backend
 │   ├── app/
 │   │   ├── Models/Leaderboard.php
 │   │   └── Http/Controllers/Api/LeaderboardController.php
 │   ├── routes/api.php
 │   └── database/migrations/
-└── frontend/         # Vue 3 SPA
+└── frontend/         # Vue 3 SPA Frontend
     ├── src/
     │   ├── components/
-    │   │   ├── ModeSelector.vue
-    │   │   ├── TypingArea.vue
-    │   │   └── ResultScreen.vue
-    │   ├── composables/useTypingGame.js
-    │   ├── data/words.js
-    │   ├── App.vue
-    │   └── style.css
+    │   │   ├── ModeSelector.vue      # Language, Mode, and Option selector
+    │   │   ├── TypingArea.vue        # Active typing test, caret, and animations
+    │   │   └── ResultScreen.vue      # Analytics, WPM chart, and Leaderboard
+    │   ├── composables/useTypingGame.js # Core game loop, state, and localStorage manager
+    │   ├── data/words.js             # English and Indonesian word banks
+    │   ├── App.vue                   # Root component & theme switcher
+    │   └── style.css                 # Theme CSS variables and keyframe animations
     └── index.html
 ```
 
-## Getting Started
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
 
 - PHP 8.2+ & Composer
 - Node.js 18+ & npm
 
-### Backend
+### 1. Setup Backend (Laravel API)
 
 ```bash
 cd backend
@@ -64,39 +73,47 @@ cp .env.example .env
 php artisan key:generate
 php artisan migrate
 php artisan serve
-# → http://localhost:8000
+# → Backend runs at http://localhost:8000
 ```
 
-### Frontend
+### 2. Setup Frontend (Vue 3 SPA)
+
+Open a second terminal window:
 
 ```bash
 cd frontend
 npm install
 npm run dev
-# → http://localhost:5173
+# → Frontend runs at http://localhost:5173
 ```
 
-Open `http://localhost:5173` in your browser and start typing.
+Open `http://localhost:5173` in your browser and start typing!
 
-## API Endpoints
+---
 
-| Method | Endpoint           | Description              |
-|--------|--------------------|--------------------------|
-| GET    | /api/leaderboard   | Get top scores by mode   |
-| POST   | /api/leaderboard   | Submit a new score       |
+## 📡 API Endpoints
 
-**GET** query params: `mode` (e.g. `time-30`), `limit` (default `10`)
+| Method | Endpoint           | Description                        |
+|--------|--------------------|------------------------------------|
+| GET    | `/api/leaderboard` | Fetch top scores grouped by mode   |
+| POST   | `/api/leaderboard` | Submit a new score to leaderboard  |
 
-**POST** body:
+### **GET** `/api/leaderboard`
+- **Query Params:** `mode` (e.g. `time-30`, `words-25`), `limit` (default `10`)
+
+### **POST** `/api/leaderboard`
+- **Request Body:**
 ```json
 {
-  "nickname": "yourname",
+  "nickname": "keefalegends",
   "wpm": 85,
   "accuracy": 97.5,
   "mode": "time-30"
 }
 ```
 
-## License
+---
 
-MIT
+## 📄 License
+
+This project is open-source and licensed under the [MIT License](LICENSE). Built for speed. ⚡
