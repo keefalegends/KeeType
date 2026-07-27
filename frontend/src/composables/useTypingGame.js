@@ -155,9 +155,17 @@ export function useTypingGame() {
 
   function handleBackspace(wi, ci) {
     if (ci > 0) {
-      // Remove last typed char in current word
       currentCharIndex.value--
-      typedChars.value[wi].splice(currentCharIndex.value, 1)
+      const word = words.value[wi]
+      const newCi = currentCharIndex.value
+
+      if (newCi >= word.length) {
+        // Was an extra char — remove it from array
+        typedChars.value[wi].splice(newCi, 1)
+      } else {
+        // Within word bounds — just clear status so char goes back to "untyped"
+        typedChars.value[wi][newCi] = undefined
+      }
     }
     // Don't allow backspace to previous word (like Monkeytype default behavior)
   }
