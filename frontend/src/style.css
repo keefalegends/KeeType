@@ -3,16 +3,52 @@
 /* Theme Variables for Hyper-minimalist (Monkeytype-ish) */
 @theme {
   --color-editor-bg: #323437;
-  --color-editor-text: #646669;
-  --color-editor-active: #d1d0c5;
+  --color-editor-sub: #646669;
+  --color-editor-text: #d1d0c5;
   --color-editor-error: #ca4754;
+  --color-editor-error-extra: #7e2a33;
+  --color-editor-correct: #d1d0c5;
+  --color-editor-accent: #e2b714;
+  --color-editor-accent-dim: #b89a0f;
+  --color-editor-caret: #e2b714;
   --font-mono: 'JetBrains Mono', monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
   background-color: var(--color-editor-bg);
-  color: var(--color-editor-text);
+  color: var(--color-editor-sub);
   font-family: var(--font-mono);
-  margin: 0;
-  padding: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Blinking caret animation */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.caret-blink {
+  animation: blink 1s infinite;
+}
+
+.caret-no-blink {
+  animation: none;
+  opacity: 1;
+}
+
+/* Smooth fade transitions */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
