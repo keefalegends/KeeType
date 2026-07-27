@@ -99,8 +99,8 @@ onMounted(updateCaret)
     <!-- Words Display -->
     <div
       ref="wordsContainer"
-      class="relative text-2xl leading-relaxed overflow-hidden select-none pb-4"
-      style="max-height: 8.5em;"
+      class="relative text-3xl leading-loose overflow-hidden select-none pb-2"
+      style="max-height: 6.6em;"
     >
       <!-- Caret -->
       <div

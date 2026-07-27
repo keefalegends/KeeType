@@ -44,8 +44,7 @@ onUnmounted(() => {
   >
     <!-- Header / Logo -->
     <div
-      class="absolute top-8 left-10 transition-opacity duration-300"
-      :class="isActive ? 'opacity-0' : 'opacity-100'"
+      class="absolute top-8 left-10"
     >
       <h1 class="text-2xl text-editor-accent font-bold tracking-tight">
         kee<span class="text-editor-text">type</span>
