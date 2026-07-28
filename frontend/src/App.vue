@@ -26,6 +26,19 @@ const {
 
 const gameContainer = ref(null)
 
+const showCustomTimePrompt = () => {
+  const custom = prompt('Enter custom time in seconds:', '15')
+  if (custom) {
+    const val = parseInt(custom, 10)
+    if (!isNaN(val) && val > 0) {
+      timeOption.value = val
+      initGame()
+    } else {
+      alert('Invalid time entered. Must be a number greater than 0.')
+    }
+  }
+}
+
 function onKeyDown(e) {
   // If game is finished, Tab should NOT restart the game automatically (especially since user might type in inputs)
   if (isFinished.value && e.key === 'Tab') {
@@ -73,6 +86,7 @@ onUnmounted(() => {
             @update:timeOption="timeOption = $event"
             @update:wordOption="wordOption = $event"
             @update:language="language = $event"
+            @customTimeClick="showCustomTimePrompt"
           />
 
           <!-- Timer Display -->
