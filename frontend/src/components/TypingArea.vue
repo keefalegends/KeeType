@@ -33,7 +33,7 @@ function getCharClass(wordIndex, charIndex) {
     return 'text-editor-sub'
   }
   if (typed.status === 'correct') return 'text-editor-correct char-typed'
-  if (typed.status === 'incorrect') return 'text-editor-error underline decoration-editor-error/50 char-typed char-error'
+  if (typed.status === 'incorrect') return 'text-editor-error char-typed char-error' // Removed underline here
   if (typed.status === 'extra') return 'text-editor-error-extra char-typed'
   if (typed.status === 'missed') return 'text-editor-error opacity-50'
   return 'text-editor-sub'
@@ -51,12 +51,19 @@ function getExtraChars(wordIndex) {
 }
 
 function getWordClass(wordIndex) {
+  // Check if current word has errors (misspelled letters)
+  if (wordIndex === props.currentWordIndex) {
+    const typed = props.typedChars[wordIndex] || []
+    const hasError = typed.some(c => c && c.status === 'incorrect' || c && c.status === 'extra')
+    if (hasError) return 'underline decoration-editor-error/60 decoration-2 underline-offset-4'
+  }
+  
   // If this word is already completed (before current word)
   if (wordIndex < props.currentWordIndex) {
     const word = props.words[wordIndex]
     const typed = props.typedChars[wordIndex] || []
-    // Check if any char was wrong or missed
-    const hasError = typed.some(c => c.status !== 'correct') ||
+    // Check if any char was wrong or missed or extra
+    const hasError = typed.some(c => c && c.status !== 'correct') ||
                      typed.length < word.length
     if (hasError) return 'underline decoration-editor-error/30 decoration-2 underline-offset-4'
   }

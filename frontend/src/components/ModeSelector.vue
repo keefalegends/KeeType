@@ -17,7 +17,7 @@ const emit = defineEmits([
 ])
 
 const timeOptions = [15, 30, 60, 120]
-const wordOptions = [10, 25, 50, 100]
+const wordOptions = [8, 25, 50, 100]
 </script>
 
 <template>
