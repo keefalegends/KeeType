@@ -62,6 +62,10 @@ const closeCustomPrompt = () => {
 }
 
 function onKeyDown(e) {
+  // If custom time/words prompt is open, do not handle keys for the game
+  if (isCustomPromptOpen.value) {
+    return
+  }
   // If game is finished, Tab should NOT restart the game automatically (especially since user might type in inputs)
   if (isFinished.value && e.key === 'Tab') {
     return
