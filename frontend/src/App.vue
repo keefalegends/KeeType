@@ -16,6 +16,7 @@ const gameContainer = ref(null)
 
 // ============ VIEWS & MODALS ============
 const activeView = ref('write') // 'write', 'setting', 'about'
+const isSidebarOpen = ref(true) // Sidebar toggle state
 const isCustomPromptOpen = ref(false)
 const customPromptType = ref('time')
 const customTimeInput = ref('15')
@@ -67,12 +68,32 @@ onUnmounted(() => {
 <template>
   <div class="flex min-h-screen relative overflow-hidden">
     
+    <!-- SIDEBAR TOGGLE BUTTON (Floating outline button when closed or open) -->
+    <button 
+      @click="isSidebarOpen = !isSidebarOpen"
+      class="fixed left-4 top-8 z-40 w-8 h-8 rounded-lg border border-editor-sub/20 hover:border-editor-accent/40 bg-editor-bg/60 hover:bg-editor-bg/85 flex items-center justify-center text-editor-sub hover:text-editor-accent transition-all cursor-pointer shadow-sm"
+      :class="[
+        isActive ? 'opacity-0 pointer-events-none' : 'opacity-100',
+        isSidebarOpen ? 'left-[10.5rem]' : 'left-4'
+      ]"
+      title="Toggle Sidebar"
+    >
+      <!-- Hamburger Icon when closed, Arrow left when open -->
+      <svg v-if="!isSidebarOpen" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/>
+      </svg>
+      <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+    </button>
+
     <!-- LEFT SIDEBAR (Polished Chocolate Panel from user drawing) -->
     <aside 
-      class="fixed left-0 top-16 bottom-16 w-40 z-30 flex flex-col py-8 px-4 text-center select-none shadow-lg transition-opacity duration-300"
+      class="fixed left-0 top-16 bottom-16 w-40 z-30 flex flex-col py-8 px-4 text-center select-none shadow-lg transition-all duration-300 ease-in-out"
       :class="[
         theme === 'theme-retro-crt' ? 'bg-[#001a00] border-r-2 border-y-2 border-editor-accent rounded-r-2xl' : 'bg-[#2E2520] text-white rounded-r-[2.5rem]',
-        isActive ? 'opacity-0 pointer-events-none' : 'opacity-100'
+        isActive ? 'opacity-0 pointer-events-none' : 'opacity-100',
+        isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
       ]"
     >
       <!-- Menu Header -->
@@ -118,12 +139,18 @@ onUnmounted(() => {
     </aside>
 
     <!-- RIGHT MAIN CONTENT AREA -->
-    <div class="flex-1 flex flex-col ml-40 min-h-screen relative">
+    <div 
+      class="flex-1 flex flex-col min-h-screen relative transition-all duration-300 ease-in-out"
+      :class="isSidebarOpen ? 'ml-40' : 'ml-0'"
+    >
       
       <!-- Top Header (Logo) -->
       <header 
-        class="w-full pt-8 pl-12 transition-opacity duration-300"
-        :class="isActive ? 'opacity-0' : 'opacity-100'"
+        class="w-full pt-8 transition-opacity duration-300"
+        :class="[
+          isActive ? 'opacity-0' : 'opacity-100',
+          isSidebarOpen ? 'pl-12' : 'pl-16'
+        ]"
       >
         <h1 class="text-2xl text-editor-accent font-bold tracking-tight">
           kee<span class="text-editor-text">type</span>
