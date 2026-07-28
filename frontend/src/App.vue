@@ -68,10 +68,10 @@ onUnmounted(() => {
 <template>
   <div class="flex min-h-screen relative overflow-hidden">
     
-    <!-- SIDEBAR TOGGLE BUTTON (Floating outline button when closed or open) -->
+    <!-- SIDEBAR TOGGLE BUTTON (Placed neatly on top of the sidebar panel, not floating awkwardly) -->
     <button 
       @click="isSidebarOpen = !isSidebarOpen"
-      class="fixed left-4 top-8 z-40 w-8 h-8 rounded-lg border border-editor-sub/20 hover:border-editor-accent/40 bg-editor-bg/60 hover:bg-editor-bg/85 flex items-center justify-center text-editor-sub hover:text-editor-accent transition-all cursor-pointer shadow-sm"
+      class="fixed left-4 top-20 z-40 w-8 h-8 rounded-lg border border-editor-sub/20 hover:border-editor-accent/40 bg-editor-bg/60 hover:bg-editor-bg/85 flex items-center justify-center text-editor-sub hover:text-editor-accent transition-all cursor-pointer shadow-sm"
       :class="[
         isActive ? 'opacity-0 pointer-events-none' : 'opacity-100',
         isSidebarOpen ? 'left-[10.5rem]' : 'left-4'
@@ -87,7 +87,7 @@ onUnmounted(() => {
       </svg>
     </button>
 
-    <!-- LEFT SIDEBAR (Polished Panel matching the active theme colors) -->
+    <!-- LEFT SIDEBAR (Polished Panel matching the active theme colors, top-32 bottom-32) -->
     <aside 
       class="fixed left-0 top-32 bottom-32 w-36 z-30 flex flex-col justify-between py-10 px-3 text-center select-none shadow-lg transition-all duration-300 ease-in-out border-r border-y"
       :style="{
@@ -159,13 +159,10 @@ onUnmounted(() => {
       :class="isSidebarOpen ? 'ml-36' : 'ml-0'"
     >
       
-      <!-- Top Header (Logo) - Moved back to absolute top-8 left-10 like original -->
+      <!-- Top Header (Logo) - Fixed position in left top corner, does not move with sidebar -->
       <header 
-        class="absolute top-8 left-10 transition-all duration-300"
-        :class="[
-          isActive ? 'opacity-0 pointer-events-none' : 'opacity-100',
-          isSidebarOpen ? 'translate-x-36' : 'translate-x-0'
-        ]"
+        class="absolute top-8 left-10 transition-opacity duration-300 z-20"
+        :class="isActive ? 'opacity-0 pointer-events-none' : 'opacity-100'"
       >
         <h1 class="text-2xl text-editor-accent font-bold tracking-tight">
           kee<span class="text-editor-text">type</span>
