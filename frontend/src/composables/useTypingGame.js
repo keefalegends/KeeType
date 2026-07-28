@@ -1,6 +1,6 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { generateWords } from '../data/words.js'
-import { playKeyboardClick } from '../utils/sound.js'
+import { playKeyboardClick, preloadMp3Sounds } from '../utils/sound.js'
 
 export function useTypingGame() {
   // ============ STATE ============
@@ -9,7 +9,9 @@ export function useTypingGame() {
   const wordOption = ref(25)         // word count: 10, 25, 50, 100
   const language = ref('english')    // 'english' or 'indonesian'
   const theme = ref('theme-default') // Current theme
-  const isMuted = ref(false)         // Mute mechanical keyboard sound state
+  const keyboardSound = ref('cherry-mx-brown') // 'off', 'cherry-mx-brown'
+  const keyboardVolume = ref(0.5)    // Volume slider: 0.0 to 1.0
+  const isMuted = computed(() => keyboardSound.value === 'off')
 
   const words = ref([])              // array of word strings
   const currentWordIndex = ref(0)
@@ -111,24 +113,24 @@ export function useTypingGame() {
       startTimer()
     }
 
-    if (!isActive.value) return
-
     const wi = currentWordIndex.value
     const ci = currentCharIndex.value
-    const currentWord = words.value[wi]
+    // Safe guard: check if words.value[wi] is undefined
+    const currentWord = words.value[wi] || ''
 
+    // Play click sound even if game hasn't started yet (or during game)
     if (e.key === 'Backspace') {
       e.preventDefault()
-      if (!isMuted.value) playKeyboardClick('backspace')
-      handleBackspace(wi, ci)
+      if (!isMuted.value) playKeyboardClick('backspace', keyboardVolume.value, keyboardSound.value)
+      if (isActive.value) handleBackspace(wi, ci)
       return
     }
 
     if (e.key === ' ') {
       e.preventDefault()
-      if (!isMuted.value) playKeyboardClick('space')
-      // Move to next word
-      if (ci > 0) {
+      if (!isMuted.value) playKeyboardClick('space', keyboardVolume.value, keyboardSound.value)
+      if (isActive.value && ci > 0) {
+        // Move to next word
         // Mark remaining chars as missed
         for (let i = ci; i < currentWord.length; i++) {
           if (!typedChars.value[wi][i]) {
@@ -149,7 +151,10 @@ export function useTypingGame() {
     // Regular character input
     if (e.key.length === 1) {
       e.preventDefault()
-      if (!isMuted.value) playKeyboardClick('default')
+      if (!isMuted.value) playKeyboardClick('default', keyboardVolume.value, keyboardSound.value)
+      
+      if (!isActive.value) return // If game is not active yet (e.g. initial start blocked)
+
       const expected = currentWord[ci]
 
       if (ci < currentWord.length) {
@@ -266,6 +271,15 @@ export function useTypingGame() {
     localStorage.setItem('keetype_theme', newTheme)
   }
 
+  // ============ AUDIO PREFERENCE HANDLING ============
+  function applyKeyboardSound(newSound) {
+    localStorage.setItem('keetype_sound', newSound)
+  }
+
+  function applyKeyboardVolume(newVolume) {
+    localStorage.setItem('keetype_volume', newVolume)
+  }
+
   // ============ LIFECYCLE ============
   onMounted(() => {
     initGame()
@@ -275,6 +289,21 @@ export function useTypingGame() {
       theme.value = savedTheme
     }
     applyTheme(theme.value)
+
+    // Restore sound preference from storage
+    const savedSound = localStorage.getItem('keetype_sound')
+    if (savedSound) {
+      keyboardSound.value = savedSound
+    }
+
+    // Restore volume preference from storage
+    const savedVolume = localStorage.getItem('keetype_volume')
+    if (savedVolume !== null) {
+      keyboardVolume.value = parseFloat(savedVolume)
+    }
+
+    // Preload MP3 files on mount to prevent lag on first click
+    preloadMp3Sounds()
   })
 
   onUnmounted(() => {
@@ -291,12 +320,24 @@ export function useTypingGame() {
     applyTheme(newTheme)
   })
 
+  // Watch sound changes
+  watch(keyboardSound, (newSound) => {
+    applyKeyboardSound(newSound)
+  })
+
+  // Watch volume changes
+  watch(keyboardVolume, (newVolume) => {
+    applyKeyboardVolume(newVolume)
+  })
+
   return {
     mode,
     timeOption,
     wordOption,
     language,
     theme,
+    keyboardSound,
+    keyboardVolume,
     isMuted,
     words,
     currentWordIndex,
@@ -308,6 +349,7 @@ export function useTypingGame() {
     wpmHistory,
     stats,
     initGame,
-    handleKeyDown
+    handleKeyDown,
+    preloadMp3Sounds
   }
 }

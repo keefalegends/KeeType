@@ -6,7 +6,7 @@ import TypingArea from './components/TypingArea.vue'
 import ResultScreen from './components/ResultScreen.vue'
 
 const {
-  mode, timeOption, wordOption, language, theme,
+  mode, timeOption, wordOption, language, theme, keyboardSound, keyboardVolume,
   words, currentWordIndex, currentCharIndex, typedChars,
   isActive, isFinished, displayTime, wpmHistory, stats,
   initGame, handleKeyDown,
@@ -292,11 +292,14 @@ onUnmounted(() => {
             </div>
 
             <!-- View: Setting (Visual settings panel integrated into main flow) -->
-            <div v-else-if="activeView === 'setting'" key="setting" class="max-w-md mx-auto py-8">
+            <div v-else-if="activeView === 'setting'" key="setting" class="max-w-xl mx-auto py-8">
               <h2 class="text-2xl font-bold text-editor-text mb-6 tracking-tight">Setting</h2>
-              <div class="flex flex-col gap-6">
-                <!-- Theme list -->
-                <div>
+              
+              <!-- Two column settings layout (Theme Selection side-by-side with Mechanical sound) -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                
+                <!-- Column 1: Theme list -->
+                <div class="flex flex-col">
                   <div class="text-[10px] uppercase tracking-[0.2em] text-editor-sub mb-3">Theme Selection</div>
                   <div class="flex flex-col gap-2">
                     <button 
@@ -328,30 +331,45 @@ onUnmounted(() => {
                   </div>
                 </div>
 
-                <!-- Keyboard Sound Options -->
-                <div class="border-t border-editor-sub/10 pt-6">
+                <!-- Column 2: Keyboard Sound Options -->
+                <div class="flex flex-col">
                   <div class="text-[10px] uppercase tracking-[0.2em] text-editor-sub mb-3">Mechanical Sound (ASMR)</div>
-                  <button 
-                    @click="isMuted = !isMuted"
-                    class="w-full flex items-center justify-between px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
-                    :class="!isMuted ? 'border-editor-accent/60 bg-editor-accent/5' : ''"
-                  >
-                    <div class="flex items-center gap-3">
-                      <!-- Sound wave / Speaker Icon -->
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-editor-text">
-                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14" v-if="!isMuted" />
-                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07" v-if="!isMuted" />
-                        <line x1="23" y1="9" x2="17" y2="15" v-if="isMuted" />
-                        <line x1="17" y1="9" x2="23" y2="15" v-if="isMuted" />
-                      </svg>
-                      <span class="text-xs font-semibold text-editor-text">Cherry MX Brown Click</span>
-                    </div>
-                    <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded" :class="!isMuted ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'">
-                      {{ !isMuted ? 'ON' : 'OFF' }}
-                    </span>
-                  </button>
+                  <div class="flex flex-col gap-2">
+                    
+                    <!-- Option OFF -->
+                    <button 
+                      @click="keyboardSound = 'off'"
+                      class="flex items-center justify-between px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
+                      :class="keyboardSound === 'off' ? (theme === 'theme-default' ? 'border-editor-gold/60 bg-editor-accent/5' : 'border-editor-accent/60 bg-editor-accent/5') : ''"
+                    >
+                      <span class="text-xs font-semibold text-editor-text">OFF</span>
+                      <span class="w-3.5 h-3.5 rounded-full border border-editor-sub/30 flex items-center justify-center" :class="keyboardSound === 'off' ? 'bg-red-500/20' : ''">
+                        <span class="w-1.5 h-1.5 rounded-full bg-red-500" v-if="keyboardSound === 'off'"></span>
+                      </span>
+                    </button>
+
+                    <!-- Option CHERRY MX BROWN -->
+                    <button 
+                      @click="keyboardSound = 'cherry-mx-brown'"
+                      class="flex items-center justify-between px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
+                      :class="keyboardSound === 'cherry-mx-brown' ? (theme === 'theme-default' ? 'border-editor-gold/60 bg-editor-accent/5' : 'border-editor-accent/60 bg-editor-accent/5') : ''"
+                    >
+                      <div class="flex items-center gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-editor-text">
+                          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                          <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                          <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                        </svg>
+                        <span class="text-xs font-semibold text-editor-text">Cherry MX Brown</span>
+                      </div>
+                      <span class="w-3.5 h-3.5 rounded-full border border-editor-sub/30 flex items-center justify-center" :class="keyboardSound === 'cherry-mx-brown' ? 'bg-green-500/20' : ''">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500" v-if="keyboardSound === 'cherry-mx-brown'"></span>
+                      </span>
+                    </button>
+
+                  </div>
                 </div>
+
               </div>
             </div>
 
