@@ -81,7 +81,7 @@ onUnmounted(() => {
       @click="isSidebarOpen = false"
       class="fixed left-4 top-20 z-40 w-8 h-8 rounded-lg border border-editor-sub/20 flex items-center justify-center text-editor-sub transition-opacity duration-300 cursor-pointer shadow-sm"
       :class="[
-        isActive ? 'opacity-0 pointer-events-none' : 'opacity-100',
+        (isActive || isFinished) ? 'opacity-0 pointer-events-none' : 'opacity-100',
         theme === 'theme-default' ? 'hover:border-editor-gold/40 hover:text-editor-gold' : 'hover:border-editor-accent/40 hover:text-editor-accent'
       ]"
       :style="{
@@ -100,7 +100,7 @@ onUnmounted(() => {
       @click="isSidebarOpen = true"
       class="fixed left-0 top-1/2 -translate-y-1/2 z-40 w-5 h-24 rounded-r-xl border-y border-r border-editor-sub/20 flex flex-col items-center justify-center text-editor-sub transition-opacity duration-300 cursor-pointer shadow-md group"
       :class="[
-        isActive ? 'opacity-0 pointer-events-none' : 'opacity-100',
+        (isActive || isFinished) ? 'opacity-0 pointer-events-none' : 'opacity-100',
         theme === 'theme-default' ? 'hover:border-editor-gold/40 hover:text-editor-gold' : 'hover:border-editor-accent/40 hover:text-editor-accent'
       ]"
       :style="{
@@ -125,7 +125,7 @@ onUnmounted(() => {
         color: 'var(--color-editor-text)'
       }"
       :class="[
-        isActive ? 'opacity-0 pointer-events-none' : 'opacity-100',
+        (isActive || isFinished) ? 'opacity-0 pointer-events-none' : 'opacity-100',
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
       ]"
     >
