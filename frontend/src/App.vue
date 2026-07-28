@@ -14,7 +14,8 @@ const {
 
 const gameContainer = ref(null)
 
-// ============ CUSTOM MODALS ============
+// ============ VIEWS & MODALS ============
+const activeView = ref('write') // 'write', 'setting', 'about'
 const isCustomPromptOpen = ref(false)
 const customPromptType = ref('time')
 const customTimeInput = ref('15')
@@ -64,115 +65,227 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div
-    ref="gameContainer"
-    class="min-h-screen flex flex-col items-center justify-center px-8 relative"
-  >
-    <!-- Header / Logo -->
-    <div
-      class="absolute top-8 left-10 transition-opacity duration-300"
-      :class="isActive ? 'opacity-0' : 'opacity-100'"
+  <div class="flex min-h-screen relative overflow-hidden">
+    
+    <!-- LEFT SIDEBAR (Polished Chocolate Panel from user drawing) -->
+    <aside 
+      class="fixed left-0 top-16 bottom-16 w-40 z-30 flex flex-col py-8 px-4 text-center select-none shadow-lg transition-opacity duration-300"
+      :class="[
+        theme === 'theme-retro-crt' ? 'bg-[#001a00] border-r-2 border-y-2 border-editor-accent rounded-r-2xl' : 'bg-[#2E2520] text-white rounded-r-[2.5rem]',
+        isActive ? 'opacity-0 pointer-events-none' : 'opacity-100'
+      ]"
     >
-      <h1 class="text-2xl text-editor-accent font-bold tracking-tight">
-        kee<span class="text-editor-text">type</span>
-      </h1>
-    </div>
-
-    <!-- Main Content (Centered) -->
-    <div class="w-full max-w-4xl">
-      <Transition name="fade" mode="out-in">
-        <!-- Game View -->
-        <div v-if="!isFinished" key="game">
-          <!-- Mode Selector -->
-          <ModeSelector
-            :mode="mode"
-            :timeOption="timeOption"
-            :wordOption="wordOption"
-            :language="language"
-            :isActive="isActive"
-            @update:mode="mode = $event"
-            @update:timeOption="timeOption = $event"
-            @update:wordOption="wordOption = $event"
-            @update:language="language = $event"
-            @customTimeClick="showCustomTimePrompt"
-            @customWordClick="showCustomWordPrompt"
-          />
-
-          <!-- Timer Display -->
-          <div class="text-3xl text-editor-accent mt-6 mb-4 transition-opacity duration-300">
-            {{ displayTime }}
-          </div>
-
-          <!-- Typing Area -->
-          <TypingArea
-            :words="words"
-            :currentWordIndex="currentWordIndex"
-            :currentCharIndex="currentCharIndex"
-            :typedChars="typedChars"
-            :isActive="isActive"
-            :isFinished="isFinished"
-          />
-
-          <!-- Restart hint -->
-          <div
-            class="mt-8 text-sm text-editor-sub text-center transition-opacity duration-300"
-            :class="isActive ? 'opacity-0' : 'opacity-100'"
-          >
-            press <span class="text-editor-text">tab</span> to restart
-          </div>
-        </div>
-
-        <!-- Result View -->
-        <div v-else key="result">
-          <ResultScreen
-            :stats="stats"
-            :wpmHistory="wpmHistory"
-            :mode="mode"
-            :timeOption="timeOption"
-            :wordOption="wordOption"
-            @restart="initGame"
-          />
-        </div>
-      </Transition>
-    </div>
-
-    <!-- Footer & Theme Switcher (Centered at Bottom) -->
-    <div
-      class="absolute bottom-6 w-full flex flex-col items-center justify-center gap-3 text-xs text-editor-sub transition-opacity duration-300"
-      :class="isActive ? 'opacity-0' : 'opacity-100'"
-    >
-      <div class="flex items-center gap-4">
-        <!-- Theme Default -->
-        <button 
-          @click="theme = 'theme-default'"
-          class="flex items-center gap-1.5 cursor-pointer transition-colors duration-200"
-          :class="theme === 'theme-default' ? 'text-editor-accent' : 'hover:text-editor-text'"
-        >
-          <div class="w-3 h-3 rounded-full border border-editor-sub/30" style="background-color: #1e1e1e; border-color: #d7ba7d;"></div>
-          charcoal
-        </button>
-
-        <!-- Theme Retro CRT -->
-        <button 
-          @click="theme = 'theme-retro-crt'"
-          class="flex items-center gap-1.5 cursor-pointer transition-colors duration-200"
-          :class="theme === 'theme-retro-crt' ? 'text-editor-accent' : 'hover:text-editor-text'"
-        >
-          <div class="w-3 h-3 rounded-none border border-editor-sub/30" style="background-color: #000000; border-color: #00ff00;"></div>
-          crt
-        </button>
-
-        <!-- Theme Paper -->
-        <button 
-          @click="theme = 'theme-paper'"
-          class="flex items-center gap-1.5 cursor-pointer transition-colors duration-200"
-          :class="theme === 'theme-paper' ? 'text-editor-accent' : 'hover:text-editor-text'"
-        >
-          <div class="w-3 h-3 rounded-sm shadow-sm border border-editor-sub/30" style="background-color: #f4f4f0; border-color: #225ccb;"></div>
-          paper
-        </button>
+      <!-- Menu Header -->
+      <div class="text-xs uppercase tracking-[0.2em] font-semibold mb-8 opacity-60 text-center">
+        Menu
       </div>
-      <div class="font-light opacity-50">open source · built for speed</div>
+
+      <!-- Nav Items -->
+      <nav class="flex flex-col gap-6 font-semibold text-sm">
+        <!-- Write (Typing Test) -->
+        <button 
+          @click="activeView = 'write'"
+          class="transition-colors cursor-pointer text-center py-1.5 rounded-lg"
+          :class="activeView === 'write' ? 'text-editor-accent' : 'hover:text-editor-accent/80 opacity-80 hover:opacity-100'"
+        >
+          Write
+        </button>
+
+        <!-- Arena (Coming Soon) -->
+        <div class="flex flex-col items-center opacity-40 cursor-not-allowed">
+          <span>Arena</span>
+          <span class="text-[9px] uppercase tracking-wider font-light mt-0.5">Coming Soon</span>
+        </div>
+
+        <!-- Setting -->
+        <button 
+          @click="activeView = 'setting'"
+          class="transition-colors cursor-pointer text-center py-1.5 rounded-lg"
+          :class="activeView === 'setting' ? 'text-editor-accent' : 'hover:text-editor-accent/80 opacity-80 hover:opacity-100'"
+        >
+          Setting
+        </button>
+
+        <!-- About -->
+        <button 
+          @click="activeView = 'about'"
+          class="transition-colors cursor-pointer text-center py-1.5 rounded-lg"
+          :class="activeView === 'about' ? 'text-editor-accent' : 'hover:text-editor-accent/80 opacity-80 hover:opacity-100'"
+        >
+          About
+        </button>
+      </nav>
+    </aside>
+
+    <!-- RIGHT MAIN CONTENT AREA -->
+    <div class="flex-1 flex flex-col ml-40 min-h-screen relative">
+      
+      <!-- Top Header (Logo) -->
+      <header 
+        class="w-full pt-8 pl-12 transition-opacity duration-300"
+        :class="isActive ? 'opacity-0' : 'opacity-100'"
+      >
+        <h1 class="text-2xl text-editor-accent font-bold tracking-tight">
+          kee<span class="text-editor-text">type</span>
+        </h1>
+      </header>
+
+      <!-- Centered Play / View Area -->
+      <main 
+        ref="gameContainer"
+        class="flex-1 flex flex-col items-center justify-center px-12 pb-16"
+      >
+        <div class="w-full max-w-4xl">
+          <Transition name="fade" mode="out-in">
+            
+            <!-- View: Write (Game View) -->
+            <div v-if="activeView === 'write'" key="write">
+              <div v-if="!isFinished" key="game">
+                <ModeSelector
+                  :mode="mode"
+                  :timeOption="timeOption"
+                  :wordOption="wordOption"
+                  :language="language"
+                  :isActive="isActive"
+                  @update:mode="mode = $event"
+                  @update:timeOption="timeOption = $event"
+                  @update:wordOption="wordOption = $event"
+                  @update:language="language = $event"
+                  @customTimeClick="showCustomTimePrompt"
+                  @customWordClick="showCustomWordPrompt"
+                />
+
+                <!-- Timer Display -->
+                <div class="text-3xl text-editor-accent mt-6 mb-4 transition-opacity duration-300">
+                  {{ displayTime }}
+                </div>
+
+                <!-- Typing Area -->
+                <TypingArea
+                  :words="words"
+                  :currentWordIndex="currentWordIndex"
+                  :currentCharIndex="currentCharIndex"
+                  :typedChars="typedChars"
+                  :isActive="isActive"
+                  :isFinished="isFinished"
+                />
+
+                <!-- Restart hint -->
+                <div
+                  class="mt-8 text-sm text-editor-sub text-center transition-opacity duration-300"
+                  :class="isActive ? 'opacity-0' : 'opacity-100'"
+                >
+                  press <span class="text-editor-text">tab</span> to restart
+                </div>
+              </div>
+
+              <!-- Result View -->
+              <div v-else key="result">
+                <ResultScreen
+                  :stats="stats"
+                  :wpmHistory="wpmHistory"
+                  :mode="mode"
+                  :timeOption="timeOption"
+                  :wordOption="wordOption"
+                  @restart="initGame"
+                />
+              </div>
+            </div>
+
+            <!-- View: Setting (Visual settings panel integrated into main flow) -->
+            <div v-else-if="activeView === 'setting'" key="setting" class="max-w-md mx-auto py-8">
+              <h2 class="text-2xl font-bold text-editor-text mb-6 tracking-tight">Setting</h2>
+              <div class="flex flex-col gap-6">
+                <!-- Theme list -->
+                <div>
+                  <div class="text-[10px] uppercase tracking-[0.2em] text-editor-sub mb-3">Theme Selection</div>
+                  <div class="flex flex-col gap-2">
+                    <button 
+                      @click="theme = 'theme-default'"
+                      class="flex items-center gap-3 px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
+                      :class="theme === 'theme-default' ? 'border-editor-accent/60 bg-editor-accent/5' : ''"
+                    >
+                      <div class="w-4 h-4 rounded-full border border-editor-sub/30 bg-[#1e1e1e]" style="border-color: #d7ba7d;"></div>
+                      <span class="text-xs font-semibold text-editor-text">charcoal</span>
+                    </button>
+                    
+                    <button 
+                      @click="theme = 'theme-retro-crt'"
+                      class="flex items-center gap-3 px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
+                      :class="theme === 'theme-retro-crt' ? 'border-editor-accent/60 bg-editor-accent/5' : ''"
+                    >
+                      <div class="w-4 h-4 rounded-none border border-editor-sub/30 bg-[#000000]" style="border-color: #00ff00;"></div>
+                      <span class="text-xs font-semibold text-editor-text">crt</span>
+                    </button>
+
+                    <button 
+                      @click="theme = 'theme-paper'"
+                      class="flex items-center gap-3 px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
+                      :class="theme === 'theme-paper' ? 'border-editor-accent/60 bg-editor-accent/5' : ''"
+                    >
+                      <div class="w-4 h-4 rounded-sm border border-editor-sub/30 bg-[#f4f4f0]" style="border-color: #225ccb;"></div>
+                      <span class="text-xs font-semibold text-editor-text">paper</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- View: About -->
+            <div v-else-if="activeView === 'about'" key="about" class="max-w-md mx-auto py-8">
+              <h2 class="text-2xl font-bold text-editor-text mb-4 tracking-tight">About KeeType</h2>
+              <div class="text-xs text-editor-sub leading-relaxed flex flex-col gap-4">
+                <p>
+                  KeeType is a hyper-minimalist, distraction-free typing speed test application built with Vue 3, Tailwind CSS v4, and Laravel 13.
+                </p>
+                <p>
+                  No login. No database bloat. Just load the page and type to test your words-per-minute (WPM) speed and accuracy.
+                </p>
+              </div>
+            </div>
+
+          </Transition>
+        </div>
+      </main>
+
+      <!-- Footer (Centered at Bottom) -->
+      <footer 
+        class="w-full flex flex-col items-center justify-center gap-3 text-xs text-editor-sub pb-8 transition-opacity duration-300"
+        :class="isActive ? 'opacity-0' : 'opacity-100'"
+      >
+        <div class="flex items-center gap-4">
+          <!-- Theme Default -->
+          <button 
+            @click="theme = 'theme-default'"
+            class="flex items-center gap-1.5 cursor-pointer transition-colors duration-200"
+            :class="theme === 'theme-default' ? 'text-editor-accent' : 'hover:text-editor-text'"
+          >
+            <div class="w-3 h-3 rounded-full border border-editor-sub/30" style="background-color: #1e1e1e; border-color: #d7ba7d;"></div>
+            charcoal
+          </button>
+
+          <!-- Theme Retro CRT -->
+          <button 
+            @click="theme = 'theme-retro-crt'"
+            class="flex items-center gap-1.5 cursor-pointer transition-colors duration-200"
+            :class="theme === 'theme-retro-crt' ? 'text-editor-accent' : 'hover:text-editor-text'"
+          >
+            <div class="w-3 h-3 rounded-none border border-editor-sub/30" style="background-color: #000000; border-color: #00ff00;"></div>
+            crt
+          </button>
+
+          <!-- Theme Paper -->
+          <button 
+            @click="theme = 'theme-paper'"
+            class="flex items-center gap-1.5 cursor-pointer transition-colors duration-200"
+            :class="theme === 'theme-paper' ? 'text-editor-accent' : 'hover:text-editor-text'"
+          >
+            <div class="w-3 h-3 rounded-sm shadow-sm border border-editor-sub/30" style="background-color: #f4f4f0; border-color: #225ccb;"></div>
+            paper
+          </button>
+        </div>
+        <div class="font-light opacity-50">open source · built for speed</div>
+      </footer>
     </div>
 
     <!-- Custom Time/Words Modal Overlay -->
