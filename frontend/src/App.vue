@@ -16,7 +16,7 @@ const gameContainer = ref(null)
 
 // ============ VIEWS & MODALS ============
 const activeView = ref('write') // 'write', 'setting', 'about'
-const isSidebarOpen = ref(true) // Sidebar toggle state
+const isSidebarOpen = ref(false) // Sidebar toggle state (Default closed)
 const isCustomPromptOpen = ref(false)
 const customPromptType = ref('time')
 const customTimeInput = ref('15')
@@ -326,6 +326,31 @@ onUnmounted(() => {
                       <span class="text-xs font-semibold text-editor-text">paper</span>
                     </button>
                   </div>
+                </div>
+
+                <!-- Keyboard Sound Options -->
+                <div class="border-t border-editor-sub/10 pt-6">
+                  <div class="text-[10px] uppercase tracking-[0.2em] text-editor-sub mb-3">Mechanical Sound (ASMR)</div>
+                  <button 
+                    @click="isMuted = !isMuted"
+                    class="w-full flex items-center justify-between px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
+                    :class="!isMuted ? 'border-editor-accent/60 bg-editor-accent/5' : ''"
+                  >
+                    <div class="flex items-center gap-3">
+                      <!-- Sound wave / Speaker Icon -->
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-editor-text">
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14" v-if="!isMuted" />
+                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07" v-if="!isMuted" />
+                        <line x1="23" y1="9" x2="17" y2="15" v-if="isMuted" />
+                        <line x1="17" y1="9" x2="23" y2="15" v-if="isMuted" />
+                      </svg>
+                      <span class="text-xs font-semibold text-editor-text">Cherry MX Brown Click</span>
+                    </div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded" :class="!isMuted ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'">
+                      {{ !isMuted ? 'ON' : 'OFF' }}
+                    </span>
+                  </button>
                 </div>
               </div>
             </div>

@@ -1,5 +1,6 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { generateWords } from '../data/words.js'
+import { playKeyboardClick } from '../utils/sound.js'
 
 export function useTypingGame() {
   // ============ STATE ============
@@ -8,6 +9,7 @@ export function useTypingGame() {
   const wordOption = ref(25)         // word count: 10, 25, 50, 100
   const language = ref('english')    // 'english' or 'indonesian'
   const theme = ref('theme-default') // Current theme
+  const isMuted = ref(false)         // Mute mechanical keyboard sound state
 
   const words = ref([])              // array of word strings
   const currentWordIndex = ref(0)
@@ -117,12 +119,14 @@ export function useTypingGame() {
 
     if (e.key === 'Backspace') {
       e.preventDefault()
+      if (!isMuted.value) playKeyboardClick('backspace')
       handleBackspace(wi, ci)
       return
     }
 
     if (e.key === ' ') {
       e.preventDefault()
+      if (!isMuted.value) playKeyboardClick('space')
       // Move to next word
       if (ci > 0) {
         // Mark remaining chars as missed
@@ -145,6 +149,7 @@ export function useTypingGame() {
     // Regular character input
     if (e.key.length === 1) {
       e.preventDefault()
+      if (!isMuted.value) playKeyboardClick('default')
       const expected = currentWord[ci]
 
       if (ci < currentWord.length) {
@@ -287,12 +292,12 @@ export function useTypingGame() {
   })
 
   return {
-    // State
     mode,
     timeOption,
     wordOption,
     language,
     theme,
+    isMuted,
     words,
     currentWordIndex,
     currentCharIndex,
@@ -301,12 +306,8 @@ export function useTypingGame() {
     isFinished,
     displayTime,
     wpmHistory,
-
-    // Computed
     stats,
-
-    // Methods
     initGame,
-    handleKeyDown,
+    handleKeyDown
   }
 }
