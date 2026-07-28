@@ -386,7 +386,7 @@ onUnmounted(() => {
                         </span>
                       </button>
 
-                      <!-- Option TYPEWRITER -->
+                      <!-- Option TACTILE KEYBOARD -->
                       <button 
                         @click="keyboardSound = 'typewriter'"
                         class="flex items-center justify-between px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
@@ -397,7 +397,7 @@ onUnmounted(() => {
                             <rect x="2" y="4" width="20" height="16" rx="2" />
                             <path d="M6 8h12M6 12h12M6 16h8" />
                           </svg>
-                          <span class="text-xs font-semibold text-editor-text">Typewriter</span>
+                          <span class="text-xs font-semibold text-editor-text">Tactile Keyboard</span>
                         </div>
                         <span class="w-3.5 h-3.5 rounded-full border border-editor-sub/30 flex items-center justify-center" :class="keyboardSound === 'typewriter' ? 'bg-green-500/20' : ''">
                           <span class="w-1.5 h-1.5 rounded-full bg-green-500" v-if="keyboardSound === 'typewriter'"></span>

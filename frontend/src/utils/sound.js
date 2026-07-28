@@ -24,15 +24,15 @@ function getAudioContext() {
   return audioCtx;
 }
 
-// Preload typewriter sounds from local public folder
+// Preload tactile-keyboard sounds from local public folder
 export async function preloadMp3Sounds() {
   const ctx = getAudioContext();
   if (!ctx) return;
 
   const files = {
-    click: '/audio-typewriter/click.mp3',
-    space: '/audio-typewriter/space.mp3',
-    backspace: '/audio-typewriter/backspace.mp3'
+    click: '/Tactile-Keyboard/click.mp3',
+    space: '/Tactile-Keyboard/space.mp3',
+    backspace: '/Tactile-Keyboard/backspace.mp3'
   };
 
   for (const [key, url] of Object.entries(files)) {
@@ -44,10 +44,10 @@ export async function preloadMp3Sounds() {
       ctx.decodeAudioData(arrayBuffer, (buffer) => {
         audioBuffers.typewriter[key] = buffer;
       }, (err) => {
-        console.warn(`Failed to decode typewriter ${key} sound:`, err);
+        console.warn(`Failed to decode tactile ${key} sound:`, err);
       });
     } catch (err) {
-      console.warn(`Failed to fetch typewriter ${key} sound:`, err);
+      console.warn(`Failed to fetch tactile ${key} sound:`, err);
     }
   }
 }
