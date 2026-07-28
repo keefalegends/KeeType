@@ -69,11 +69,11 @@ onUnmounted(() => {
   <div class="flex min-h-screen relative overflow-hidden">
     
     <!-- SIDEBAR TOGGLE BUTTON (Collapsible controller) -->
-    <!-- (a) When Open: Appears neatly at the top of the sidebar panel -->
+    <!-- (a) When Open: Appears neatly above the sidebar panel at the top-left corner -->
     <button 
       v-if="isSidebarOpen"
       @click="isSidebarOpen = false"
-      class="fixed left-[10.5rem] top-20 z-40 w-8 h-8 rounded-lg border border-editor-sub/20 hover:border-editor-accent/40 bg-editor-bg/60 hover:bg-editor-bg/85 flex items-center justify-center text-editor-sub hover:text-editor-accent transition-opacity duration-300 cursor-pointer shadow-sm"
+      class="fixed left-4 top-20 z-40 w-8 h-8 rounded-lg border border-editor-sub/20 hover:border-editor-accent/40 bg-editor-bg/60 hover:bg-editor-bg/85 flex items-center justify-center text-editor-sub hover:text-editor-accent transition-opacity duration-300 cursor-pointer shadow-sm"
       :class="isActive ? 'opacity-0 pointer-events-none' : 'opacity-100'"
       title="Close Sidebar"
     >
