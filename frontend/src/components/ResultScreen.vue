@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
 
 const props = defineProps({
@@ -12,28 +12,33 @@ const props = defineProps({
 
 const emit = defineEmits(['restart'])
 
+// Preset values — anything outside these is "custom"
+const PRESET_TIME = [15, 30, 60, 120]
+const PRESET_WORDS = [8, 25, 50, 100]
+
+const isCustom = computed(() => {
+  if (props.mode === 'time') return !PRESET_TIME.includes(props.timeOption)
+  return !PRESET_WORDS.includes(props.wordOption)
+})
+
+const testModeString = computed(() =>
+  `${props.mode}-${props.mode === 'time' ? props.timeOption : props.wordOption}`
+)
+
+// ============ GLOBAL LEADERBOARD (preset only) ============
 const nickname = ref('')
 const isSubmitted = ref(false)
 const errorMessage = ref('')
 const leaderboards = ref([])
 const isLoadingLeaderboard = ref(false)
-
 const apiBaseUrl = 'http://localhost:8000/api'
-const testModeString = `${props.mode}-${props.mode === 'time' ? props.timeOption : props.wordOption}`
-
-onMounted(() => {
-  const savedNickname = localStorage.getItem('keetype_nickname')
-  if (savedNickname) {
-    nickname.value = savedNickname
-  }
-  fetchLeaderboard()
-})
 
 async function fetchLeaderboard() {
+  if (isCustom.value) return
   isLoadingLeaderboard.value = true
   try {
     const res = await axios.get(`${apiBaseUrl}/leaderboard`, {
-      params: { mode: testModeString, limit: 10 }
+      params: { mode: testModeString.value, limit: 10 }
     })
     if (res.data.status === 'success') {
       leaderboards.value = res.data.data
@@ -46,17 +51,15 @@ async function fetchLeaderboard() {
 }
 
 async function submitScore() {
-  if (!nickname.value) return
+  if (!nickname.value || isCustom.value) return
   errorMessage.value = ''
-  
   try {
     const res = await axios.post(`${apiBaseUrl}/leaderboard`, {
       nickname: nickname.value,
       wpm: props.stats.wpm,
       accuracy: props.stats.accuracy,
-      mode: testModeString
+      mode: testModeString.value
     })
-    
     if (res.data.status === 'success') {
       isSubmitted.value = true
       localStorage.setItem('keetype_nickname', nickname.value)
@@ -70,6 +73,51 @@ async function submitScore() {
     }
   }
 }
+
+// ============ PERSONAL BEST (custom only, localStorage) ============
+const personalBest = ref(null)
+
+function getPersonalBestKey() {
+  return `keetype_pb_${testModeString.value}`
+}
+
+function loadPersonalBest() {
+  const saved = localStorage.getItem(getPersonalBestKey())
+  if (saved) {
+    personalBest.value = JSON.parse(saved)
+  }
+}
+
+function savePersonalBest() {
+  const current = {
+    wpm: props.stats.wpm,
+    accuracy: props.stats.accuracy,
+    raw: props.stats.raw,
+    date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+  }
+  if (!personalBest.value || current.wpm > personalBest.value.wpm) {
+    personalBest.value = current
+    localStorage.setItem(getPersonalBestKey(), JSON.stringify(current))
+  }
+}
+
+const isNewPersonalBest = computed(() => {
+  if (!personalBest.value) return true
+  return props.stats.wpm >= personalBest.value.wpm
+})
+
+// ============ LIFECYCLE ============
+onMounted(() => {
+  const savedNickname = localStorage.getItem('keetype_nickname')
+  if (savedNickname) nickname.value = savedNickname
+
+  if (isCustom.value) {
+    loadPersonalBest()
+    savePersonalBest()
+  } else {
+    fetchLeaderboard()
+  }
+})
 </script>
 
 <template>
@@ -79,13 +127,10 @@ async function submitScore() {
       <div>
         <!-- Main Stats Row -->
         <div class="flex items-baseline gap-16 mb-12">
-          <!-- WPM (Big) -->
           <div>
             <div class="text-xs tracking-wider uppercase text-editor-sub mb-2">wpm</div>
             <div class="text-7xl font-extralight text-editor-accent leading-none">{{ stats.wpm }}</div>
           </div>
-
-          <!-- Accuracy (Big) -->
           <div>
             <div class="text-xs tracking-wider uppercase text-editor-sub mb-2">accuracy</div>
             <div class="text-7xl font-extralight text-editor-accent leading-none">{{ stats.accuracy }}<span class="text-3xl text-editor-sub">%</span></div>
@@ -98,6 +143,7 @@ async function submitScore() {
             <span class="text-editor-sub">test type</span>
             <span class="text-editor-text font-semibold">
               {{ mode }} ({{ mode === 'time' ? timeOption + 's' : wordOption + ' words' }})
+              <span v-if="isCustom" class="text-editor-accent text-[10px] ml-1">custom</span>
             </span>
           </div>
           <div class="flex justify-between items-center pb-2 border-b border-editor-sub/5">
@@ -107,10 +153,7 @@ async function submitScore() {
           <div class="flex justify-between items-center pb-2 border-b border-editor-sub/5">
             <span class="text-editor-sub">characters</span>
             <span class="text-editor-text font-semibold">
-              <span class="text-editor-correct">{{ stats.chars?.correct || 0 }}</span>/<!--
-              --><span class="text-editor-error">{{ stats.chars?.incorrect || 0 }}</span>/<!--
-              --><span class="text-editor-error-extra">{{ stats.chars?.extra || 0 }}</span>/<!--
-              --><span class="text-editor-sub">{{ stats.chars?.missed || 0 }}</span>
+              <span class="text-editor-correct">{{ stats.chars?.correct || 0 }}</span>/<span class="text-editor-error">{{ stats.chars?.incorrect || 0 }}</span>/<span class="text-editor-error-extra">{{ stats.chars?.extra || 0 }}</span>/<span class="text-editor-sub">{{ stats.chars?.missed || 0 }}</span>
             </span>
           </div>
           <div class="flex justify-between items-center pb-2 border-b border-editor-sub/5">
@@ -138,8 +181,8 @@ async function submitScore() {
           </div>
         </div>
 
-        <!-- Score Submission -->
-        <div v-if="!isSubmitted" class="mb-10 max-w-sm">
+        <!-- Score Submission (PRESET ONLY) -->
+        <div v-if="!isCustom && !isSubmitted" class="mb-10 max-w-sm">
           <div class="text-xs text-editor-sub mb-3 uppercase tracking-wider">submit to leaderboard</div>
           <form @submit.prevent="submitScore" class="flex gap-2">
             <input
@@ -160,44 +203,88 @@ async function submitScore() {
             {{ errorMessage }}
           </div>
         </div>
-        <div v-else class="mb-10 text-xs text-editor-correct flex items-center gap-2">
+        <div v-else-if="!isCustom && isSubmitted" class="mb-10 text-xs text-editor-correct flex items-center gap-2">
           <span>✓</span> <span>Score successfully submitted!</span>
         </div>
       </div>
     </div>
 
-    <!-- Right: Leaderboard Display -->
+    <!-- Right Column -->
     <div class="w-full lg:w-80 border-t lg:border-t-0 lg:border-l border-editor-sub/10 pt-10 lg:pt-0 lg:pl-12 flex flex-col">
-      <div class="text-xs uppercase tracking-widest text-editor-accent font-semibold mb-6 flex-shrink-0">
-        leaderboard <span class="text-editor-sub font-light">({{ testModeString }})</span>
-      </div>
-      
-      <div v-if="isLoadingLeaderboard" class="text-xs text-editor-sub flex-shrink-0">
-        Loading scores...
-      </div>
-      
-      <div v-else-if="leaderboards.length === 0" class="text-xs text-editor-sub flex-shrink-0">
-        No scores recorded yet. Be the first!
-      </div>
-      
-      <div v-else class="flex flex-col gap-2 overflow-y-auto flex-1 custom-scrollbar pr-2" style="max-height: 250px;">
-        <div
-          v-for="(score, index) in leaderboards"
-          :key="score.id"
-          class="flex items-center justify-between text-xs py-2 border-b border-editor-sub/5 hover:bg-editor-sub/5 px-2 rounded-sm transition-colors duration-150"
-        >
-          <div class="flex items-center gap-3">
-            <span class="text-editor-sub w-6 text-right font-light">{{ index + 1 }}.</span>
-            <span class="text-editor-text font-medium">{{ score.nickname }}</span>
-          </div>
-          <div class="flex items-center gap-4">
-            <span class="text-editor-accent font-semibold">{{ score.wpm }} <span class="text-[10px] text-editor-sub font-light">WPM</span></span>
-            <span class="text-editor-sub text-[10px]">{{ Math.round(score.accuracy) }}%</span>
+
+      <!-- PRESET: Global Leaderboard -->
+      <template v-if="!isCustom">
+        <div class="text-xs uppercase tracking-widest text-editor-accent font-semibold mb-6 flex-shrink-0">
+          leaderboard <span class="text-editor-sub font-light">({{ testModeString }})</span>
+        </div>
+        
+        <div v-if="isLoadingLeaderboard" class="text-xs text-editor-sub flex-shrink-0">
+          Loading scores...
+        </div>
+        
+        <div v-else-if="leaderboards.length === 0" class="text-xs text-editor-sub flex-shrink-0">
+          No scores recorded yet. Be the first!
+        </div>
+        
+        <div v-else class="flex flex-col gap-2 overflow-y-auto flex-1 custom-scrollbar pr-2" style="max-height: 250px;">
+          <div
+            v-for="(score, index) in leaderboards"
+            :key="score.id"
+            class="flex items-center justify-between text-xs py-2 border-b border-editor-sub/5 hover:bg-editor-sub/5 px-2 rounded-sm transition-colors duration-150"
+          >
+            <div class="flex items-center gap-3">
+              <span class="text-editor-sub w-6 text-right font-light">{{ index + 1 }}.</span>
+              <span class="text-editor-text font-medium">{{ score.nickname }}</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="text-editor-accent font-semibold">{{ score.wpm }} <span class="text-[10px] text-editor-sub font-light">WPM</span></span>
+              <span class="text-editor-sub text-[10px]">{{ Math.round(score.accuracy) }}%</span>
+            </div>
           </div>
         </div>
-      </div>
+      </template>
 
-      <!-- Restart Hint (Moved here) -->
+      <!-- CUSTOM: Personal Best -->
+      <template v-else>
+        <div class="text-xs uppercase tracking-widest text-editor-accent font-semibold mb-6 flex-shrink-0">
+          personal best <span class="text-editor-sub font-light">({{ testModeString }})</span>
+        </div>
+
+        <div v-if="personalBest" class="flex flex-col gap-6">
+          <!-- New PB indicator -->
+          <div v-if="isNewPersonalBest" class="flex items-center gap-2 text-xs text-editor-accent">
+            <span class="text-base">🎉</span>
+            <span class="font-semibold">new personal best!</span>
+          </div>
+
+          <!-- PB Stats -->
+          <div class="flex flex-col gap-3">
+            <div class="flex justify-between items-baseline text-xs">
+              <span class="text-editor-sub">best wpm</span>
+              <span class="text-2xl font-bold text-editor-accent leading-none">{{ personalBest.wpm }}</span>
+            </div>
+            <div class="flex justify-between items-center text-xs border-t border-editor-sub/10 pt-3">
+              <span class="text-editor-sub">accuracy</span>
+              <span class="text-editor-text font-semibold">{{ personalBest.accuracy }}%</span>
+            </div>
+            <div class="flex justify-between items-center text-xs border-t border-editor-sub/10 pt-3">
+              <span class="text-editor-sub">raw speed</span>
+              <span class="text-editor-text font-semibold">{{ personalBest.raw }} wpm</span>
+            </div>
+            <div class="flex justify-between items-center text-xs border-t border-editor-sub/10 pt-3">
+              <span class="text-editor-sub">achieved</span>
+              <span class="text-editor-sub font-light">{{ personalBest.date }}</span>
+            </div>
+          </div>
+
+          <!-- Info note -->
+          <div class="text-[10px] text-editor-sub/60 leading-relaxed mt-2">
+            custom modes track personal bests locally. use preset durations to compete on the global leaderboard.
+          </div>
+        </div>
+      </template>
+
+      <!-- Restart Hint -->
       <div class="text-xs text-editor-sub mt-8 pt-6 border-t border-editor-sub/10 flex-shrink-0">
         <span class="text-editor-text hover:text-editor-accent cursor-pointer transition-colors duration-200" @click="emit('restart')">> click here to restart</span>
       </div>
