@@ -73,7 +73,10 @@ onUnmounted(() => {
     <button 
       v-if="isSidebarOpen"
       @click="isSidebarOpen = false"
-      class="fixed left-4 top-20 z-40 w-8 h-8 rounded-lg border border-editor-sub/20 hover:border-editor-gold/40 bg-editor-bg/60 hover:bg-editor-bg/85 flex items-center justify-center text-editor-sub hover:text-editor-gold transition-opacity duration-300 cursor-pointer shadow-sm"
+      class="fixed left-4 top-20 z-40 w-8 h-8 rounded-lg border border-editor-sub/20 hover:border-editor-gold/40 flex items-center justify-center text-editor-sub hover:text-editor-gold transition-opacity duration-300 cursor-pointer shadow-sm"
+      :style="{
+        backgroundColor: theme === 'theme-paper' ? '#fcfcfc' : (theme === 'theme-retro-crt' ? '#001a00' : '#4B5694'),
+      }"
       :class="isActive ? 'opacity-0 pointer-events-none' : 'opacity-100'"
       title="Close Sidebar"
     >
@@ -86,7 +89,10 @@ onUnmounted(() => {
     <button
       v-else
       @click="isSidebarOpen = true"
-      class="fixed left-0 top-1/2 -translate-y-1/2 z-40 w-5 h-24 rounded-r-xl border-y border-r border-editor-sub/20 hover:border-editor-gold/40 bg-editor-bg/60 hover:bg-editor-bg/90 flex flex-col items-center justify-center text-editor-sub hover:text-editor-gold transition-opacity duration-300 cursor-pointer shadow-md group"
+      class="fixed left-0 top-1/2 -translate-y-1/2 z-40 w-5 h-24 rounded-r-xl border-y border-r border-editor-sub/20 hover:border-editor-gold/40 flex flex-col items-center justify-center text-editor-sub hover:text-editor-gold transition-opacity duration-300 cursor-pointer shadow-md group"
+      :style="{
+        backgroundColor: theme === 'theme-paper' ? '#fcfcfc' : (theme === 'theme-retro-crt' ? '#001a00' : '#4B5694'),
+      }"
       :class="isActive ? 'opacity-0 pointer-events-none' : 'opacity-100'"
       title="Open Sidebar"
     >
@@ -100,7 +106,7 @@ onUnmounted(() => {
     <aside 
       class="fixed left-0 top-32 bottom-32 w-36 z-30 flex flex-col py-10 px-3 text-center select-none shadow-lg transition-all duration-300 ease-in-out border-r border-y"
       :style="{
-        backgroundColor: theme === 'theme-paper' ? '#fcfcfc' : (theme === 'theme-retro-crt' ? '#001a00' : '#1a1a1a'),
+        backgroundColor: theme === 'theme-paper' ? '#fcfcfc' : (theme === 'theme-retro-crt' ? '#001a00' : '#4B5694'),
         borderColor: theme === 'theme-paper' ? 'rgba(0,0,0,0.1)' : 'var(--color-editor-gold)',
         borderTopRightRadius: '2rem',
         borderBottomRightRadius: '2rem',
