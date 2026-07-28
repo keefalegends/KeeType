@@ -4,8 +4,14 @@
 
 let audioCtx = null;
 const audioBuffers = {
-  typewriter: {
+  tactile: {
     click: null,
+    space: null,
+    backspace: null
+  },
+  typewriter: {
+    click1: null,
+    click2: null,
     space: null,
     backspace: null
   }
@@ -24,30 +30,53 @@ function getAudioContext() {
   return audioCtx;
 }
 
-// Preload tactile-keyboard sounds from local public folder
+// Preload local keyboard sound profiles
 export async function preloadMp3Sounds() {
   const ctx = getAudioContext();
   if (!ctx) return;
 
-  const files = {
+  // 1. Tactile Keyboard sounds
+  const tactileFiles = {
     click: '/Tactile-Keyboard/click.mp3',
     space: '/Tactile-Keyboard/space.mp3',
     backspace: '/Tactile-Keyboard/backspace.mp3'
   };
 
-  for (const [key, url] of Object.entries(files)) {
-    if (audioBuffers.typewriter[key]) continue; // already loaded
+  for (const [key, url] of Object.entries(tactileFiles)) {
+    if (audioBuffers.tactile[key]) continue;
     try {
       const response = await fetch(url);
       const arrayBuffer = await response.arrayBuffer();
-      // Decode audio data safely
+      ctx.decodeAudioData(arrayBuffer, (buffer) => {
+        audioBuffers.tactile[key] = buffer;
+      }, (err) => {
+        console.warn(`Failed to decode Tactile ${key} sound:`, err);
+      });
+    } catch (err) {
+      console.warn(`Failed to fetch Tactile ${key} sound:`, err);
+    }
+  }
+
+  // 2. Typewriter Keyboard sounds
+  const typewriterFiles = {
+    click1: '/Typewriter-Keyboard/click1.mp3',
+    click2: '/Typewriter-Keyboard/click2.mp3',
+    space: '/Typewriter-Keyboard/space.mp3',
+    backspace: '/Typewriter-Keyboard/backspace.mp3'
+  };
+
+  for (const [key, url] of Object.entries(typewriterFiles)) {
+    if (audioBuffers.typewriter[key]) continue;
+    try {
+      const response = await fetch(url);
+      const arrayBuffer = await response.arrayBuffer();
       ctx.decodeAudioData(arrayBuffer, (buffer) => {
         audioBuffers.typewriter[key] = buffer;
       }, (err) => {
-        console.warn(`Failed to decode tactile ${key} sound:`, err);
+        console.warn(`Failed to decode Typewriter ${key} sound:`, err);
       });
     } catch (err) {
-      console.warn(`Failed to fetch tactile ${key} sound:`, err);
+      console.warn(`Failed to fetch Typewriter ${key} sound:`, err);
     }
   }
 }
@@ -165,8 +194,8 @@ function playCherryMXBrownSound(type, volume, ctx) {
   }
 }
 
-// Play preloaded local MP3 files
-function playLocalTypewriterSound(type, volume, ctx) {
+// Play preloaded local Tactile Keyboard sound
+function playLocalTactileSound(type, volume, ctx) {
   const keyMap = {
     space: 'space',
     backspace: 'backspace',
@@ -174,10 +203,9 @@ function playLocalTypewriterSound(type, volume, ctx) {
   };
 
   const fileKey = keyMap[type] || 'click';
-  const buffer = audioBuffers.typewriter[fileKey];
+  const buffer = audioBuffers.tactile[fileKey];
 
   if (!buffer) {
-    // Fallback dynamically to synthetic Cherry MX Brown if audio files are not preloaded yet
     playCherryMXBrownSound(type, volume, ctx);
     return;
   }
@@ -191,7 +219,40 @@ function playLocalTypewriterSound(type, volume, ctx) {
   source.connect(gain);
   gain.connect(ctx.destination);
 
-  // Pitch variation (+/- 5%) for natural realism
+  const randomPlaybackRate = 0.95 + Math.random() * 0.1;
+  source.playbackRate.value = randomPlaybackRate;
+
+  source.start(ctx.currentTime);
+}
+
+// Play preloaded local Typewriter Keyboard sound (with alternating click1/click2)
+function playLocalTypewriterSound(type, volume, ctx) {
+  let fileKey = 'click1';
+  if (type === 'space') {
+    fileKey = 'space';
+  } else if (type === 'backspace') {
+    fileKey = 'backspace';
+  } else {
+    // Alternating between click1 and click2 for organic feel
+    fileKey = Math.random() < 0.5 ? 'click1' : 'click2';
+  }
+
+  const buffer = audioBuffers.typewriter[fileKey];
+
+  if (!buffer) {
+    playCherryMXBrownSound(type, volume, ctx);
+    return;
+  }
+
+  const source = ctx.createBufferSource();
+  source.buffer = buffer;
+
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.7 * volume, ctx.currentTime);
+
+  source.connect(gain);
+  gain.connect(ctx.destination);
+
   const randomPlaybackRate = 0.95 + Math.random() * 0.1;
   source.playbackRate.value = randomPlaybackRate;
 
@@ -208,6 +269,8 @@ export function playKeyboardClick(type = 'default', volume = 0.5, soundProfile =
   try {
     if (soundProfile === 'bubble') {
       playBubblePopSound(type, volMultiplier, ctx);
+    } else if (soundProfile === 'tactile') {
+      playLocalTactileSound(type, volMultiplier, ctx);
     } else if (soundProfile === 'typewriter') {
       playLocalTypewriterSound(type, volMultiplier, ctx);
     } else if (soundProfile === 'cherry-mx-brown') {

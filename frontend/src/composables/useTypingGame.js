@@ -9,7 +9,7 @@ export function useTypingGame() {
   const wordOption = ref(25)         // word count: 10, 25, 50, 100
   const language = ref('english')    // 'english' or 'indonesian'
   const theme = ref('theme-default') // Current theme
-  const keyboardSound = ref('cherry-mx-brown') // 'off', 'cherry-mx-brown'
+  const keyboardSound = ref('cherry-mx-brown') // 'off', 'cherry-mx-brown', 'bubble', 'tactile', 'typewriter'
   const keyboardVolume = ref(0.5)    // Volume slider: 0.0 to 1.0
   const isMuted = computed(() => keyboardSound.value === 'off')
 

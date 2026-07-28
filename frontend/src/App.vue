@@ -388,6 +388,24 @@ onUnmounted(() => {
 
                       <!-- Option TACTILE KEYBOARD -->
                       <button 
+                        @click="keyboardSound = 'tactile'"
+                        class="flex items-center justify-between px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
+                        :class="keyboardSound === 'tactile' ? (theme === 'theme-default' ? 'border-editor-gold/60 bg-editor-accent/5' : 'border-editor-accent/60 bg-editor-accent/5') : ''"
+                      >
+                        <div class="flex items-center gap-3">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-editor-text">
+                            <rect x="2" y="4" width="20" height="16" rx="2" />
+                            <path d="M6 8h12M6 12h12M6 16h8" />
+                          </svg>
+                          <span class="text-xs font-semibold text-editor-text">Tactile Keyboard</span>
+                        </div>
+                        <span class="w-3.5 h-3.5 rounded-full border border-editor-sub/30 flex items-center justify-center" :class="keyboardSound === 'tactile' ? 'bg-green-500/20' : ''">
+                          <span class="w-1.5 h-1.5 rounded-full bg-green-500" v-if="keyboardSound === 'tactile'"></span>
+                        </span>
+                      </button>
+
+                      <!-- Option TYPEWRITER -->
+                      <button 
                         @click="keyboardSound = 'typewriter'"
                         class="flex items-center justify-between px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
                         :class="keyboardSound === 'typewriter' ? (theme === 'theme-default' ? 'border-editor-gold/60 bg-editor-accent/5' : 'border-editor-accent/60 bg-editor-accent/5') : ''"
@@ -397,7 +415,7 @@ onUnmounted(() => {
                             <rect x="2" y="4" width="20" height="16" rx="2" />
                             <path d="M6 8h12M6 12h12M6 16h8" />
                           </svg>
-                          <span class="text-xs font-semibold text-editor-text">Tactile Keyboard</span>
+                          <span class="text-xs font-semibold text-editor-text">Typewriter Keyboard</span>
                         </div>
                         <span class="w-3.5 h-3.5 rounded-full border border-editor-sub/30 flex items-center justify-center" :class="keyboardSound === 'typewriter' ? 'bg-green-500/20' : ''">
                           <span class="w-1.5 h-1.5 rounded-full bg-green-500" v-if="keyboardSound === 'typewriter'"></span>
