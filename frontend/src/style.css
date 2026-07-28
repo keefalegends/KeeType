@@ -30,9 +30,9 @@
   --error: #f44747;
   --error-extra: #7e2a33;
   --correct: #caaa98;     /* Match light beige */
-  --accent: #dfb15b;      /* Primary accent - changed to Gold (#dfb15b) */
-  --accent-dim: #b89a0f;
-  --caret: #dfb15b;       /* Caret color matches gold primary */
+  --accent: #caaa98;      /* Restore typing text & timer to original beige (#caaa98) */
+  --accent-dim: #9a8678;
+  --caret: #caaa98;       /* Caret color matches primary beige */
   --gold: #dfb15b;        /* Gold color for headers, logos, and settings indicators */
 }
 

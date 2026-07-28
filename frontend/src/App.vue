@@ -73,11 +73,14 @@ onUnmounted(() => {
     <button 
       v-if="isSidebarOpen"
       @click="isSidebarOpen = false"
-      class="fixed left-4 top-20 z-40 w-8 h-8 rounded-lg border border-editor-sub/20 hover:border-editor-gold/40 flex items-center justify-center text-editor-sub hover:text-editor-gold transition-opacity duration-300 cursor-pointer shadow-sm"
+      class="fixed left-4 top-20 z-40 w-8 h-8 rounded-lg border border-editor-sub/20 flex items-center justify-center text-editor-sub transition-opacity duration-300 cursor-pointer shadow-sm"
+      :class="[
+        isActive ? 'opacity-0 pointer-events-none' : 'opacity-100',
+        theme === 'theme-default' ? 'hover:border-editor-gold/40 hover:text-editor-gold' : 'hover:border-editor-accent/40 hover:text-editor-accent'
+      ]"
       :style="{
-        backgroundColor: theme === 'theme-paper' ? '#fcfcfc' : (theme === 'theme-retro-crt' ? '#001a00' : '#4B5694'),
+        backgroundColor: theme === 'theme-paper' ? '#fcfcfc' : (theme === 'theme-retro-crt' ? '#001a00' : '#202940'),
       }"
-      :class="isActive ? 'opacity-0 pointer-events-none' : 'opacity-100'"
       title="Close Sidebar"
     >
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -89,11 +92,14 @@ onUnmounted(() => {
     <button
       v-else
       @click="isSidebarOpen = true"
-      class="fixed left-0 top-1/2 -translate-y-1/2 z-40 w-5 h-24 rounded-r-xl border-y border-r border-editor-sub/20 hover:border-editor-gold/40 flex flex-col items-center justify-center text-editor-sub hover:text-editor-gold transition-opacity duration-300 cursor-pointer shadow-md group"
+      class="fixed left-0 top-1/2 -translate-y-1/2 z-40 w-5 h-24 rounded-r-xl border-y border-r border-editor-sub/20 flex flex-col items-center justify-center text-editor-sub transition-opacity duration-300 cursor-pointer shadow-md group"
+      :class="[
+        isActive ? 'opacity-0 pointer-events-none' : 'opacity-100',
+        theme === 'theme-default' ? 'hover:border-editor-gold/40 hover:text-editor-gold' : 'hover:border-editor-accent/40 hover:text-editor-accent'
+      ]"
       :style="{
-        backgroundColor: theme === 'theme-paper' ? '#fcfcfc' : (theme === 'theme-retro-crt' ? '#001a00' : '#4B5694'),
+        backgroundColor: theme === 'theme-paper' ? '#fcfcfc' : (theme === 'theme-retro-crt' ? '#001a00' : '#202940'),
       }"
-      :class="isActive ? 'opacity-0 pointer-events-none' : 'opacity-100'"
       title="Open Sidebar"
     >
       <!-- Subtle vertical indicator line or arrow -->
@@ -106,8 +112,8 @@ onUnmounted(() => {
     <aside 
       class="fixed left-0 top-32 bottom-32 w-36 z-30 flex flex-col py-10 px-3 text-center select-none shadow-lg transition-all duration-300 ease-in-out border-r border-y"
       :style="{
-        backgroundColor: theme === 'theme-paper' ? '#fcfcfc' : (theme === 'theme-retro-crt' ? '#001a00' : '#4B5694'),
-        borderColor: theme === 'theme-paper' ? 'rgba(0,0,0,0.1)' : 'var(--color-editor-gold)',
+        backgroundColor: theme === 'theme-paper' ? '#fcfcfc' : (theme === 'theme-retro-crt' ? '#001a00' : '#202940'),
+        borderColor: theme === 'theme-paper' ? 'rgba(0,0,0,0.1)' : (theme === 'theme-retro-crt' ? 'var(--color-editor-accent)' : 'var(--color-editor-gold)'),
         borderTopRightRadius: '2rem',
         borderBottomRightRadius: '2rem',
         color: 'var(--color-editor-text)'
@@ -118,7 +124,13 @@ onUnmounted(() => {
       ]"
     >
       <!-- Top Header -->
-      <div class="text-[11px] uppercase tracking-[0.25em] text-editor-gold font-bold mb-4">
+      <div 
+        class="text-[11px] uppercase tracking-[0.25em] font-bold mb-4"
+        :class="{
+          'text-editor-gold': theme === 'theme-default',
+          'text-editor-accent': theme !== 'theme-default'
+        }"
+      >
         Menu
       </div>
 
@@ -128,7 +140,11 @@ onUnmounted(() => {
         <button 
           @click="activeView = 'write'"
           class="transition-all duration-200 cursor-pointer text-center py-3.5 rounded-xl"
-          :class="activeView === 'write' ? 'text-editor-gold bg-editor-gold/10 scale-105' : 'text-editor-sub hover:text-editor-text hover:bg-editor-sub/5'"
+          :class="[
+            activeView === 'write'
+              ? (theme === 'theme-default' ? 'text-editor-gold bg-editor-gold/10 scale-105' : 'text-editor-accent bg-editor-accent/10 scale-105')
+              : 'text-editor-sub hover:text-editor-text hover:bg-editor-sub/5'
+          ]"
         >
           Write
         </button>
@@ -143,7 +159,11 @@ onUnmounted(() => {
         <button 
           @click="activeView = 'setting'"
           class="transition-all duration-200 cursor-pointer text-center py-3.5 rounded-xl"
-          :class="activeView === 'setting' ? 'text-editor-gold bg-editor-gold/10 scale-105' : 'text-editor-sub hover:text-editor-text hover:bg-editor-sub/5'"
+          :class="[
+            activeView === 'setting'
+              ? (theme === 'theme-default' ? 'text-editor-gold bg-editor-gold/10 scale-105' : 'text-editor-accent bg-editor-accent/10 scale-105')
+              : 'text-editor-sub hover:text-editor-text hover:bg-editor-sub/5'
+          ]"
         >
           Setting
         </button>
@@ -152,7 +172,11 @@ onUnmounted(() => {
         <button 
           @click="activeView = 'about'"
           class="transition-all duration-200 cursor-pointer text-center py-3.5 rounded-xl"
-          :class="activeView === 'about' ? 'text-editor-gold bg-editor-gold/10 scale-105' : 'text-editor-sub hover:text-editor-text hover:bg-editor-sub/5'"
+          :class="[
+            activeView === 'about'
+              ? (theme === 'theme-default' ? 'text-editor-gold bg-editor-gold/10 scale-105' : 'text-editor-accent bg-editor-accent/10 scale-105')
+              : 'text-editor-sub hover:text-editor-text hover:bg-editor-sub/5'
+          ]"
         >
           About
         </button>
@@ -274,7 +298,7 @@ onUnmounted(() => {
                       class="flex items-center gap-3 px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
                       :class="theme === 'theme-paper' ? 'border-editor-accent/60 bg-editor-accent/5' : ''"
                     >
-                      <div class="w-4 h-4 rounded-sm border border-editor-sub/30 bg-[#f4f4f0]" style="border-color: #225ccb;"></div>
+                      <div class="w-4 h-4 rounded-sm border border-editor-sub/30 bg-[#f4f4f0]" style="border-color: #111844;"></div>
                       <span class="text-xs font-semibold text-editor-text">paper</span>
                     </button>
                   </div>
@@ -331,7 +355,7 @@ onUnmounted(() => {
             class="flex items-center gap-1.5 cursor-pointer transition-colors duration-200"
             :class="theme === 'theme-paper' ? 'text-editor-accent font-bold' : 'hover:text-editor-text'"
           >
-            <div class="w-3 h-3 rounded-sm shadow-sm border border-editor-sub/30" style="background-color: #f4f4f0; border-color: #225ccb;"></div>
+            <div class="w-3 h-3 rounded-sm shadow-sm border border-editor-sub/30" style="background-color: #f4f4f0; border-color: #111844;"></div>
             paper
           </button>
         </div>
