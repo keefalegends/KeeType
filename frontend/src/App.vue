@@ -87,69 +87,84 @@ onUnmounted(() => {
       </svg>
     </button>
 
-    <!-- LEFT SIDEBAR (Polished Chocolate Panel from user drawing) -->
+    <!-- LEFT SIDEBAR (Polished Panel matching the active theme colors) -->
     <aside 
-      class="fixed left-0 top-16 bottom-16 w-40 z-30 flex flex-col py-8 px-4 text-center select-none shadow-lg transition-all duration-300 ease-in-out"
+      class="fixed left-0 top-32 bottom-32 w-36 z-30 flex flex-col justify-between py-10 px-3 text-center select-none shadow-lg transition-all duration-300 ease-in-out border-r border-y"
+      :style="{
+        backgroundColor: theme === 'theme-paper' ? '#fcfcfc' : (theme === 'theme-retro-crt' ? '#001a00' : '#1a1a1a'),
+        borderColor: 'var(--color-editor-sub)',
+        borderTopRightRadius: '2rem',
+        borderBottomRightRadius: '2rem',
+        color: 'var(--color-editor-text)'
+      }"
       :class="[
-        theme === 'theme-retro-crt' ? 'bg-[#001a00] border-r-2 border-y-2 border-editor-accent rounded-r-2xl' : 'bg-[#2E2520] text-white rounded-r-[2.5rem]',
         isActive ? 'opacity-0 pointer-events-none' : 'opacity-100',
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
       ]"
     >
-      <!-- Menu Header -->
-      <div class="text-xs uppercase tracking-[0.2em] font-semibold mb-8 opacity-60 text-center">
-        Menu
-      </div>
-
-      <!-- Nav Items -->
-      <nav class="flex flex-col gap-6 font-semibold text-sm">
-        <!-- Write (Typing Test) -->
-        <button 
-          @click="activeView = 'write'"
-          class="transition-colors cursor-pointer text-center py-1.5 rounded-lg"
-          :class="activeView === 'write' ? 'text-editor-accent' : 'hover:text-editor-accent/80 opacity-80 hover:opacity-100'"
-        >
-          Write
-        </button>
-
-        <!-- Arena (Coming Soon) -->
-        <div class="flex flex-col items-center opacity-40 cursor-not-allowed">
-          <span>Arena</span>
-          <span class="text-[9px] uppercase tracking-wider font-light mt-0.5">Coming Soon</span>
+      <!-- Top Group -->
+      <div class="flex flex-col gap-6">
+        <!-- Menu Header -->
+        <div class="text-[10px] uppercase tracking-[0.25em] text-editor-sub/60 font-bold text-center">
+          Menu
         </div>
 
-        <!-- Setting -->
-        <button 
-          @click="activeView = 'setting'"
-          class="transition-colors cursor-pointer text-center py-1.5 rounded-lg"
-          :class="activeView === 'setting' ? 'text-editor-accent' : 'hover:text-editor-accent/80 opacity-80 hover:opacity-100'"
-        >
-          Setting
-        </button>
+        <!-- Nav Items -->
+        <nav class="flex flex-col gap-4 font-semibold text-xs">
+          <!-- Write (Typing Test) -->
+          <button 
+            @click="activeView = 'write'"
+            class="transition-colors cursor-pointer text-center py-2 rounded-lg"
+            :class="activeView === 'write' ? 'text-editor-accent bg-editor-accent/10' : 'text-editor-sub hover:text-editor-text'"
+          >
+            Write
+          </button>
 
-        <!-- About -->
-        <button 
-          @click="activeView = 'about'"
-          class="transition-colors cursor-pointer text-center py-1.5 rounded-lg"
-          :class="activeView === 'about' ? 'text-editor-accent' : 'hover:text-editor-accent/80 opacity-80 hover:opacity-100'"
-        >
-          About
-        </button>
-      </nav>
+          <!-- Arena (Coming Soon) -->
+          <div class="flex flex-col items-center py-2 rounded-lg text-editor-sub/30 cursor-not-allowed">
+            <span class="line-through">Arena</span>
+            <span class="text-[8px] uppercase tracking-wider font-light mt-0.5">Soon</span>
+          </div>
+
+          <!-- Setting -->
+          <button 
+            @click="activeView = 'setting'"
+            class="transition-colors cursor-pointer text-center py-2 rounded-lg"
+            :class="activeView === 'setting' ? 'text-editor-accent bg-editor-accent/10' : 'text-editor-sub hover:text-editor-text'"
+          >
+            Setting
+          </button>
+
+          <!-- About -->
+          <button 
+            @click="activeView = 'about'"
+            class="transition-colors cursor-pointer text-center py-2 rounded-lg"
+            :class="activeView === 'about' ? 'text-editor-accent bg-editor-accent/10' : 'text-editor-sub hover:text-editor-text'"
+          >
+            About
+          </button>
+        </nav>
+      </div>
+
+      <!-- Bottom Group (Fill the empty space below) -->
+      <div class="flex flex-col gap-1 text-[9px] text-editor-sub/50 leading-relaxed font-light mt-auto">
+        <div>v1.0.0</div>
+        <div>speed & focus</div>
+      </div>
     </aside>
 
     <!-- RIGHT MAIN CONTENT AREA -->
     <div 
       class="flex-1 flex flex-col min-h-screen relative transition-all duration-300 ease-in-out"
-      :class="isSidebarOpen ? 'ml-40' : 'ml-0'"
+      :class="isSidebarOpen ? 'ml-36' : 'ml-0'"
     >
       
-      <!-- Top Header (Logo) -->
+      <!-- Top Header (Logo) - Moved back to absolute top-8 left-10 like original -->
       <header 
-        class="w-full pt-8 transition-opacity duration-300"
+        class="absolute top-8 left-10 transition-all duration-300"
         :class="[
-          isActive ? 'opacity-0' : 'opacity-100',
-          isSidebarOpen ? 'pl-12' : 'pl-16'
+          isActive ? 'opacity-0 pointer-events-none' : 'opacity-100',
+          isSidebarOpen ? 'translate-x-36' : 'translate-x-0'
         ]"
       >
         <h1 class="text-2xl text-editor-accent font-bold tracking-tight">
@@ -160,7 +175,7 @@ onUnmounted(() => {
       <!-- Centered Play / View Area -->
       <main 
         ref="gameContainer"
-        class="flex-1 flex flex-col items-center justify-center px-12 pb-16"
+        class="flex-1 flex flex-col items-center justify-center px-12 pb-16 pt-20"
       >
         <div class="w-full max-w-4xl">
           <Transition name="fade" mode="out-in">
