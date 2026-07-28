@@ -290,7 +290,6 @@ onUnmounted(() => {
                 />
               </div>
             </div>
-
             <!-- View: Setting (Visual settings panel integrated into main flow) -->
             <div v-else-if="activeView === 'setting'" key="setting" class="max-w-xl mx-auto py-8">
               <h2 class="text-2xl font-bold text-editor-text mb-6 tracking-tight">Setting</h2>
@@ -332,41 +331,106 @@ onUnmounted(() => {
                 </div>
 
                 <!-- Column 2: Keyboard Sound Options -->
-                <div class="flex flex-col">
-                  <div class="text-[10px] uppercase tracking-[0.2em] text-editor-sub mb-3">Mechanical Sound (ASMR)</div>
-                  <div class="flex flex-col gap-2">
-                    
-                    <!-- Option OFF -->
-                    <button 
-                      @click="keyboardSound = 'off'"
-                      class="flex items-center justify-between px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
-                      :class="keyboardSound === 'off' ? (theme === 'theme-default' ? 'border-editor-gold/60 bg-editor-accent/5' : 'border-editor-accent/60 bg-editor-accent/5') : ''"
-                    >
-                      <span class="text-xs font-semibold text-editor-text">OFF</span>
-                      <span class="w-3.5 h-3.5 rounded-full border border-editor-sub/30 flex items-center justify-center" :class="keyboardSound === 'off' ? 'bg-red-500/20' : ''">
-                        <span class="w-1.5 h-1.5 rounded-full bg-red-500" v-if="keyboardSound === 'off'"></span>
-                      </span>
-                    </button>
+                <div class="flex flex-col gap-5">
+                  <div>
+                    <div class="text-[10px] uppercase tracking-[0.2em] text-editor-sub mb-3">Mechanical Sound (ASMR)</div>
+                    <div class="flex flex-col gap-2">
+                      
+                      <!-- Option OFF -->
+                      <button 
+                        @click="keyboardSound = 'off'"
+                        class="flex items-center justify-between px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
+                        :class="keyboardSound === 'off' ? (theme === 'theme-default' ? 'border-editor-gold/60 bg-editor-accent/5' : 'border-editor-accent/60 bg-editor-accent/5') : ''"
+                      >
+                        <span class="text-xs font-semibold text-editor-text">OFF</span>
+                        <span class="w-3.5 h-3.5 rounded-full border border-editor-sub/30 flex items-center justify-center" :class="keyboardSound === 'off' ? 'bg-red-500/20' : ''">
+                          <span class="w-1.5 h-1.5 rounded-full bg-red-500" v-if="keyboardSound === 'off'"></span>
+                        </span>
+                      </button>
 
-                    <!-- Option CHERRY MX BROWN -->
-                    <button 
-                      @click="keyboardSound = 'cherry-mx-brown'"
-                      class="flex items-center justify-between px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
-                      :class="keyboardSound === 'cherry-mx-brown' ? (theme === 'theme-default' ? 'border-editor-gold/60 bg-editor-accent/5' : 'border-editor-accent/60 bg-editor-accent/5') : ''"
-                    >
-                      <div class="flex items-center gap-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-editor-text">
-                          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                          <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-                          <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-                        </svg>
-                        <span class="text-xs font-semibold text-editor-text">Cherry MX Brown</span>
-                      </div>
-                      <span class="w-3.5 h-3.5 rounded-full border border-editor-sub/30 flex items-center justify-center" :class="keyboardSound === 'cherry-mx-brown' ? 'bg-green-500/20' : ''">
-                        <span class="w-1.5 h-1.5 rounded-full bg-green-500" v-if="keyboardSound === 'cherry-mx-brown'"></span>
-                      </span>
-                    </button>
+                      <!-- Option CHERRY MX BROWN -->
+                      <button 
+                        @click="keyboardSound = 'cherry-mx-brown'"
+                        class="flex items-center justify-between px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
+                        :class="keyboardSound === 'cherry-mx-brown' ? (theme === 'theme-default' ? 'border-editor-gold/60 bg-editor-accent/5' : 'border-editor-accent/60 bg-editor-accent/5') : ''"
+                      >
+                        <div class="flex items-center gap-3">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-editor-text">
+                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                            <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                          </svg>
+                          <span class="text-xs font-semibold text-editor-text">Cherry MX Brown</span>
+                        </div>
+                        <span class="w-3.5 h-3.5 rounded-full border border-editor-sub/30 flex items-center justify-center" :class="keyboardSound === 'cherry-mx-brown' ? 'bg-green-500/20' : ''">
+                          <span class="w-1.5 h-1.5 rounded-full bg-green-500" v-if="keyboardSound === 'cherry-mx-brown'"></span>
+                        </span>
+                      </button>
 
+                      <!-- Option BUBBLE -->
+                      <button 
+                        @click="keyboardSound = 'bubble'"
+                        class="flex items-center justify-between px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
+                        :class="keyboardSound === 'bubble' ? (theme === 'theme-default' ? 'border-editor-gold/60 bg-editor-accent/5' : 'border-editor-accent/60 bg-editor-accent/5') : ''"
+                      >
+                        <div class="flex items-center gap-3">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-editor-text">
+                            <circle cx="12" cy="12" r="10" />
+                            <circle cx="12" cy="12" r="6" />
+                            <circle cx="12" cy="12" r="2" />
+                          </svg>
+                          <span class="text-xs font-semibold text-editor-text">Bubble Pop</span>
+                        </div>
+                        <span class="w-3.5 h-3.5 rounded-full border border-editor-sub/30 flex items-center justify-center" :class="keyboardSound === 'bubble' ? 'bg-green-500/20' : ''">
+                          <span class="w-1.5 h-1.5 rounded-full bg-green-500" v-if="keyboardSound === 'bubble'"></span>
+                        </span>
+                      </button>
+
+                      <!-- Option TYPEWRITER -->
+                      <button 
+                        @click="keyboardSound = 'typewriter'"
+                        class="flex items-center justify-between px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
+                        :class="keyboardSound === 'typewriter' ? (theme === 'theme-default' ? 'border-editor-gold/60 bg-editor-accent/5' : 'border-editor-accent/60 bg-editor-accent/5') : ''"
+                      >
+                        <div class="flex items-center gap-3">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-editor-text">
+                            <rect x="2" y="4" width="20" height="16" rx="2" />
+                            <path d="M6 8h12M6 12h12M6 16h8" />
+                          </svg>
+                          <span class="text-xs font-semibold text-editor-text">Typewriter</span>
+                        </div>
+                        <span class="w-3.5 h-3.5 rounded-full border border-editor-sub/30 flex items-center justify-center" :class="keyboardSound === 'typewriter' ? 'bg-green-500/20' : ''">
+                          <span class="w-1.5 h-1.5 rounded-full bg-green-500" v-if="keyboardSound === 'typewriter'"></span>
+                        </span>
+                      </button>
+
+                    </div>
+                  </div>
+
+                  <!-- Volume Control Slider (Only visible when sound is not OFF) -->
+                  <div v-if="keyboardSound !== 'off'" class="mt-2 flex flex-col gap-2">
+                    <div class="flex items-center justify-between text-[10px] uppercase tracking-wider text-editor-sub">
+                      <span>Volume</span>
+                      <span class="font-bold">{{ Math.round(keyboardVolume * 100) }}%</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-editor-sub">
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                      </svg>
+                      <input 
+                        type="range" 
+                        min="0" 
+                        max="1" 
+                        step="0.05"
+                        v-model.number="keyboardVolume"
+                        class="w-full h-1 bg-editor-sub/10 rounded-lg appearance-none cursor-pointer focus:outline-none transition-colors accent-editor-accent"
+                        :class="theme === 'theme-default' ? 'accent-editor-gold' : 'accent-editor-accent'"
+                        :style="{
+                          '--thumb-color': theme === 'theme-default' ? '#dfb15b' : 'var(--color-editor-accent)'
+                        }"
+                      />
+                    </div>
                   </div>
                 </div>
 
