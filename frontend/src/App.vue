@@ -68,22 +68,31 @@ onUnmounted(() => {
 <template>
   <div class="flex min-h-screen relative overflow-hidden">
     
-    <!-- SIDEBAR TOGGLE BUTTON (Placed neatly on top of the sidebar panel, not floating awkwardly) -->
+    <!-- SIDEBAR TOGGLE BUTTON (Collapsible controller) -->
+    <!-- (a) When Open: Appears neatly at the top of the sidebar panel -->
     <button 
-      @click="isSidebarOpen = !isSidebarOpen"
-      class="fixed left-4 top-20 z-40 w-8 h-8 rounded-lg border border-editor-sub/20 hover:border-editor-accent/40 bg-editor-bg/60 hover:bg-editor-bg/85 flex items-center justify-center text-editor-sub hover:text-editor-accent transition-all cursor-pointer shadow-sm"
-      :class="[
-        isActive ? 'opacity-0 pointer-events-none' : 'opacity-100',
-        isSidebarOpen ? 'left-[10.5rem]' : 'left-4'
-      ]"
-      title="Toggle Sidebar"
+      v-if="isSidebarOpen"
+      @click="isSidebarOpen = false"
+      class="fixed left-[10.5rem] top-20 z-40 w-8 h-8 rounded-lg border border-editor-sub/20 hover:border-editor-accent/40 bg-editor-bg/60 hover:bg-editor-bg/85 flex items-center justify-center text-editor-sub hover:text-editor-accent transition-opacity duration-300 cursor-pointer shadow-sm"
+      :class="isActive ? 'opacity-0 pointer-events-none' : 'opacity-100'"
+      title="Close Sidebar"
     >
-      <!-- Hamburger Icon when closed, Arrow left when open -->
-      <svg v-if="!isSidebarOpen" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/>
-      </svg>
-      <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="15 18 9 12 15 6"/>
+      </svg>
+    </button>
+
+    <!-- (b) When Closed: Appears at the left-center, styled as a vertical handle (high/narrow button) -->
+    <button
+      v-else
+      @click="isSidebarOpen = true"
+      class="fixed left-0 top-1/2 -translate-y-1/2 z-40 w-5 h-24 rounded-r-xl border-y border-r border-editor-sub/20 hover:border-editor-accent/40 bg-editor-bg/60 hover:bg-editor-bg/90 flex flex-col items-center justify-center text-editor-sub hover:text-editor-accent transition-opacity duration-300 cursor-pointer shadow-md group"
+      :class="isActive ? 'opacity-0 pointer-events-none' : 'opacity-100'"
+      title="Open Sidebar"
+    >
+      <!-- Subtle vertical indicator line or arrow -->
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-0.5 transition-transform">
+        <polyline points="9 18 15 12 9 6"/>
       </svg>
     </button>
 
