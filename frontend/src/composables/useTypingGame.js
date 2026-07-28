@@ -26,6 +26,16 @@ export function useTypingGame() {
   // Per-second WPM tracking for live chart
   const wpmHistory = ref([])         // [{ second, wpm, raw }, ...]
 
+  // For words mode display
+  const displayTime = computed(() => {
+    if (mode.value === 'time') {
+      return timeLeft.value
+    } else {
+      // In words mode, show words completed / total words (e.g. 0/25)
+      return `${currentWordIndex.value}/${wordOption.value}`
+    }
+  })
+
   // ============ INIT ============
   function initGame() {
     clearInterval(timerInterval)
@@ -242,11 +252,8 @@ export function useTypingGame() {
     }
   })
 
-  // ============ DISPLAY TIME ============
-  const displayTime = computed(() => {
-    if (mode.value === 'time') return timeLeft.value
-    return timeLeft.value
-  })
+  // ============ STATS DISPLAY ============
+  // The first duplicate displayTime block was added above. Removing this duplicate lower one.
 
   // ============ THEME HANDLING ============
   function applyTheme(newTheme) {

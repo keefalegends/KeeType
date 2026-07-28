@@ -28,24 +28,36 @@ const gameContainer = ref(null)
 
 const customTimeInput = ref('15')
 const isCustomPromptOpen = ref(false)
+const customPromptType = ref('time') // 'time' or 'words'
 
 const showCustomTimePrompt = () => {
+  customPromptType.value = 'time'
   customTimeInput.value = timeOption.value.toString()
   isCustomPromptOpen.value = true
 }
 
-const submitCustomTime = () => {
+const showCustomWordPrompt = () => {
+  customPromptType.value = 'words'
+  customTimeInput.value = wordOption.value.toString()
+  isCustomPromptOpen.value = true
+}
+
+const submitCustomValue = () => {
   const val = parseInt(customTimeInput.value, 10)
   if (!isNaN(val) && val > 0) {
-    timeOption.value = val
+    if (customPromptType.value === 'time') {
+      timeOption.value = val
+    } else {
+      wordOption.value = val
+    }
     isCustomPromptOpen.value = false
     initGame()
   } else {
-    alert('Invalid time entered. Must be a number greater than 0.')
+    alert(`Invalid ${customPromptType.value} entered. Must be a number greater than 0.`)
   }
 }
 
-const closeCustomTimePrompt = () => {
+const closeCustomPrompt = () => {
   isCustomPromptOpen.value = false
 }
 
@@ -97,6 +109,7 @@ onUnmounted(() => {
             @update:wordOption="wordOption = $event"
             @update:language="language = $event"
             @customTimeClick="showCustomTimePrompt"
+            @customWordClick="showCustomWordPrompt"
           />
 
           <!-- Timer Display -->
@@ -176,21 +189,21 @@ onUnmounted(() => {
       <div class="font-light opacity-50">open source · built for speed</div>
     </div>
 
-    <!-- Custom Time Modal Overlay -->
+    <!-- Custom Modal Overlay -->
     <Transition name="fade">
       <div
         v-if="isCustomPromptOpen"
         class="fixed inset-0 z-50 flex items-center justify-center modal-overlay"
-        @click.self="closeCustomTimePrompt"
+        @click.self="closeCustomPrompt"
       >
         <div class="modal-content rounded-xl p-8 w-80 max-w-[90vw] shadow-2xl flex flex-col items-center gap-6 text-center transform transition-all scale-100 opacity-100">
           <!-- Title -->
           <div class="flex flex-col gap-1 w-full">
             <h2 class="text-xl font-bold tracking-tight text-editor-text">
-              custom time
+              custom {{ customPromptType }}
             </h2>
             <p class="text-sm text-editor-sub font-light">
-              enter seconds to test
+              enter {{ customPromptType === 'time' ? 'seconds' : 'words count' }} to test
             </p>
           </div>
 
@@ -201,9 +214,9 @@ onUnmounted(() => {
               type="number"
               min="1"
               max="3600"
-              placeholder="15"
-              @keyup.enter="submitCustomTime"
-              @keyup.esc="closeCustomTimePrompt"
+              :placeholder="customPromptType === 'time' ? '15' : '25'"
+              @keyup.enter="submitCustomValue"
+              @keyup.esc="closeCustomPrompt"
               class="w-full text-center py-4 bg-editor-bg/50 border-2 border-editor-sub/20 rounded-lg text-editor-text focus:outline-none focus:border-editor-accent font-mono text-3xl font-bold transition-colors shadow-inner"
               autofocus
             />
@@ -212,13 +225,13 @@ onUnmounted(() => {
           <!-- Actions -->
           <div class="flex items-center justify-center gap-3 w-full mt-2">
             <button
-              @click="closeCustomTimePrompt"
+              @click="closeCustomPrompt"
               class="flex-1 py-2.5 rounded-lg border border-transparent text-editor-sub hover:text-editor-text hover:bg-editor-sub/10 transition-colors cursor-pointer font-medium"
             >
               cancel
             </button>
             <button
-              @click="submitCustomTime"
+              @click="submitCustomValue"
               class="flex-1 py-2.5 rounded-lg bg-editor-accent text-editor-bg font-bold hover:opacity-90 transition-opacity cursor-pointer shadow-md"
             >
               start
