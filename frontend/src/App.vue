@@ -73,7 +73,7 @@ onUnmounted(() => {
     <button 
       v-if="isSidebarOpen"
       @click="isSidebarOpen = false"
-      class="fixed left-4 top-20 z-40 w-8 h-8 rounded-lg border border-editor-sub/20 hover:border-editor-accent/40 bg-editor-bg/60 hover:bg-editor-bg/85 flex items-center justify-center text-editor-sub hover:text-editor-accent transition-opacity duration-300 cursor-pointer shadow-sm"
+      class="fixed left-4 top-20 z-40 w-8 h-8 rounded-lg border border-editor-sub/20 hover:border-editor-gold/40 bg-editor-bg/60 hover:bg-editor-bg/85 flex items-center justify-center text-editor-sub hover:text-editor-gold transition-opacity duration-300 cursor-pointer shadow-sm"
       :class="isActive ? 'opacity-0 pointer-events-none' : 'opacity-100'"
       title="Close Sidebar"
     >
@@ -86,7 +86,7 @@ onUnmounted(() => {
     <button
       v-else
       @click="isSidebarOpen = true"
-      class="fixed left-0 top-1/2 -translate-y-1/2 z-40 w-5 h-24 rounded-r-xl border-y border-r border-editor-sub/20 hover:border-editor-accent/40 bg-editor-bg/60 hover:bg-editor-bg/90 flex flex-col items-center justify-center text-editor-sub hover:text-editor-accent transition-opacity duration-300 cursor-pointer shadow-md group"
+      class="fixed left-0 top-1/2 -translate-y-1/2 z-40 w-5 h-24 rounded-r-xl border-y border-r border-editor-sub/20 hover:border-editor-gold/40 bg-editor-bg/60 hover:bg-editor-bg/90 flex flex-col items-center justify-center text-editor-sub hover:text-editor-gold transition-opacity duration-300 cursor-pointer shadow-md group"
       :class="isActive ? 'opacity-0 pointer-events-none' : 'opacity-100'"
       title="Open Sidebar"
     >
@@ -122,7 +122,7 @@ onUnmounted(() => {
         <button 
           @click="activeView = 'write'"
           class="transition-all duration-200 cursor-pointer text-center py-3.5 rounded-xl"
-          :class="activeView === 'write' ? 'text-editor-accent bg-editor-accent/10 scale-105' : 'text-editor-sub hover:text-editor-text hover:bg-editor-sub/5'"
+          :class="activeView === 'write' ? 'text-editor-gold bg-editor-gold/10 scale-105' : 'text-editor-sub hover:text-editor-text hover:bg-editor-sub/5'"
         >
           Write
         </button>
@@ -137,7 +137,7 @@ onUnmounted(() => {
         <button 
           @click="activeView = 'setting'"
           class="transition-all duration-200 cursor-pointer text-center py-3.5 rounded-xl"
-          :class="activeView === 'setting' ? 'text-editor-accent bg-editor-accent/10 scale-105' : 'text-editor-sub hover:text-editor-text hover:bg-editor-sub/5'"
+          :class="activeView === 'setting' ? 'text-editor-gold bg-editor-gold/10 scale-105' : 'text-editor-sub hover:text-editor-text hover:bg-editor-sub/5'"
         >
           Setting
         </button>
@@ -146,7 +146,7 @@ onUnmounted(() => {
         <button 
           @click="activeView = 'about'"
           class="transition-all duration-200 cursor-pointer text-center py-3.5 rounded-xl"
-          :class="activeView === 'about' ? 'text-editor-accent bg-editor-accent/10 scale-105' : 'text-editor-sub hover:text-editor-text hover:bg-editor-sub/5'"
+          :class="activeView === 'about' ? 'text-editor-gold bg-editor-gold/10 scale-105' : 'text-editor-sub hover:text-editor-text hover:bg-editor-sub/5'"
         >
           About
         </button>
@@ -170,7 +170,7 @@ onUnmounted(() => {
         class="absolute top-8 left-10 transition-opacity duration-300 z-20"
         :class="isActive ? 'opacity-0 pointer-events-none' : 'opacity-100'"
       >
-        <h1 class="text-2xl text-editor-accent font-bold tracking-tight">
+        <h1 class="text-2xl text-editor-gold font-bold tracking-tight">
           kee<span class="text-editor-text">type</span>
         </h1>
       </header>

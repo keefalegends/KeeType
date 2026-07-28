@@ -14,6 +14,7 @@
   --color-editor-accent: var(--accent);
   --color-editor-accent-dim: var(--accent-dim);
   --color-editor-caret: var(--caret);
+  --color-editor-gold: var(--gold, var(--accent));
   --font-mono: 'JetBrains Mono', monospace;
 }
 
@@ -21,7 +22,7 @@
   THEMES
 */
 
-/* 1. Default (Charcoal & Warm Palette) - Based on user color hunt selection */
+/* 1. Default (Navy & Gold Warm Palette) - Replaced charcoal with dark navy & gold */
 :root, .theme-default {
   --bg: #202940;          /* Dark navy blue */
   --sub: #9a8678;         /* Taupe/grey-brown for sub text */
@@ -29,9 +30,10 @@
   --error: #f44747;
   --error-extra: #7e2a33;
   --correct: #caaa98;     /* Match light beige */
-  --accent: #caaa98;      /* Primary accent */
+  --accent: #caaa98;      /* Primary accent for game active text */
   --accent-dim: #9a8678;
   --caret: #caaa98;       /* Caret color matches primary */
+  --gold: #dfb15b;        /* Gold color for headers, logos, and settings indicators */
 }
 
 /* 2. Retro CRT (Pure Black & Phosphor Green) - Hacker terminal vibe */
