@@ -26,17 +26,27 @@ const {
 
 const gameContainer = ref(null)
 
+const customTimeInput = ref('15')
+const isCustomPromptOpen = ref(false)
+
 const showCustomTimePrompt = () => {
-  const custom = prompt('Enter custom time in seconds:', '15')
-  if (custom) {
-    const val = parseInt(custom, 10)
-    if (!isNaN(val) && val > 0) {
-      timeOption.value = val
-      initGame()
-    } else {
-      alert('Invalid time entered. Must be a number greater than 0.')
-    }
+  customTimeInput.value = timeOption.value.toString()
+  isCustomPromptOpen.value = true
+}
+
+const submitCustomTime = () => {
+  const val = parseInt(customTimeInput.value, 10)
+  if (!isNaN(val) && val > 0) {
+    timeOption.value = val
+    isCustomPromptOpen.value = false
+    initGame()
+  } else {
+    alert('Invalid time entered. Must be a number greater than 0.')
   }
+}
+
+const closeCustomTimePrompt = () => {
+  isCustomPromptOpen.value = false
 }
 
 function onKeyDown(e) {
@@ -165,5 +175,48 @@ onUnmounted(() => {
       </div>
       <div class="font-light opacity-50">open source · built for speed</div>
     </div>
+
+    <!-- Custom Time Modal Overlay -->
+    <Transition name="fade">
+      <div
+        v-if="isCustomPromptOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center modal-overlay"
+        @click.self="closeCustomTimePrompt"
+      >
+        <div class="modal-content rounded-lg p-6 w-80 max-w-[90vw] shadow-xl flex flex-col gap-4 text-center">
+          <div class="text-sm font-semibold text-editor-accent">
+            custom test time
+          </div>
+          <div class="text-xs text-editor-sub">
+            enter custom test time in seconds:
+          </div>
+          <input
+            v-model="customTimeInput"
+            type="number"
+            min="1"
+            max="3600"
+            placeholder="15"
+            @keyup.enter="submitCustomTime"
+            @keyup.esc="closeCustomTimePrompt"
+            class="w-full text-center py-2 px-3 bg-transparent border border-editor-sub/40 rounded text-editor-text focus:outline-none focus:border-editor-accent font-mono text-lg transition-colors"
+            autofocus
+          />
+          <div class="flex items-center justify-end gap-2 mt-2 text-xs">
+            <button
+              @click="closeCustomTimePrompt"
+              class="px-3 py-1.5 rounded border border-editor-sub/30 text-editor-sub hover:text-editor-text hover:border-editor-text transition-colors cursor-pointer"
+            >
+              cancel
+            </button>
+            <button
+              @click="submitCustomTime"
+              class="px-3 py-1.5 rounded bg-editor-accent text-editor-bg font-medium hover:bg-editor-accent/90 transition-colors cursor-pointer"
+            >
+              ok
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>

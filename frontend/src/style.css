@@ -60,6 +60,22 @@
   --caret: #225ccb;
 }
 
+/* Modal styles for custom prompt */
+.modal-overlay {
+  background-color: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+}
+.theme-paper .modal-overlay {
+  background-color: rgba(255, 255, 255, 0.6);
+}
+.modal-content {
+  background-color: var(--bg);
+  border: 1.5px solid var(--sub);
+}
+.theme-retro-crt .modal-content {
+  border: 2px solid var(--accent);
+}
+
 
 * {
   margin: 0;
