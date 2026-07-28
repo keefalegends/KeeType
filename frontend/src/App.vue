@@ -116,7 +116,7 @@ onUnmounted(() => {
 
     <!-- LEFT SIDEBAR (Polished Panel matching the active theme colors, top-32 bottom-32) -->
     <aside 
-      class="fixed left-0 top-32 bottom-32 w-36 z-30 flex flex-col py-10 px-3 text-center select-none shadow-lg transition-all duration-300 ease-in-out border-r border-y"
+      class="fixed left-0 top-32 bottom-32 w-36 z-30 flex flex-col py-6 px-3 text-center select-none shadow-lg transition-all duration-300 ease-in-out border-r border-y"
       :style="{
         backgroundColor: theme === 'theme-paper' ? '#fcfcfc' : (theme === 'theme-retro-crt' ? '#001a00' : '#202940'),
         borderColor: theme === 'theme-paper' ? 'rgba(0,0,0,0.1)' : (theme === 'theme-retro-crt' ? 'var(--color-editor-accent)' : 'var(--color-editor-gold)'),
@@ -129,15 +129,22 @@ onUnmounted(() => {
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
       ]"
     >
-      <!-- Top Header (Pushed down slightly) -->
+      <!-- Top Header (Pushed down significantly inside the sidebar container) -->
       <div 
-        class="text-[11px] uppercase tracking-[0.25em] font-bold mt-4 mb-2"
-        :class="{
-          'text-editor-gold': theme === 'theme-default',
-          'text-editor-accent': theme !== 'theme-default'
+        class="pb-3 mb-6 border-b pt-12"
+        :style="{
+          borderColor: theme === 'theme-paper' ? 'var(--color-editor-accent)' : 'var(--color-editor-gold)'
         }"
       >
-        Menu
+        <div 
+          class="text-[13px] uppercase tracking-[0.25em] font-extrabold"
+          :class="{
+            'text-editor-gold': theme === 'theme-default',
+            'text-editor-accent': theme !== 'theme-default'
+          }"
+        >
+          Menu
+        </div>
       </div>
 
       <!-- Nav Items (Expanded to fill vertical space down to the bottom) -->
@@ -212,8 +219,13 @@ onUnmounted(() => {
         class="absolute top-8 left-10 transition-opacity duration-300 z-20"
         :class="isActive ? 'opacity-0 pointer-events-none' : 'opacity-100'"
       >
-        <h1 class="text-2xl text-editor-gold font-bold tracking-tight">
-          kee<span class="text-editor-text">type</span>
+        <h1 class="text-2xl font-bold tracking-tight">
+          <span 
+            :class="{
+              'text-editor-gold': theme === 'theme-default',
+              'text-editor-accent': theme !== 'theme-default'
+            }"
+          >kee</span><span class="text-editor-text">type</span>
         </h1>
       </header>
 
@@ -302,7 +314,7 @@ onUnmounted(() => {
                       :class="theme === 'theme-retro-crt' ? 'border-editor-accent/60 bg-editor-accent/5' : ''"
                     >
                       <div class="w-4 h-4 rounded-none border border-editor-sub/30 bg-[#000000]" style="border-color: #00ff00;"></div>
-                      <span class="text-xs font-semibold text-editor-text">crt</span>
+                      <span class="text-xs font-semibold text-editor-text">terminal</span>
                     </button>
 
                     <button 

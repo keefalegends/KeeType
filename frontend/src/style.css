@@ -36,7 +36,7 @@
   --gold: #dfb15b;        /* Gold color for headers, logos, and settings indicators */
 }
 
-/* 2. Retro CRT (Pure Black & Phosphor Green) - Hacker terminal vibe */
+/* 2. Retro Terminal CRT (Pure Black & Phosphor Green) - Hacker terminal vibe */
 .theme-retro-crt {
   --bg: #000000;
   --sub: #005a00;
