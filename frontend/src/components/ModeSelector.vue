@@ -24,27 +24,6 @@ const wordOptions = [8, 25, 50, 100]
   <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 text-sm select-none transition-opacity duration-300"
        :class="isActive ? 'opacity-0 pointer-events-none' : 'opacity-100'">
 
-    <!-- Language Selector -->
-    <div class="flex items-center gap-2">
-      <button
-        @click="emit('update:language', 'english')"
-        class="px-2 py-0.5 transition-colors duration-200 cursor-pointer text-xs"
-        :class="language === 'english' ? 'text-editor-accent' : 'text-editor-sub hover:text-editor-text'"
-      >
-        english
-      </button>
-      <span class="text-editor-sub/30 text-xs">|</span>
-      <button
-        @click="emit('update:language', 'indonesian')"
-        class="px-2 py-0.5 transition-colors duration-200 cursor-pointer text-xs"
-        :class="language === 'indonesian' ? 'text-editor-accent' : 'text-editor-sub hover:text-editor-text'"
-      >
-        indonesian
-      </button>
-    </div>
-
-    <span class="hidden md:inline text-editor-sub/30">|</span>
-
     <div class="flex items-center gap-6">
       <!-- Mode Toggle -->
       <div class="flex items-center gap-2">

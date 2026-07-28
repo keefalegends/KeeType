@@ -79,6 +79,14 @@
   border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
+/* Sidebar background — slightly offset from main bg */
+.sidebar-bg {
+  background-color: color-mix(in srgb, var(--bg) 92%, black 8%);
+}
+.theme-paper .sidebar-bg {
+  background-color: color-mix(in srgb, var(--bg) 92%, white 8%);
+}
+
 
 * {
   margin: 0;
