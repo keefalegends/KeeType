@@ -50,6 +50,12 @@ const closeCustomPrompt = () => {
   isCustomPromptOpen.value = false
 }
 
+// Automatically navigate back to 'write' view when game is restarted/init
+const restartGame = () => {
+  activeView.value = 'write'
+  initGame()
+}
+
 function onKeyDown(e) {
   if (isCustomPromptOpen.value) return
   if (isFinished.value && e.key === 'Tab') return
@@ -123,9 +129,9 @@ onUnmounted(() => {
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
       ]"
     >
-      <!-- Top Header -->
+      <!-- Top Header (Pushed down slightly) -->
       <div 
-        class="text-[11px] uppercase tracking-[0.25em] font-bold mb-4"
+        class="text-[11px] uppercase tracking-[0.25em] font-bold mt-4 mb-2"
         :class="{
           'text-editor-gold': theme === 'theme-default',
           'text-editor-accent': theme !== 'theme-default'
@@ -135,55 +141,61 @@ onUnmounted(() => {
       </div>
 
       <!-- Nav Items (Expanded to fill vertical space down to the bottom) -->
-      <nav class="flex-1 flex flex-col justify-evenly font-bold text-[15px] my-6">
-        <!-- Write (Typing Test) -->
-        <button 
-          @click="activeView = 'write'"
-          class="transition-all duration-200 cursor-pointer text-center py-3.5 rounded-xl"
-          :class="[
-            activeView === 'write'
-              ? (theme === 'theme-default' ? 'text-editor-gold bg-editor-gold/10 scale-105' : 'text-editor-accent bg-editor-accent/10 scale-105')
-              : 'text-editor-sub hover:text-editor-text hover:bg-editor-sub/5'
-          ]"
-        >
-          Write
-        </button>
+      <nav class="flex-1 flex flex-col justify-between font-bold text-[15px] my-6">
+        <!-- Top Menu Items Group (Centered vertically in the upper half) -->
+        <div class="flex flex-col gap-6 justify-center flex-1">
+          <!-- Write (Typing Test) -->
+          <button 
+            @click="activeView = 'write'"
+            class="transition-all duration-200 cursor-pointer text-center py-3.5 rounded-xl"
+            :class="[
+              activeView === 'write'
+                ? (theme === 'theme-default' ? 'text-editor-gold bg-editor-gold/10 scale-105' : 'text-editor-accent bg-editor-accent/10 scale-105')
+                : 'text-editor-sub hover:text-editor-text hover:bg-editor-sub/5'
+            ]"
+          >
+            Write
+          </button>
 
-        <!-- Arena (Coming Soon) -->
-        <div class="flex flex-col items-center py-3.5 rounded-xl text-editor-sub/30 cursor-not-allowed">
-          <span class="line-through">Arena</span>
-          <span class="text-[9px] uppercase tracking-wider font-semibold mt-1 bg-red-500/10 text-red-500 px-1.5 py-0.5 rounded">Soon</span>
+          <!-- Arena (Coming Soon) -->
+          <div class="flex flex-col items-center py-3.5 rounded-xl text-editor-sub/30 cursor-not-allowed">
+            <span class="line-through">Arena</span>
+            <span class="text-[9px] uppercase tracking-wider font-semibold mt-1 bg-red-500/10 text-red-500 px-1.5 py-0.5 rounded">Soon</span>
+          </div>
         </div>
 
-        <!-- Setting -->
-        <button 
-          @click="activeView = 'setting'"
-          class="transition-all duration-200 cursor-pointer text-center py-3.5 rounded-xl"
-          :class="[
-            activeView === 'setting'
-              ? (theme === 'theme-default' ? 'text-editor-gold bg-editor-gold/10 scale-105' : 'text-editor-accent bg-editor-accent/10 scale-105')
-              : 'text-editor-sub hover:text-editor-text hover:bg-editor-sub/5'
-          ]"
-        >
-          Setting
-        </button>
+        <!-- Bottom Menu Items Group (Pushed completely to the bottom of the navigation flow) -->
+        <div class="flex flex-col gap-4 mt-auto">
+          <!-- Setting -->
+          <button 
+            @click="activeView = 'setting'"
+            class="transition-all duration-200 cursor-pointer text-center py-3.5 rounded-xl"
+            :class="[
+              activeView === 'setting'
+                ? (theme === 'theme-default' ? 'text-editor-gold bg-editor-gold/10 scale-105' : 'text-editor-accent bg-editor-accent/10 scale-105')
+                : 'text-editor-sub hover:text-editor-text hover:bg-editor-sub/5'
+            ]"
+          >
+            Setting
+          </button>
 
-        <!-- About -->
-        <button 
-          @click="activeView = 'about'"
-          class="transition-all duration-200 cursor-pointer text-center py-3.5 rounded-xl"
-          :class="[
-            activeView === 'about'
-              ? (theme === 'theme-default' ? 'text-editor-gold bg-editor-gold/10 scale-105' : 'text-editor-accent bg-editor-accent/10 scale-105')
-              : 'text-editor-sub hover:text-editor-text hover:bg-editor-sub/5'
-          ]"
-        >
-          About
-        </button>
+          <!-- About -->
+          <button 
+            @click="activeView = 'about'"
+            class="transition-all duration-200 cursor-pointer text-center py-3.5 rounded-xl"
+            :class="[
+              activeView === 'about'
+                ? (theme === 'theme-default' ? 'text-editor-gold bg-editor-gold/10 scale-105' : 'text-editor-accent bg-editor-accent/10 scale-105')
+                : 'text-editor-sub hover:text-editor-text hover:bg-editor-sub/5'
+            ]"
+          >
+            About
+          </button>
+        </div>
       </nav>
 
       <!-- Bottom Group (Clean layout at the very end of the panel) -->
-      <div class="flex flex-col gap-1 text-[9px] text-editor-sub/50 leading-relaxed font-light mt-2 pt-4 border-t border-editor-sub/5">
+      <div class="flex flex-col gap-1 text-[9px] text-editor-sub/50 leading-relaxed font-light pt-4 border-t border-editor-sub/5">
         <div>v1.0.0</div>
         <div>speed & focus</div>
       </div>
@@ -262,7 +274,7 @@ onUnmounted(() => {
                   :mode="mode"
                   :timeOption="timeOption"
                   :wordOption="wordOption"
-                  @restart="initGame"
+                  @restart="restartGame"
                 />
               </div>
             </div>
@@ -278,7 +290,7 @@ onUnmounted(() => {
                     <button 
                       @click="theme = 'theme-default'"
                       class="flex items-center gap-3 px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
-                      :class="theme === 'theme-default' ? 'border-editor-accent/60 bg-editor-accent/5' : ''"
+                      :class="theme === 'theme-default' ? 'border-editor-gold/60 bg-editor-accent/5' : ''"
                     >
                       <div class="w-4 h-4 rounded-full border border-editor-sub/30 bg-[#202940]" style="border-color: #dfb15b;"></div>
                       <span class="text-xs font-semibold text-editor-text">navy</span>
@@ -298,7 +310,7 @@ onUnmounted(() => {
                       class="flex items-center gap-3 px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
                       :class="theme === 'theme-paper' ? 'border-editor-accent/60 bg-editor-accent/5' : ''"
                     >
-                      <div class="w-4 h-4 rounded-sm border border-editor-sub/30 bg-[#f4f4f0]" style="border-color: #111844;"></div>
+                      <div class="w-4 h-4 rounded-sm border border-editor-sub/30 bg-[#f4f4f0]" style="border-color: #225ccb;"></div>
                       <span class="text-xs font-semibold text-editor-text">paper</span>
                     </button>
                   </div>
@@ -325,41 +337,15 @@ onUnmounted(() => {
 
       <!-- Footer (Centered at Bottom) -->
       <footer 
-        class="w-full flex flex-col items-center justify-center gap-3 text-xs text-editor-gold pb-8 transition-opacity duration-300 animate-pulse-slow"
-        :class="isActive ? 'opacity-0' : 'opacity-100'"
+        class="w-full flex flex-col items-center justify-center gap-3 text-xs pb-8 transition-opacity duration-300 animate-pulse-slow"
+        :class="[
+          isActive ? 'opacity-0 pointer-events-none' : 'opacity-100',
+          theme === 'theme-default' ? 'text-editor-gold' : 'text-editor-sub'
+        ]"
       >
-        <div class="flex items-center gap-4">
-          <!-- Theme Default -->
-          <button 
-            @click="theme = 'theme-default'"
-            class="flex items-center gap-1.5 cursor-pointer transition-colors duration-200"
-            :class="theme === 'theme-default' ? 'text-editor-accent font-bold' : 'hover:text-editor-text'"
-          >
-            <div class="w-3 h-3 rounded-full border border-editor-sub/30" style="background-color: #202940; border-color: #dfb15b;"></div>
-            navy
-          </button>
-
-          <!-- Theme Retro CRT -->
-          <button 
-            @click="theme = 'theme-retro-crt'"
-            class="flex items-center gap-1.5 cursor-pointer transition-colors duration-200"
-            :class="theme === 'theme-retro-crt' ? 'text-editor-accent font-bold' : 'hover:text-editor-text'"
-          >
-            <div class="w-3 h-3 rounded-none border border-editor-sub/30" style="background-color: #000000; border-color: #00ff00;"></div>
-            crt
-          </button>
-
-          <!-- Theme Paper -->
-          <button 
-            @click="theme = 'theme-paper'"
-            class="flex items-center gap-1.5 cursor-pointer transition-colors duration-200"
-            :class="theme === 'theme-paper' ? 'text-editor-accent font-bold' : 'hover:text-editor-text'"
-          >
-            <div class="w-3 h-3 rounded-sm shadow-sm border border-editor-sub/30" style="background-color: #f4f4f0; border-color: #111844;"></div>
-            paper
-          </button>
+        <div class="font-light opacity-80" :class="theme === 'theme-default' ? 'text-editor-gold' : 'text-editor-sub'">
+          open source · built for speed
         </div>
-        <div class="font-light opacity-80 text-editor-gold">open source · built for speed</div>
       </footer>
     </div>
 
