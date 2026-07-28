@@ -1,39 +1,23 @@
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useTypingGame } from './composables/useTypingGame.js'
-import Sidebar from './components/Sidebar.vue'
-import SettingsPanel from './components/SettingsPanel.vue'
 import ModeSelector from './components/ModeSelector.vue'
 import TypingArea from './components/TypingArea.vue'
 import ResultScreen from './components/ResultScreen.vue'
 
 const {
-  mode,
-  timeOption,
-  wordOption,
-  language,
-  theme,
-  words,
-  currentWordIndex,
-  currentCharIndex,
-  typedChars,
-  isActive,
-  isFinished,
-  displayTime,
-  wpmHistory,
-  stats,
-  initGame,
-  handleKeyDown,
+  mode, timeOption, wordOption, language, theme,
+  words, currentWordIndex, currentCharIndex, typedChars,
+  isActive, isFinished, displayTime, wpmHistory, stats,
+  initGame, handleKeyDown,
 } = useTypingGame()
 
 const gameContainer = ref(null)
-const activeView = ref('home')
-const isSettingsOpen = ref(false)
 
-// Custom modal state
-const customTimeInput = ref('15')
+// ============ CUSTOM MODALS ============
 const isCustomPromptOpen = ref(false)
 const customPromptType = ref('time')
+const customTimeInput = ref('15')
 
 const showCustomTimePrompt = () => {
   customPromptType.value = 'time'
@@ -65,25 +49,9 @@ const closeCustomPrompt = () => {
 }
 
 function onKeyDown(e) {
-  if (isCustomPromptOpen.value || isSettingsOpen.value) return
+  if (isCustomPromptOpen.value) return
   if (isFinished.value && e.key === 'Tab') return
   handleKeyDown(e)
-}
-
-function handleNavigate(view) {
-  activeView.value = view
-}
-
-function handleOpenSettings() {
-  isSettingsOpen.value = true
-}
-
-function handleUpdateTheme(newTheme) {
-  theme.value = newTheme
-}
-
-function handleUpdateLanguage(newLang) {
-  language.value = newLang
 }
 
 onMounted(() => {
@@ -96,88 +64,118 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="flex min-h-screen">
-    <!-- Sidebar -->
-    <Sidebar
-      :activeView="activeView"
-      @navigate="handleNavigate"
-      @openSettings="handleOpenSettings"
-    />
-
-    <!-- Settings Panel -->
-    <SettingsPanel
-      :isOpen="isSettingsOpen"
-      :theme="theme"
-      :language="language"
-      @close="isSettingsOpen = false"
-      @update:theme="handleUpdateTheme"
-      @update:language="handleUpdateLanguage"
-    />
-
-    <!-- Main Content -->
-    <main
-      ref="gameContainer"
-      class="flex-1 ml-16 min-h-screen flex flex-col items-center justify-center px-8"
+  <div
+    ref="gameContainer"
+    class="min-h-screen flex flex-col items-center justify-center px-8 relative"
+  >
+    <!-- Header / Logo -->
+    <div
+      class="absolute top-8 left-10 transition-opacity duration-300"
+      :class="isActive ? 'opacity-0' : 'opacity-100'"
     >
-      <div class="w-full max-w-4xl">
-        <Transition name="fade" mode="out-in">
-          <!-- Game View -->
-          <div v-if="!isFinished" key="game">
-            <!-- Mode Selector -->
-            <ModeSelector
-              :mode="mode"
-              :timeOption="timeOption"
-              :wordOption="wordOption"
-              :language="language"
-              :isActive="isActive"
-              @update:mode="mode = $event"
-              @update:timeOption="timeOption = $event"
-              @update:wordOption="wordOption = $event"
-              @update:language="language = $event"
-              @customTimeClick="showCustomTimePrompt"
-              @customWordClick="showCustomWordPrompt"
-            />
+      <h1 class="text-2xl text-editor-accent font-bold tracking-tight">
+        kee<span class="text-editor-text">type</span>
+      </h1>
+    </div>
 
-            <!-- Timer Display -->
-            <div class="text-3xl text-editor-accent mt-6 mb-4 transition-opacity duration-300">
-              {{ displayTime }}
-            </div>
+    <!-- Main Content (Centered) -->
+    <div class="w-full max-w-4xl">
+      <Transition name="fade" mode="out-in">
+        <!-- Game View -->
+        <div v-if="!isFinished" key="game">
+          <!-- Mode Selector -->
+          <ModeSelector
+            :mode="mode"
+            :timeOption="timeOption"
+            :wordOption="wordOption"
+            :language="language"
+            :isActive="isActive"
+            @update:mode="mode = $event"
+            @update:timeOption="timeOption = $event"
+            @update:wordOption="wordOption = $event"
+            @update:language="language = $event"
+            @customTimeClick="showCustomTimePrompt"
+            @customWordClick="showCustomWordPrompt"
+          />
 
-            <!-- Typing Area -->
-            <TypingArea
-              :words="words"
-              :currentWordIndex="currentWordIndex"
-              :currentCharIndex="currentCharIndex"
-              :typedChars="typedChars"
-              :isActive="isActive"
-              :isFinished="isFinished"
-            />
-
-            <!-- Restart hint -->
-            <div
-              class="mt-8 text-sm text-editor-sub text-center transition-opacity duration-300"
-              :class="isActive ? 'opacity-0' : 'opacity-100'"
-            >
-              press <span class="text-editor-text">tab</span> to restart
-            </div>
+          <!-- Timer Display -->
+          <div class="text-3xl text-editor-accent mt-6 mb-4 transition-opacity duration-300">
+            {{ displayTime }}
           </div>
 
-          <!-- Result View -->
-          <div v-else key="result">
-            <ResultScreen
-              :stats="stats"
-              :wpmHistory="wpmHistory"
-              :mode="mode"
-              :timeOption="timeOption"
-              :wordOption="wordOption"
-              @restart="initGame"
-            />
+          <!-- Typing Area -->
+          <TypingArea
+            :words="words"
+            :currentWordIndex="currentWordIndex"
+            :currentCharIndex="currentCharIndex"
+            :typedChars="typedChars"
+            :isActive="isActive"
+            :isFinished="isFinished"
+          />
+
+          <!-- Restart hint -->
+          <div
+            class="mt-8 text-sm text-editor-sub text-center transition-opacity duration-300"
+            :class="isActive ? 'opacity-0' : 'opacity-100'"
+          >
+            press <span class="text-editor-text">tab</span> to restart
           </div>
-        </Transition>
+        </div>
+
+        <!-- Result View -->
+        <div v-else key="result">
+          <ResultScreen
+            :stats="stats"
+            :wpmHistory="wpmHistory"
+            :mode="mode"
+            :timeOption="timeOption"
+            :wordOption="wordOption"
+            @restart="initGame"
+          />
+        </div>
+      </Transition>
+    </div>
+
+    <!-- Footer & Theme Switcher (Centered at Bottom) -->
+    <div
+      class="absolute bottom-6 w-full flex flex-col items-center justify-center gap-3 text-xs text-editor-sub transition-opacity duration-300"
+      :class="isActive ? 'opacity-0' : 'opacity-100'"
+    >
+      <div class="flex items-center gap-4">
+        <!-- Theme Default -->
+        <button 
+          @click="theme = 'theme-default'"
+          class="flex items-center gap-1.5 cursor-pointer transition-colors duration-200"
+          :class="theme === 'theme-default' ? 'text-editor-accent' : 'hover:text-editor-text'"
+        >
+          <div class="w-3 h-3 rounded-full border border-editor-sub/30" style="background-color: #1e1e1e; border-color: #d7ba7d;"></div>
+          charcoal
+        </button>
+
+        <!-- Theme Retro CRT -->
+        <button 
+          @click="theme = 'theme-retro-crt'"
+          class="flex items-center gap-1.5 cursor-pointer transition-colors duration-200"
+          :class="theme === 'theme-retro-crt' ? 'text-editor-accent' : 'hover:text-editor-text'"
+        >
+          <div class="w-3 h-3 rounded-none border border-editor-sub/30" style="background-color: #000000; border-color: #00ff00;"></div>
+          crt
+        </button>
+
+        <!-- Theme Paper -->
+        <button 
+          @click="theme = 'theme-paper'"
+          class="flex items-center gap-1.5 cursor-pointer transition-colors duration-200"
+          :class="theme === 'theme-paper' ? 'text-editor-accent' : 'hover:text-editor-text'"
+        >
+          <div class="w-3 h-3 rounded-sm shadow-sm border border-editor-sub/30" style="background-color: #f4f4f0; border-color: #225ccb;"></div>
+          paper
+        </button>
       </div>
-    </main>
+      <div class="font-light opacity-50">open source · built for speed</div>
+    </div>
 
-    <!-- Custom Modal Overlay -->
+    <!-- Custom Time/Words Modal Overlay -->
     <Transition name="fade">
       <div
         v-if="isCustomPromptOpen"
@@ -185,6 +183,7 @@ onUnmounted(() => {
         @click.self="closeCustomPrompt"
       >
         <div class="modal-content rounded-xl p-8 w-80 max-w-[90vw] shadow-2xl flex flex-col items-center gap-6 text-center">
+          <!-- Title -->
           <div class="flex flex-col gap-1 w-full">
             <h2 class="text-xl font-bold tracking-tight text-editor-text">
               custom {{ customPromptType }}
@@ -193,7 +192,9 @@ onUnmounted(() => {
               enter {{ customPromptType === 'time' ? 'seconds' : 'words count' }} to test
             </p>
           </div>
-          <div class="w-full">
+
+          <!-- Input -->
+          <div class="w-full relative">
             <input
               v-model="customTimeInput"
               type="number"
@@ -206,6 +207,8 @@ onUnmounted(() => {
               autofocus
             />
           </div>
+
+          <!-- Actions -->
           <div class="flex items-center justify-center gap-3 w-full mt-2">
             <button
               @click="closeCustomPrompt"
