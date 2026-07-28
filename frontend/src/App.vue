@@ -101,7 +101,7 @@ onUnmounted(() => {
       class="fixed left-0 top-32 bottom-32 w-36 z-30 flex flex-col py-10 px-3 text-center select-none shadow-lg transition-all duration-300 ease-in-out border-r border-y"
       :style="{
         backgroundColor: theme === 'theme-paper' ? '#fcfcfc' : (theme === 'theme-retro-crt' ? '#001a00' : '#1a1a1a'),
-        borderColor: 'var(--color-editor-sub)',
+        borderColor: theme === 'theme-paper' ? 'rgba(0,0,0,0.1)' : 'var(--color-editor-gold)',
         borderTopRightRadius: '2rem',
         borderBottomRightRadius: '2rem',
         color: 'var(--color-editor-text)'
@@ -112,7 +112,7 @@ onUnmounted(() => {
       ]"
     >
       <!-- Top Header -->
-      <div class="text-[11px] uppercase tracking-[0.25em] text-editor-sub/60 font-bold mb-4">
+      <div class="text-[11px] uppercase tracking-[0.25em] text-editor-gold font-bold mb-4">
         Menu
       </div>
 
@@ -250,8 +250,8 @@ onUnmounted(() => {
                       class="flex items-center gap-3 px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
                       :class="theme === 'theme-default' ? 'border-editor-accent/60 bg-editor-accent/5' : ''"
                     >
-                      <div class="w-4 h-4 rounded-full border border-editor-sub/30 bg-[#202940]" style="border-color: #caaa98;"></div>
-                      <span class="text-xs font-semibold text-editor-text">charcoal</span>
+                      <div class="w-4 h-4 rounded-full border border-editor-sub/30 bg-[#202940]" style="border-color: #dfb15b;"></div>
+                      <span class="text-xs font-semibold text-editor-text">navy</span>
                     </button>
                     
                     <button 
@@ -295,7 +295,7 @@ onUnmounted(() => {
 
       <!-- Footer (Centered at Bottom) -->
       <footer 
-        class="w-full flex flex-col items-center justify-center gap-3 text-xs text-editor-sub pb-8 transition-opacity duration-300"
+        class="w-full flex flex-col items-center justify-center gap-3 text-xs text-editor-gold pb-8 transition-opacity duration-300 animate-pulse-slow"
         :class="isActive ? 'opacity-0' : 'opacity-100'"
       >
         <div class="flex items-center gap-4">
@@ -303,17 +303,17 @@ onUnmounted(() => {
           <button 
             @click="theme = 'theme-default'"
             class="flex items-center gap-1.5 cursor-pointer transition-colors duration-200"
-            :class="theme === 'theme-default' ? 'text-editor-accent' : 'hover:text-editor-text'"
+            :class="theme === 'theme-default' ? 'text-editor-accent font-bold' : 'hover:text-editor-text'"
           >
-            <div class="w-3 h-3 rounded-full border border-editor-sub/30" style="background-color: #202940; border-color: #caaa98;"></div>
-            charcoal
+            <div class="w-3 h-3 rounded-full border border-editor-sub/30" style="background-color: #202940; border-color: #dfb15b;"></div>
+            navy
           </button>
 
           <!-- Theme Retro CRT -->
           <button 
             @click="theme = 'theme-retro-crt'"
             class="flex items-center gap-1.5 cursor-pointer transition-colors duration-200"
-            :class="theme === 'theme-retro-crt' ? 'text-editor-accent' : 'hover:text-editor-text'"
+            :class="theme === 'theme-retro-crt' ? 'text-editor-accent font-bold' : 'hover:text-editor-text'"
           >
             <div class="w-3 h-3 rounded-none border border-editor-sub/30" style="background-color: #000000; border-color: #00ff00;"></div>
             crt
@@ -323,13 +323,13 @@ onUnmounted(() => {
           <button 
             @click="theme = 'theme-paper'"
             class="flex items-center gap-1.5 cursor-pointer transition-colors duration-200"
-            :class="theme === 'theme-paper' ? 'text-editor-accent' : 'hover:text-editor-text'"
+            :class="theme === 'theme-paper' ? 'text-editor-accent font-bold' : 'hover:text-editor-text'"
           >
             <div class="w-3 h-3 rounded-sm shadow-sm border border-editor-sub/30" style="background-color: #f4f4f0; border-color: #225ccb;"></div>
             paper
           </button>
         </div>
-        <div class="font-light opacity-50">open source · built for speed</div>
+        <div class="font-light opacity-80 text-editor-gold">open source · built for speed</div>
       </footer>
     </div>
 
