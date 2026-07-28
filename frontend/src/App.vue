@@ -183,36 +183,45 @@ onUnmounted(() => {
         class="fixed inset-0 z-50 flex items-center justify-center modal-overlay"
         @click.self="closeCustomTimePrompt"
       >
-        <div class="modal-content rounded-lg p-6 w-80 max-w-[90vw] shadow-xl flex flex-col gap-4 text-center">
-          <div class="text-sm font-semibold text-editor-accent">
-            custom test time
+        <div class="modal-content rounded-xl p-8 w-80 max-w-[90vw] shadow-2xl flex flex-col items-center gap-6 text-center transform transition-all scale-100 opacity-100">
+          <!-- Title -->
+          <div class="flex flex-col gap-1 w-full">
+            <h2 class="text-xl font-bold tracking-tight text-editor-text">
+              custom time
+            </h2>
+            <p class="text-sm text-editor-sub font-light">
+              enter seconds to test
+            </p>
           </div>
-          <div class="text-xs text-editor-sub">
-            enter custom test time in seconds:
+
+          <!-- Input -->
+          <div class="w-full relative">
+            <input
+              v-model="customTimeInput"
+              type="number"
+              min="1"
+              max="3600"
+              placeholder="15"
+              @keyup.enter="submitCustomTime"
+              @keyup.esc="closeCustomTimePrompt"
+              class="w-full text-center py-4 bg-editor-bg/50 border-2 border-editor-sub/20 rounded-lg text-editor-text focus:outline-none focus:border-editor-accent font-mono text-3xl font-bold transition-colors shadow-inner"
+              autofocus
+            />
           </div>
-          <input
-            v-model="customTimeInput"
-            type="number"
-            min="1"
-            max="3600"
-            placeholder="15"
-            @keyup.enter="submitCustomTime"
-            @keyup.esc="closeCustomTimePrompt"
-            class="w-full text-center py-2 px-3 bg-transparent border border-editor-sub/40 rounded text-editor-text focus:outline-none focus:border-editor-accent font-mono text-lg transition-colors"
-            autofocus
-          />
-          <div class="flex items-center justify-end gap-2 mt-2 text-xs">
+
+          <!-- Actions -->
+          <div class="flex items-center justify-center gap-3 w-full mt-2">
             <button
               @click="closeCustomTimePrompt"
-              class="px-3 py-1.5 rounded border border-editor-sub/30 text-editor-sub hover:text-editor-text hover:border-editor-text transition-colors cursor-pointer"
+              class="flex-1 py-2.5 rounded-lg border border-transparent text-editor-sub hover:text-editor-text hover:bg-editor-sub/10 transition-colors cursor-pointer font-medium"
             >
               cancel
             </button>
             <button
               @click="submitCustomTime"
-              class="px-3 py-1.5 rounded bg-editor-accent text-editor-bg font-medium hover:bg-editor-accent/90 transition-colors cursor-pointer"
+              class="flex-1 py-2.5 rounded-lg bg-editor-accent text-editor-bg font-bold hover:opacity-90 transition-opacity cursor-pointer shadow-md"
             >
-              ok
+              start
             </button>
           </div>
         </div>

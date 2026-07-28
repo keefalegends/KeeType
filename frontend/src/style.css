@@ -62,18 +62,21 @@
 
 /* Modal styles for custom prompt */
 .modal-overlay {
-  background-color: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(4px);
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(1.5px);
 }
 .theme-paper .modal-overlay {
-  background-color: rgba(255, 255, 255, 0.6);
+  background-color: rgba(255, 255, 255, 0.4);
 }
 .modal-content {
   background-color: var(--bg);
-  border: 1.5px solid var(--sub);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 .theme-retro-crt .modal-content {
   border: 2px solid var(--accent);
+}
+.theme-paper .modal-content {
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 
