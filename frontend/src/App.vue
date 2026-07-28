@@ -98,7 +98,7 @@ onUnmounted(() => {
 
     <!-- LEFT SIDEBAR (Polished Panel matching the active theme colors, top-32 bottom-32) -->
     <aside 
-      class="fixed left-0 top-32 bottom-32 w-36 z-30 flex flex-col justify-between py-10 px-3 text-center select-none shadow-lg transition-all duration-300 ease-in-out border-r border-y"
+      class="fixed left-0 top-32 bottom-32 w-36 z-30 flex flex-col py-10 px-3 text-center select-none shadow-lg transition-all duration-300 ease-in-out border-r border-y"
       :style="{
         backgroundColor: theme === 'theme-paper' ? '#fcfcfc' : (theme === 'theme-retro-crt' ? '#001a00' : '#1a1a1a'),
         borderColor: 'var(--color-editor-sub)',
@@ -111,52 +111,49 @@ onUnmounted(() => {
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
       ]"
     >
-      <!-- Top Group -->
-      <div class="flex flex-col gap-6">
-        <!-- Menu Header -->
-        <div class="text-[10px] uppercase tracking-[0.25em] text-editor-sub/60 font-bold text-center">
-          Menu
-        </div>
-
-        <!-- Nav Items -->
-        <nav class="flex flex-col gap-4 font-semibold text-xs">
-          <!-- Write (Typing Test) -->
-          <button 
-            @click="activeView = 'write'"
-            class="transition-colors cursor-pointer text-center py-2 rounded-lg"
-            :class="activeView === 'write' ? 'text-editor-accent bg-editor-accent/10' : 'text-editor-sub hover:text-editor-text'"
-          >
-            Write
-          </button>
-
-          <!-- Arena (Coming Soon) -->
-          <div class="flex flex-col items-center py-2 rounded-lg text-editor-sub/30 cursor-not-allowed">
-            <span class="line-through">Arena</span>
-            <span class="text-[8px] uppercase tracking-wider font-light mt-0.5">Soon</span>
-          </div>
-
-          <!-- Setting -->
-          <button 
-            @click="activeView = 'setting'"
-            class="transition-colors cursor-pointer text-center py-2 rounded-lg"
-            :class="activeView === 'setting' ? 'text-editor-accent bg-editor-accent/10' : 'text-editor-sub hover:text-editor-text'"
-          >
-            Setting
-          </button>
-
-          <!-- About -->
-          <button 
-            @click="activeView = 'about'"
-            class="transition-colors cursor-pointer text-center py-2 rounded-lg"
-            :class="activeView === 'about' ? 'text-editor-accent bg-editor-accent/10' : 'text-editor-sub hover:text-editor-text'"
-          >
-            About
-          </button>
-        </nav>
+      <!-- Top Header -->
+      <div class="text-[11px] uppercase tracking-[0.25em] text-editor-sub/60 font-bold mb-4">
+        Menu
       </div>
 
-      <!-- Bottom Group (Fill the empty space below) -->
-      <div class="flex flex-col gap-1 text-[9px] text-editor-sub/50 leading-relaxed font-light mt-auto">
+      <!-- Nav Items (Expanded to fill vertical space down to the bottom) -->
+      <nav class="flex-1 flex flex-col justify-evenly font-bold text-[15px] my-6">
+        <!-- Write (Typing Test) -->
+        <button 
+          @click="activeView = 'write'"
+          class="transition-all duration-200 cursor-pointer text-center py-3.5 rounded-xl"
+          :class="activeView === 'write' ? 'text-editor-accent bg-editor-accent/10 scale-105' : 'text-editor-sub hover:text-editor-text hover:bg-editor-sub/5'"
+        >
+          Write
+        </button>
+
+        <!-- Arena (Coming Soon) -->
+        <div class="flex flex-col items-center py-3.5 rounded-xl text-editor-sub/30 cursor-not-allowed">
+          <span class="line-through">Arena</span>
+          <span class="text-[9px] uppercase tracking-wider font-semibold mt-1 bg-red-500/10 text-red-500 px-1.5 py-0.5 rounded">Soon</span>
+        </div>
+
+        <!-- Setting -->
+        <button 
+          @click="activeView = 'setting'"
+          class="transition-all duration-200 cursor-pointer text-center py-3.5 rounded-xl"
+          :class="activeView === 'setting' ? 'text-editor-accent bg-editor-accent/10 scale-105' : 'text-editor-sub hover:text-editor-text hover:bg-editor-sub/5'"
+        >
+          Setting
+        </button>
+
+        <!-- About -->
+        <button 
+          @click="activeView = 'about'"
+          class="transition-all duration-200 cursor-pointer text-center py-3.5 rounded-xl"
+          :class="activeView === 'about' ? 'text-editor-accent bg-editor-accent/10 scale-105' : 'text-editor-sub hover:text-editor-text hover:bg-editor-sub/5'"
+        >
+          About
+        </button>
+      </nav>
+
+      <!-- Bottom Group (Clean layout at the very end of the panel) -->
+      <div class="flex flex-col gap-1 text-[9px] text-editor-sub/50 leading-relaxed font-light mt-2 pt-4 border-t border-editor-sub/5">
         <div>v1.0.0</div>
         <div>speed & focus</div>
       </div>
