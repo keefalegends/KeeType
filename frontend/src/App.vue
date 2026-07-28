@@ -250,7 +250,7 @@ onUnmounted(() => {
                       class="flex items-center gap-3 px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
                       :class="theme === 'theme-default' ? 'border-editor-accent/60 bg-editor-accent/5' : ''"
                     >
-                      <div class="w-4 h-4 rounded-full border border-editor-sub/30 bg-[#1e1e1e]" style="border-color: #d7ba7d;"></div>
+                      <div class="w-4 h-4 rounded-full border border-editor-sub/30 bg-[#202940]" style="border-color: #caaa98;"></div>
                       <span class="text-xs font-semibold text-editor-text">charcoal</span>
                     </button>
                     
@@ -305,7 +305,7 @@ onUnmounted(() => {
             class="flex items-center gap-1.5 cursor-pointer transition-colors duration-200"
             :class="theme === 'theme-default' ? 'text-editor-accent' : 'hover:text-editor-text'"
           >
-            <div class="w-3 h-3 rounded-full border border-editor-sub/30" style="background-color: #1e1e1e; border-color: #d7ba7d;"></div>
+            <div class="w-3 h-3 rounded-full border border-editor-sub/30" style="background-color: #202940; border-color: #caaa98;"></div>
             charcoal
           </button>
 

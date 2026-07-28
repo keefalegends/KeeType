@@ -21,17 +21,17 @@
   THEMES
 */
 
-/* 1. Default (Charcoal & Amber) - Refined dark mode */
+/* 1. Default (Charcoal & Warm Palette) - Based on user color hunt selection */
 :root, .theme-default {
-  --bg: #1e1e1e;
-  --sub: #5c5c5c;
-  --text: #d4d4d4;
+  --bg: #202940;          /* Dark navy blue */
+  --sub: #9a8678;         /* Taupe/grey-brown for sub text */
+  --text: #caaa98;        /* Light dusty rose/beige for typed/active text */
   --error: #f44747;
   --error-extra: #7e2a33;
-  --correct: #d4d4d4;
-  --accent: #d7ba7d;
-  --accent-dim: #b89a0f;
-  --caret: #d7ba7d;
+  --correct: #caaa98;     /* Match light beige */
+  --accent: #caaa98;      /* Primary accent */
+  --accent-dim: #9a8678;
+  --caret: #caaa98;       /* Caret color matches primary */
 }
 
 /* 2. Retro CRT (Pure Black & Phosphor Green) - Hacker terminal vibe */
