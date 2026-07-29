@@ -299,7 +299,7 @@ body {
   border-radius: 12px;
   border: 1px solid transparent;
   background: transparent;
-  color: var(--sub);
+  color: color-mix(in srgb, var(--text) 60%, transparent);
   font-family: var(--font-mono);
   font-size: 13px;
   font-weight: 600;
@@ -309,7 +309,7 @@ body {
 }
 
 .sidebar-item svg {
-  opacity: 0.7;
+  opacity: 0.8;
   transition: transform 0.2s ease;
 }
 
@@ -318,7 +318,7 @@ body {
 }
 
 .sidebar-item:hover {
-  background: color-mix(in srgb, var(--sub) 8%, transparent);
+  background: color-mix(in srgb, var(--text) 8%, transparent);
   color: var(--text);
 }
 
@@ -337,6 +337,7 @@ body {
 /* Disabled/Soon Item */
 .sidebar-item--disabled {
   opacity: 0.4;
+  color: color-mix(in srgb, var(--text) 45%, transparent) !important;
   cursor: not-allowed;
 }
 .sidebar-item--disabled:hover svg {
@@ -364,9 +365,9 @@ body {
 .sidebar-footer {
   margin-top: auto;
   padding-top: 1rem;
-  border-top: 1px solid color-mix(in srgb, var(--sub) 8%, transparent);
+  border-top: 1px solid color-mix(in srgb, var(--text) 8%, transparent);
   font-size: 9px;
-  color: color-mix(in srgb, var(--sub) 50%, transparent);
+  color: color-mix(in srgb, var(--text) 50%, transparent);
   line-height: 1.5;
   padding-left: 0.5rem;
 }
