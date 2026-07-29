@@ -137,3 +137,173 @@ body {
 .fade-leave-to {
   opacity: 0;
 }
+
+/* ==========================================================================
+   MODERN FLOATING SIDEBAR
+   ========================================================================== */
+
+/* Hover Trigger Area (Thin vertical trigger on left edge) */
+.sidebar-hover-trigger {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 24px; /* Area sensing */
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+/* Handle indicator in the middle of left edge */
+.sidebar-hover-indicator {
+  width: 4px;
+  height: 60px;
+  background: color-mix(in srgb, var(--sub) 30%, transparent);
+  border-radius: 0 4px 4px 0;
+  transition: background 0.2s, width 0.2s;
+}
+
+.sidebar-hover-trigger:hover .sidebar-hover-indicator {
+  background: var(--accent);
+  width: 6px;
+}
+
+/* Sidebar Panel */
+.sidebar-panel {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  bottom: 1rem;
+  width: 220px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  padding: 2.25rem 1.25rem 1.5rem;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--bg) 95%, black 5%);
+  border: 1px solid color-mix(in srgb, var(--sub) 15%, transparent);
+  color: var(--text);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+  user-select: none;
+}
+
+.theme-paper .sidebar-panel {
+  background: color-mix(in srgb, var(--bg) 95%, white 5%);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+.theme-retro-crt .sidebar-panel {
+  border: 2px solid var(--accent);
+  box-shadow: none;
+  background: #000;
+}
+
+.sidebar-open {
+  transform: translateX(0);
+}
+
+.sidebar-closed {
+  transform: translateX(-260px);
+}
+
+/* Sidebar Logo */
+.sidebar-logo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 2.5rem;
+  padding-left: 0.5rem;
+}
+
+/* Nav Wrapper */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+}
+
+/* Nav Items */
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--sub);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sidebar-item svg {
+  opacity: 0.7;
+  transition: transform 0.2s ease;
+}
+
+.sidebar-item:hover svg {
+  transform: translateX(2px);
+}
+
+.sidebar-item:hover {
+  background: color-mix(in srgb, var(--sub) 8%, transparent);
+  color: var(--text);
+}
+
+/* Active Item */
+.sidebar-item--active {
+  background: color-mix(in srgb, var(--accent) 12%, transparent) !important;
+  color: var(--accent) !important;
+  border-color: color-mix(in srgb, var(--accent) 25%, transparent) !important;
+}
+
+.sidebar-item--active svg {
+  opacity: 1;
+  color: var(--accent);
+}
+
+/* Disabled/Soon Item */
+.sidebar-item--disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.sidebar-item--disabled:hover svg {
+  transform: none;
+}
+
+.sidebar-soon {
+  margin-left: auto;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: rgba(239, 68, 68, 0.15);
+  color: rgb(239, 68, 68);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+/* Spacer */
+.sidebar-spacer {
+  flex: 1;
+}
+
+/* Footer info inside sidebar */
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid color-mix(in srgb, var(--sub) 8%, transparent);
+  font-size: 9px;
+  color: color-mix(in srgb, var(--sub) 50%, transparent);
+  line-height: 1.5;
+  padding-left: 0.5rem;
+}
+

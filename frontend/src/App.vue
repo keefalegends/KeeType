@@ -78,137 +78,99 @@ onUnmounted(() => {
 <template>
   <div class="flex min-h-screen relative overflow-hidden">
     
-    <!-- SIDEBAR TOGGLE BUTTON (Collapsible controller) -->
-    <!-- (a) When Open: Appears neatly above the sidebar panel at the top-left corner -->
-    <button 
-      v-if="isSidebarOpen"
-      @click="isSidebarOpen = false"
-      class="fixed left-4 top-20 z-40 w-8 h-8 rounded-lg border border-editor-sub/20 flex items-center justify-center text-editor-sub transition-opacity duration-300 cursor-pointer shadow-sm"
+    <!-- HOVER TRIGGER AREA (Left edge handle) -->
+    <div
+      v-if="!isSidebarOpen"
+      @mouseenter="isSidebarOpen = true"
+      class="sidebar-hover-trigger"
       :class="[
         (isActive || isFinished) ? 'opacity-0 pointer-events-none' : 'opacity-100',
-        theme === 'theme-default' ? 'hover:border-editor-gold/40 hover:text-editor-gold' : 'hover:border-editor-accent/40 hover:text-editor-accent'
       ]"
-      :style="{
-        backgroundColor: theme === 'theme-paper' ? '#fcfcfc' : (theme === 'theme-retro-crt' ? '#001a00' : '#202940'),
-      }"
-      title="Close Sidebar"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="15 18 9 12 15 6"/>
-      </svg>
-    </button>
+      <div class="sidebar-hover-indicator"></div>
+    </div>
 
-    <!-- (b) When Closed: Appears at the left-center, styled as a vertical handle (high/narrow button) -->
-    <button
-      v-else
-      @click="isSidebarOpen = true"
-      class="fixed left-0 top-1/2 -translate-y-1/2 z-40 w-5 h-24 rounded-r-xl border-y border-r border-editor-sub/20 flex flex-col items-center justify-center text-editor-sub transition-opacity duration-300 cursor-pointer shadow-md group"
+    <!-- LEFT SIDEBAR (Modern floating card, auto-closes on mouseleave) -->
+    <aside
+      class="sidebar-panel"
+      @mouseleave="isSidebarOpen = false"
       :class="[
         (isActive || isFinished) ? 'opacity-0 pointer-events-none' : 'opacity-100',
-        theme === 'theme-default' ? 'hover:border-editor-gold/40 hover:text-editor-gold' : 'hover:border-editor-accent/40 hover:text-editor-accent'
-      ]"
-      :style="{
-        backgroundColor: theme === 'theme-paper' ? '#fcfcfc' : (theme === 'theme-retro-crt' ? '#001a00' : '#202940'),
-      }"
-      title="Open Sidebar"
-    >
-      <!-- Subtle vertical indicator line or arrow -->
-      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-0.5 transition-transform">
-        <polyline points="9 18 15 12 9 6"/>
-      </svg>
-    </button>
-
-    <!-- LEFT SIDEBAR (Polished Panel matching the active theme colors, top-32 bottom-32) -->
-    <aside 
-      class="fixed left-0 top-32 bottom-32 w-36 z-30 flex flex-col py-6 px-3 text-center select-none shadow-lg transition-all duration-300 ease-in-out border-r border-y"
-      :style="{
-        backgroundColor: theme === 'theme-paper' ? '#fcfcfc' : (theme === 'theme-retro-crt' ? '#001a00' : '#202940'),
-        borderColor: theme === 'theme-paper' ? 'rgba(0,0,0,0.1)' : (theme === 'theme-retro-crt' ? 'var(--color-editor-accent)' : 'var(--color-editor-gold)'),
-        borderTopRightRadius: '2rem',
-        borderBottomRightRadius: '2rem',
-        color: 'var(--color-editor-text)'
-      }"
-      :class="[
-        (isActive || isFinished) ? 'opacity-0 pointer-events-none' : 'opacity-100',
-        isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'
       ]"
     >
-      <!-- Top Header (Pushed down significantly inside the sidebar container) -->
-      <div 
-        class="pb-3 mb-6 border-b pt-12"
-        :style="{
-          borderColor: theme === 'theme-paper' ? 'var(--color-editor-accent)' : 'var(--color-editor-gold)'
-        }"
-      >
-        <div 
-          class="text-[13px] uppercase tracking-[0.25em] font-extrabold"
+      <!-- Logo inside sidebar -->
+      <div class="sidebar-logo">
+        <span
           :class="{
             'text-editor-gold': theme === 'theme-default',
             'text-editor-accent': theme !== 'theme-default'
           }"
-        >
-          Menu
-        </div>
+        >kee</span><span class="text-editor-text">type</span>
       </div>
 
-      <!-- Nav Items (Expanded to fill vertical space down to the bottom) -->
-      <nav class="flex-1 flex flex-col justify-between font-bold text-[15px] my-6">
-        <!-- Top Menu Items Group (Centered vertically in the upper half) -->
-        <div class="flex flex-col gap-6 justify-center flex-1">
-          <!-- Write (Typing Test) -->
-          <button 
-            @click="activeView = 'write'"
-            class="transition-all duration-200 cursor-pointer text-center py-3.5 rounded-xl"
-            :class="[
-              activeView === 'write'
-                ? (theme === 'theme-default' ? 'text-editor-gold bg-editor-gold/10 scale-105' : 'text-editor-accent bg-editor-accent/10 scale-105')
-                : 'text-editor-sub hover:text-editor-text hover:bg-editor-sub/5'
-            ]"
-          >
-            Write
-          </button>
+      <!-- Nav -->
+      <nav class="sidebar-nav">
+        <!-- Write -->
+        <button
+          @click="activeView = 'write'"
+          class="sidebar-item"
+          :class="[
+            activeView === 'write' ? 'sidebar-item--active' : ''
+          ]"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+          </svg>
+          <span>Write</span>
+        </button>
 
-          <!-- Arena (Coming Soon) -->
-          <div class="flex flex-col items-center py-3.5 rounded-xl text-editor-sub/30 cursor-not-allowed">
-            <span class="line-through">Arena</span>
-            <span class="text-[9px] uppercase tracking-wider font-semibold mt-1 bg-red-500/10 text-red-500 px-1.5 py-0.5 rounded">Soon</span>
-          </div>
+        <!-- Arena -->
+        <div class="sidebar-item sidebar-item--disabled">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+          <span>Arena</span>
+          <span class="sidebar-soon">soon</span>
         </div>
 
-        <!-- Bottom Menu Items Group (Pushed completely to the bottom of the navigation flow) -->
-        <div class="flex flex-col gap-4 mt-auto">
-          <!-- Setting -->
-          <button 
-            @click="activeView = 'setting'"
-            class="transition-all duration-200 cursor-pointer text-center py-3.5 rounded-xl"
-            :class="[
-              activeView === 'setting'
-                ? (theme === 'theme-default' ? 'text-editor-gold bg-editor-gold/10 scale-105' : 'text-editor-accent bg-editor-accent/10 scale-105')
-                : 'text-editor-sub hover:text-editor-text hover:bg-editor-sub/5'
-            ]"
-          >
-            Setting
-          </button>
+        <!-- Spacer -->
+        <div class="sidebar-spacer"></div>
 
-          <!-- About -->
-          <button 
-            @click="activeView = 'about'"
-            class="transition-all duration-200 cursor-pointer text-center py-3.5 rounded-xl"
-            :class="[
-              activeView === 'about'
-                ? (theme === 'theme-default' ? 'text-editor-gold bg-editor-gold/10 scale-105' : 'text-editor-accent bg-editor-accent/10 scale-105')
-                : 'text-editor-sub hover:text-editor-text hover:bg-editor-sub/5'
-            ]"
-          >
-            About
-          </button>
-        </div>
+        <!-- Setting -->
+        <button
+          @click="activeView = 'setting'"
+          class="sidebar-item"
+          :class="[
+            activeView === 'setting' ? 'sidebar-item--active' : ''
+          ]"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          <span>Setting</span>
+        </button>
+
+        <!-- About -->
+        <button
+          @click="activeView = 'about'"
+          class="sidebar-item"
+          :class="[
+            activeView === 'about' ? 'sidebar-item--active' : ''
+          ]"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>
+          </svg>
+          <span>About</span>
+        </button>
       </nav>
 
-      <!-- Bottom Group (Clean layout at the very end of the panel) -->
-      <div class="flex flex-col gap-1 text-[9px] text-editor-sub/50 leading-relaxed font-light pt-4 border-t border-editor-sub/5">
+      <!-- Footer -->
+      <div class="sidebar-footer">
         <div>v1.0.0</div>
-        <div>speed & focus</div>
+        <div>speed &amp; focus</div>
       </div>
     </aside>
 
