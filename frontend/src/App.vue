@@ -227,7 +227,7 @@ onUnmounted(() => {
           <Transition name="fade" mode="out-in">
             
             <!-- View: Write (Game View) -->
-            <div v-if="activeView === 'write'" key="write" class="w-full">
+            <div v-if="activeView === 'write'" key="write" class="w-full max-w-3xl">
               <div v-if="!isFinished" key="game">
                 <ModeSelector
                   :mode="mode"
@@ -280,7 +280,7 @@ onUnmounted(() => {
               </div>
             </div>
             <!-- View: Leaderboard -->
-            <div v-else-if="activeView === 'leaderboard'" key="leaderboard" class="w-full">
+            <div v-else-if="activeView === 'leaderboard'" key="leaderboard" class="w-full max-w-3xl">
               <LeaderboardView />
             </div>
 
