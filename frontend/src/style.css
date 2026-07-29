@@ -62,6 +62,32 @@
   --caret: #225ccb;
 }
 
+/* 4. Serika Dark (Monkeytype default - Charcoal & Yellow) */
+.theme-serika-dark {
+  --bg: #323437;
+  --sub: #646669;
+  --text: #d1d0c5;
+  --error: #ca4754;
+  --error-extra: #7e2a33;
+  --correct: #d1d0c5;
+  --accent: #e2b714;
+  --accent-dim: #b8960f;
+  --caret: #e2b714;
+}
+
+/* 5. Darling (Pink & White - Kawaii pastel) */
+.theme-darling {
+  --bg: #fec8cd;
+  --sub: #a30000;
+  --text: #ffffff;
+  --error: #2e7dde;
+  --error-extra: #1c5aad;
+  --correct: #ffffff;
+  --accent: #ffffff;
+  --accent-dim: #f2babd;
+  --caret: #ffffff;
+}
+
 /* Modal styles for custom prompt */
 .modal-overlay {
   background-color: rgba(0, 0, 0, 0.4);

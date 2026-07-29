@@ -309,6 +309,26 @@ onUnmounted(() => {
                       <span v-if="theme === 'theme-paper'" class="theme-check">✓</span>
                     </button>
 
+                    <button 
+                      @click="theme = 'theme-serika-dark'"
+                      class="theme-btn"
+                      :class="theme === 'theme-serika-dark' ? 'theme-btn--active' : ''"
+                    >
+                      <div class="theme-preview" style="background: #323437; border-color: #e2b714;"></div>
+                      <span class="theme-name">Serika Dark</span>
+                      <span v-if="theme === 'theme-serika-dark'" class="theme-check">✓</span>
+                    </button>
+
+                    <button 
+                      @click="theme = 'theme-darling'"
+                      class="theme-btn"
+                      :class="theme === 'theme-darling' ? 'theme-btn--active' : ''"
+                    >
+                      <div class="theme-preview" style="background: #fec8cd; border-color: #a30000; border-radius: 2px;"></div>
+                      <span class="theme-name">Darling</span>
+                      <span v-if="theme === 'theme-darling'" class="theme-check">✓</span>
+                    </button>
+
                   </div>
                 </div>
 
