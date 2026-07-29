@@ -345,3 +345,225 @@ body {
   padding-left: 0.5rem;
 }
 
+/* ==========================================================================
+   MODERN SETTINGS & ABOUT VIEWS (GLASSMORPHISM)
+   ========================================================================== */
+
+/* Fade-in Animation */
+.animate-slide-up {
+  animation: slideUpSettings 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes slideUpSettings {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Setting Card Base */
+.setting-card {
+  background: color-mix(in srgb, var(--sub) 4%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sub) 10%, transparent);
+  border-radius: 16px;
+  padding: 1.5rem;
+  width: 100%;
+}
+
+.setting-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--sub);
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+}
+
+.setting-icon {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* Theme Button */
+.theme-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--sub) 4%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sub) 10%, transparent);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.theme-btn:hover {
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+  background: color-mix(in srgb, var(--sub) 8%, transparent);
+}
+
+.theme-btn--active {
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent) !important;
+  background: color-mix(in srgb, var(--accent) 8%, transparent) !important;
+}
+
+.theme-preview {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  border-width: 2px;
+  border-style: solid;
+}
+
+.theme-name {
+  flex-1: 1;
+}
+
+.theme-check {
+  color: var(--accent);
+  font-weight: bold;
+}
+
+/* Sound Button */
+.sound-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--sub) 4%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sub) 10%, transparent);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sound-btn:hover {
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+  background: color-mix(in srgb, var(--sub) 8%, transparent);
+}
+
+.sound-btn--active {
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent) !important;
+  background: color-mix(in srgb, var(--accent) 8%, transparent) !important;
+}
+
+.sound-radio {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid color-mix(in srgb, var(--sub) 30%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.radio-on {
+  border-color: var(--accent);
+  background: var(--accent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 50%, transparent);
+}
+
+.radio-red.radio-on {
+  border-color: var(--error) !important;
+  background: var(--error) !important;
+  box-shadow: 0 0 8px color-mix(in srgb, var(--error) 50%, transparent) !important;
+}
+
+/* Volume Slider */
+.vol-slider-wrap {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.vol-slider {
+  width: 100%;
+  height: 4px;
+  background: color-mix(in srgb, var(--sub) 15%, transparent);
+  border-radius: 99px;
+  appearance: none;
+  cursor: pointer;
+  outline: none;
+}
+
+.vol-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--accent) 40%, transparent);
+  transition: transform 0.1s ease;
+}
+
+.vol-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.25);
+}
+
+/* About Card Details */
+.about-card {
+  background: color-mix(in srgb, var(--sub) 4%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sub) 10%, transparent);
+  border-radius: 20px;
+  padding: 2.25rem;
+  max-width: 500px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.theme-paper .about-card {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.03);
+}
+
+.about-lead {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.about-divider {
+  height: 1px;
+  background: color-mix(in srgb, var(--sub) 15%, transparent);
+  margin: 1.5rem 0;
+}
+
+.about-text {
+  font-size: 12px;
+  color: var(--sub);
+  line-height: 1.7;
+}
+
+.about-badges {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.tech-badge {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+  color: var(--accent);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+

@@ -260,181 +260,186 @@ onUnmounted(() => {
                 />
               </div>
             </div>
-            <!-- View: Setting (Visual settings panel integrated into main flow) -->
-            <div v-else-if="activeView === 'setting'" key="setting" class="max-w-xl mx-auto py-8">
-              <h2 class="text-2xl font-bold text-editor-text mb-6 tracking-tight">Setting</h2>
+            <!-- View: Setting (Modern Glassmorphism) -->
+            <div v-else-if="activeView === 'setting'" key="setting" class="max-w-2xl mx-auto py-4 animate-slide-up">
               
-              <!-- Two column settings layout (Theme Selection side-by-side with Mechanical sound) -->
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+              <div class="flex items-center gap-4 mb-8">
+                <div class="h-px bg-editor-sub/20 flex-1"></div>
+                <h2 class="text-[10px] uppercase tracking-[0.3em] text-editor-sub font-semibold">Settings & Preferences</h2>
+                <div class="h-px bg-editor-sub/20 flex-1"></div>
+              </div>
+              
+              <!-- Two column settings layout -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                 
                 <!-- Column 1: Theme list -->
-                <div class="flex flex-col">
-                  <div class="text-[10px] uppercase tracking-[0.2em] text-editor-sub mb-3">Theme Selection</div>
-                  <div class="flex flex-col gap-2">
+                <div class="setting-card">
+                  <div class="setting-header">
+                    <span class="setting-icon">✨</span>
+                    <span>Theme Selection</span>
+                  </div>
+                  <div class="flex flex-col gap-2.5">
+                    
                     <button 
                       @click="theme = 'theme-default'"
-                      class="flex items-center gap-3 px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
-                      :class="theme === 'theme-default' ? 'border-editor-gold/60 bg-editor-accent/5' : ''"
+                      class="theme-btn"
+                      :class="theme === 'theme-default' ? 'theme-btn--active' : ''"
                     >
-                      <div class="w-4 h-4 rounded-full border border-editor-sub/30 bg-[#202940]" style="border-color: #dfb15b;"></div>
-                      <span class="text-xs font-semibold text-editor-text">navy</span>
+                      <div class="theme-preview" style="background: #202940; border-color: #dfb15b;"></div>
+                      <span class="theme-name">Navy Gold</span>
+                      <span v-if="theme === 'theme-default'" class="theme-check">✓</span>
                     </button>
                     
                     <button 
                       @click="theme = 'theme-retro-crt'"
-                      class="flex items-center gap-3 px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
-                      :class="theme === 'theme-retro-crt' ? 'border-editor-accent/60 bg-editor-accent/5' : ''"
+                      class="theme-btn"
+                      :class="theme === 'theme-retro-crt' ? 'theme-btn--active' : ''"
                     >
-                      <div class="w-4 h-4 rounded-none border border-editor-sub/30 bg-[#000000]" style="border-color: #00ff00;"></div>
-                      <span class="text-xs font-semibold text-editor-text">terminal</span>
+                      <div class="theme-preview" style="background: #000000; border-color: #00ff00; border-radius: 0;"></div>
+                      <span class="theme-name">Terminal CRT</span>
+                      <span v-if="theme === 'theme-retro-crt'" class="theme-check">✓</span>
                     </button>
 
                     <button 
                       @click="theme = 'theme-paper'"
-                      class="flex items-center gap-3 px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
-                      :class="theme === 'theme-paper' ? 'border-editor-accent/60 bg-editor-accent/5' : ''"
+                      class="theme-btn"
+                      :class="theme === 'theme-paper' ? 'theme-btn--active' : ''"
                     >
-                      <div class="w-4 h-4 rounded-sm border border-editor-sub/30 bg-[#f4f4f0]" style="border-color: #225ccb;"></div>
-                      <span class="text-xs font-semibold text-editor-text">paper</span>
+                      <div class="theme-preview" style="background: #f4f4f0; border-color: #225ccb; border-radius: 2px;"></div>
+                      <span class="theme-name">Paper Ink</span>
+                      <span v-if="theme === 'theme-paper'" class="theme-check">✓</span>
                     </button>
+
                   </div>
                 </div>
 
                 <!-- Column 2: Keyboard Sound Options -->
-                <div class="flex flex-col gap-5">
-                  <div>
-                    <div class="text-[10px] uppercase tracking-[0.2em] text-editor-sub mb-3">Mechanical Sound (ASMR)</div>
-                    <div class="flex flex-col gap-2">
-                      
+                <div class="flex flex-col gap-6">
+                  
+                  <div class="setting-card">
+                    <div class="setting-header">
+                      <span class="setting-icon">⌨️</span>
+                      <span>Mechanical Sound (ASMR)</span>
+                    </div>
+                    
+                    <div class="flex flex-col gap-2.5">
                       <!-- Option OFF -->
                       <button 
                         @click="keyboardSound = 'off'"
-                        class="flex items-center justify-between px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
-                        :class="keyboardSound === 'off' ? (theme === 'theme-default' ? 'border-editor-gold/60 bg-editor-accent/5' : 'border-editor-accent/60 bg-editor-accent/5') : ''"
+                        class="sound-btn"
+                        :class="keyboardSound === 'off' ? 'sound-btn--active' : ''"
                       >
-                        <span class="text-xs font-semibold text-editor-text">OFF</span>
-                        <span class="w-3.5 h-3.5 rounded-full border border-editor-sub/30 flex items-center justify-center" :class="keyboardSound === 'off' ? 'bg-red-500/20' : ''">
-                          <span class="w-1.5 h-1.5 rounded-full bg-red-500" v-if="keyboardSound === 'off'"></span>
-                        </span>
+                        <span class="sound-name">Muted</span>
+                        <div class="sound-radio" :class="keyboardSound === 'off' ? 'radio-on radio-red' : ''"></div>
                       </button>
 
                       <!-- Option CHERRY MX BROWN -->
                       <button 
                         @click="keyboardSound = 'cherry-mx-brown'"
-                        class="flex items-center justify-between px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
-                        :class="keyboardSound === 'cherry-mx-brown' ? (theme === 'theme-default' ? 'border-editor-gold/60 bg-editor-accent/5' : 'border-editor-accent/60 bg-editor-accent/5') : ''"
+                        class="sound-btn"
+                        :class="keyboardSound === 'cherry-mx-brown' ? 'sound-btn--active' : ''"
                       >
-                        <div class="flex items-center gap-3">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-editor-text">
-                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-                            <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-                          </svg>
-                          <span class="text-xs font-semibold text-editor-text">Cherry MX Brown</span>
-                        </div>
-                        <span class="w-3.5 h-3.5 rounded-full border border-editor-sub/30 flex items-center justify-center" :class="keyboardSound === 'cherry-mx-brown' ? 'bg-green-500/20' : ''">
-                          <span class="w-1.5 h-1.5 rounded-full bg-green-500" v-if="keyboardSound === 'cherry-mx-brown'"></span>
-                        </span>
+                        <span class="sound-name">Cherry MX Brown</span>
+                        <div class="sound-radio" :class="keyboardSound === 'cherry-mx-brown' ? 'radio-on' : ''"></div>
                       </button>
 
                       <!-- Option BUBBLE -->
                       <button 
                         @click="keyboardSound = 'bubble'"
-                        class="flex items-center justify-between px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
-                        :class="keyboardSound === 'bubble' ? (theme === 'theme-default' ? 'border-editor-gold/60 bg-editor-accent/5' : 'border-editor-accent/60 bg-editor-accent/5') : ''"
+                        class="sound-btn"
+                        :class="keyboardSound === 'bubble' ? 'sound-btn--active' : ''"
                       >
-                        <div class="flex items-center gap-3">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-editor-text">
-                            <circle cx="12" cy="12" r="10" />
-                            <circle cx="12" cy="12" r="6" />
-                            <circle cx="12" cy="12" r="2" />
-                          </svg>
-                          <span class="text-xs font-semibold text-editor-text">Bubble Pop</span>
-                        </div>
-                        <span class="w-3.5 h-3.5 rounded-full border border-editor-sub/30 flex items-center justify-center" :class="keyboardSound === 'bubble' ? 'bg-green-500/20' : ''">
-                          <span class="w-1.5 h-1.5 rounded-full bg-green-500" v-if="keyboardSound === 'bubble'"></span>
-                        </span>
+                        <span class="sound-name">Bubble Pop</span>
+                        <div class="sound-radio" :class="keyboardSound === 'bubble' ? 'radio-on' : ''"></div>
                       </button>
 
                       <!-- Option TACTILE KEYBOARD -->
                       <button 
                         @click="keyboardSound = 'tactile'"
-                        class="flex items-center justify-between px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
-                        :class="keyboardSound === 'tactile' ? (theme === 'theme-default' ? 'border-editor-gold/60 bg-editor-accent/5' : 'border-editor-accent/60 bg-editor-accent/5') : ''"
+                        class="sound-btn"
+                        :class="keyboardSound === 'tactile' ? 'sound-btn--active' : ''"
                       >
-                        <div class="flex items-center gap-3">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-editor-text">
-                            <rect x="2" y="4" width="20" height="16" rx="2" />
-                            <path d="M6 8h12M6 12h12M6 16h8" />
-                          </svg>
-                          <span class="text-xs font-semibold text-editor-text">Tactile Keyboard</span>
-                        </div>
-                        <span class="w-3.5 h-3.5 rounded-full border border-editor-sub/30 flex items-center justify-center" :class="keyboardSound === 'tactile' ? 'bg-green-500/20' : ''">
-                          <span class="w-1.5 h-1.5 rounded-full bg-green-500" v-if="keyboardSound === 'tactile'"></span>
-                        </span>
+                        <span class="sound-name">Tactile Switch</span>
+                        <div class="sound-radio" :class="keyboardSound === 'tactile' ? 'radio-on' : ''"></div>
                       </button>
 
                       <!-- Option TYPEWRITER -->
                       <button 
                         @click="keyboardSound = 'typewriter'"
-                        class="flex items-center justify-between px-4 py-3 rounded-lg border border-editor-sub/10 hover:border-editor-accent/40 bg-editor-sub/5 transition-all cursor-pointer text-left"
-                        :class="keyboardSound === 'typewriter' ? (theme === 'theme-default' ? 'border-editor-gold/60 bg-editor-accent/5' : 'border-editor-accent/60 bg-editor-accent/5') : ''"
+                        class="sound-btn"
+                        :class="keyboardSound === 'typewriter' ? 'sound-btn--active' : ''"
                       >
-                        <div class="flex items-center gap-3">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-editor-text">
-                            <rect x="2" y="4" width="20" height="16" rx="2" />
-                            <path d="M6 8h12M6 12h12M6 16h8" />
-                          </svg>
-                          <span class="text-xs font-semibold text-editor-text">Typewriter Keyboard</span>
-                        </div>
-                        <span class="w-3.5 h-3.5 rounded-full border border-editor-sub/30 flex items-center justify-center" :class="keyboardSound === 'typewriter' ? 'bg-green-500/20' : ''">
-                          <span class="w-1.5 h-1.5 rounded-full bg-green-500" v-if="keyboardSound === 'typewriter'"></span>
-                        </span>
+                        <span class="sound-name">Vintage Typewriter</span>
+                        <div class="sound-radio" :class="keyboardSound === 'typewriter' ? 'radio-on' : ''"></div>
                       </button>
-
                     </div>
                   </div>
 
                   <!-- Volume Control Slider (Only visible when sound is not OFF) -->
-                  <div v-if="keyboardSound !== 'off'" class="mt-2 flex flex-col gap-2">
-                    <div class="flex items-center justify-between text-[10px] uppercase tracking-wider text-editor-sub">
-                      <span>Volume</span>
-                      <span class="font-bold">{{ Math.round(keyboardVolume * 100) }}%</span>
+                  <div v-if="keyboardSound !== 'off'" class="setting-card">
+                    <div class="flex items-center justify-between mb-4">
+                      <div class="setting-header" style="margin-bottom: 0;">
+                        <span class="setting-icon">🔊</span>
+                        <span>Volume</span>
+                      </div>
+                      <span class="text-xs font-bold text-editor-accent tabular-nums">{{ Math.round(keyboardVolume * 100) }}%</span>
                     </div>
-                    <div class="flex items-center gap-3">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-editor-sub">
-                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-                      </svg>
+                    
+                    <div class="vol-slider-wrap">
                       <input 
                         type="range" 
-                        min="0" 
-                        max="1" 
-                        step="0.05"
+                        min="0" max="1" step="0.05"
                         v-model.number="keyboardVolume"
-                        class="w-full h-1 bg-editor-sub/10 rounded-lg appearance-none cursor-pointer focus:outline-none transition-colors accent-editor-accent"
-                        :class="theme === 'theme-default' ? 'accent-editor-gold' : 'accent-editor-accent'"
-                        :style="{
-                          '--thumb-color': theme === 'theme-default' ? '#dfb15b' : 'var(--color-editor-accent)'
-                        }"
+                        class="vol-slider"
                       />
                     </div>
                   </div>
+                  
                 </div>
-
               </div>
             </div>
 
-            <!-- View: About -->
-            <div v-else-if="activeView === 'about'" key="about" class="max-w-md mx-auto py-8">
-              <h2 class="text-2xl font-bold text-editor-text mb-4 tracking-tight">About KeeType</h2>
-              <div class="text-xs text-editor-sub leading-relaxed flex flex-col gap-4">
-                <p>
-                  KeeType is a hyper-minimalist, distraction-free typing speed test application built with Vue 3, Tailwind CSS v4, and Laravel 13.
-                </p>
-                <p>
-                  No login. No database bloat. Just load the page and type to test your words-per-minute (WPM) speed and accuracy.
-                </p>
+            <!-- View: About (Modern Glassmorphism) -->
+            <div v-else-if="activeView === 'about'" key="about" class="max-w-xl mx-auto py-10 animate-slide-up">
+              <div class="flex flex-col items-center text-center">
+                
+                <!-- Logo Display -->
+                <div class="mb-8 scale-150">
+                  <h1 class="text-2xl font-bold tracking-tight">
+                    <span 
+                      :class="{
+                        'text-editor-gold': theme === 'theme-default',
+                        'text-editor-accent': theme !== 'theme-default'
+                      }"
+                    >kee</span><span class="text-editor-text">type</span>
+                  </h1>
+                </div>
+
+                <!-- Glass Card -->
+                <div class="about-card">
+                  <p class="about-lead">
+                    A hyper-minimalist, distraction-free typing speed test built for focus.
+                  </p>
+                  
+                  <div class="about-divider"></div>
+                  
+                  <p class="about-text">
+                    No login walls. No database bloat. Just load the page and start typing to test your words-per-minute (WPM) speed and accuracy. Engineered for pure speed.
+                  </p>
+                  
+                  <!-- Tech Stack Badges -->
+                  <div class="about-badges">
+                    <span class="tech-badge">Vue 3</span>
+                    <span class="tech-badge">Tailwind v4</span>
+                    <span class="tech-badge">Laravel 13</span>
+                  </div>
+                </div>
+                
+                <!-- Signature -->
+                <div class="mt-8 text-[10px] text-editor-sub uppercase tracking-[0.2em]">
+                  Crafted by <a href="#" class="text-editor-accent hover:opacity-80 transition-opacity">keefalegends</a>
+                </div>
+
               </div>
             </div>
 
