@@ -79,31 +79,32 @@ onUnmounted(() => {
 <template>
   <div class="flex min-h-screen relative overflow-hidden">
     
-    <!-- HOVER TRIGGER AREA (Left edge handle) -->
+    <!-- SIDEBAR WRAPPER: Single hover zone covering trigger + panel to prevent flicker -->
     <div
-      v-if="!isSidebarOpen"
+      class="sidebar-wrapper"
+      :class="(isActive || isFinished) ? 'opacity-0 pointer-events-none' : 'opacity-100'"
       @mouseenter="isSidebarOpen = true"
-      class="sidebar-hover-trigger"
-      :class="[
-        (isActive || isFinished) ? 'opacity-0 pointer-events-none' : 'opacity-100',
-      ]"
-    >
-      <div class="sidebar-hover-indicator" :class="theme === 'theme-default' ? 'indicator-gold' : 'indicator-accent'">
-        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="indicator-icon">
-          <polyline points="9 18 15 12 9 6"/>
-        </svg>
-      </div>
-    </div>
-
-    <!-- LEFT SIDEBAR (Modern floating card, auto-closes on mouseleave) -->
-    <aside
-      class="sidebar-panel"
       @mouseleave="isSidebarOpen = false"
-      :class="[
-        (isActive || isFinished) ? 'opacity-0 pointer-events-none' : 'opacity-100',
-        isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'
-      ]"
     >
+      <!-- HOVER TRIGGER AREA (Left edge handle, only visible when sidebar closed) -->
+      <div
+        v-if="!isSidebarOpen"
+        class="sidebar-hover-trigger"
+      >
+        <div class="sidebar-hover-indicator" :class="theme === 'theme-default' ? 'indicator-gold' : 'indicator-accent'">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="indicator-icon">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- LEFT SIDEBAR (Modern floating card) -->
+      <aside
+        class="sidebar-panel"
+        :class="[
+          isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'
+        ]"
+      >
       <!-- Logo inside sidebar -->
       <div class="sidebar-logo">
         <span
@@ -197,6 +198,7 @@ onUnmounted(() => {
         </div>
       </div>
     </aside>
+    </div> <!-- END sidebar-wrapper -->
 
     <!-- RIGHT MAIN CONTENT AREA -->
     <div 
