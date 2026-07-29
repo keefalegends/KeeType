@@ -364,13 +364,32 @@ body {
 /* Footer info inside sidebar */
 .sidebar-footer {
   margin-top: auto;
-  padding-top: 1rem;
+  padding-top: 1.25rem;
   border-top: 1px solid color-mix(in srgb, var(--text) 8%, transparent);
-  font-size: 9px;
+  font-size: 10px;
   color: color-mix(in srgb, var(--text) 50%, transparent);
-  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
   padding-left: 0.5rem;
 }
+
+.sidebar-footer-github {
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: fit-content;
+  color: color-mix(in srgb, var(--text) 70%, transparent);
+  transition: all 0.2s ease;
+}
+
+.sidebar-footer-github:hover {
+  color: var(--accent);
+  transform: translateX(2px);
+}
+
 
 /* ==========================================================================
    MODERN SETTINGS & ABOUT VIEWS (GLASSMORPHISM)

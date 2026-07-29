@@ -130,6 +130,15 @@ onUnmounted(() => {
           <span>Write</span>
         </button>
 
+        <!-- Arena -->
+        <div class="sidebar-item sidebar-item--disabled">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+          <span>Arena</span>
+          <span class="sidebar-soon">soon</span>
+        </div>
+
         <!-- Leaderboard -->
         <button
           @click="activeView = 'leaderboard'"
@@ -143,15 +152,6 @@ onUnmounted(() => {
           </svg>
           <span>Leaderboard</span>
         </button>
-
-        <!-- Arena -->
-        <div class="sidebar-item sidebar-item--disabled">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-          </svg>
-          <span>Arena</span>
-          <span class="sidebar-soon">soon</span>
-        </div>
 
         <!-- Spacer -->
         <div class="sidebar-spacer"></div>
@@ -189,8 +189,8 @@ onUnmounted(() => {
       <!-- Footer -->
       <div class="sidebar-footer">
         <div>v1.0.0</div>
-        <div class="flex items-center gap-1.5 hover:text-editor-text transition-colors cursor-pointer" onclick="window.open('https://github.com/keefalegends/KeeType', '_blank')">
-          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <div class="sidebar-footer-github cursor-pointer" onclick="window.open('https://github.com/keefalegends/KeeType', '_blank')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.02c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A4.8 4.8 0 0 0 8 18v4"></path>
           </svg>
           github
