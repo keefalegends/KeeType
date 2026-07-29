@@ -4,6 +4,7 @@ import { useTypingGame } from './composables/useTypingGame.js'
 import ModeSelector from './components/ModeSelector.vue'
 import TypingArea from './components/TypingArea.vue'
 import ResultScreen from './components/ResultScreen.vue'
+import LeaderboardView from './components/LeaderboardView.vue'
 
 const {
   mode, timeOption, wordOption, language, theme, keyboardSound, keyboardVolume,
@@ -129,6 +130,20 @@ onUnmounted(() => {
           <span>Write</span>
         </button>
 
+        <!-- Leaderboard -->
+        <button
+          @click="activeView = 'leaderboard'"
+          class="sidebar-item"
+          :class="[
+            activeView === 'leaderboard' ? 'sidebar-item--active' : ''
+          ]"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+          </svg>
+          <span>Leaderboard</span>
+        </button>
+
         <!-- Arena -->
         <div class="sidebar-item sidebar-item--disabled">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -174,7 +189,12 @@ onUnmounted(() => {
       <!-- Footer -->
       <div class="sidebar-footer">
         <div>v1.0.0</div>
-        <div>speed &amp; focus</div>
+        <div class="flex items-center gap-1.5 hover:text-editor-text transition-colors cursor-pointer" onclick="window.open('https://github.com/keefalegends/KeeType', '_blank')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.02c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A4.8 4.8 0 0 0 8 18v4"></path>
+          </svg>
+          github
+        </div>
       </div>
     </aside>
 
@@ -259,6 +279,11 @@ onUnmounted(() => {
                 />
               </div>
             </div>
+            <!-- View: Leaderboard -->
+            <div v-else-if="activeView === 'leaderboard'" key="leaderboard" class="w-full">
+              <LeaderboardView />
+            </div>
+
             <!-- View: Setting (Modern Glassmorphism) -->
             <div v-else-if="activeView === 'setting'" key="setting" class="w-full max-w-2xl py-4 animate-slide-up">
               
