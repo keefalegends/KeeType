@@ -101,9 +101,9 @@ export function useTypingGame() {
 
     // Ignore modifier keys, function keys, etc.
     if (e.ctrlKey || e.altKey || e.metaKey) return
-    if (e.key === 'Tab' || e.key === 'Escape') {
+    if (e.key === 'Enter' || e.key === 'Escape') {
       e.preventDefault()
-      if (e.key === 'Tab') initGame()
+      if (e.key === 'Enter') initGame()
       return
     }
 

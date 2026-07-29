@@ -58,7 +58,11 @@ const restartGame = () => {
 
 function onKeyDown(e) {
   if (isCustomPromptOpen.value) return
-  if (isFinished.value && e.key === 'Tab') return
+  if (isFinished.value && e.key === 'Enter') {
+    e.preventDefault()
+    restartGame()
+    return
+  }
   handleKeyDown(e)
 }
 
@@ -274,7 +278,7 @@ onUnmounted(() => {
                   class="mt-8 text-sm text-editor-sub text-center transition-opacity duration-300"
                   :class="isActive ? 'opacity-0' : 'opacity-100'"
                 >
-                  press <span class="text-editor-text">tab</span> to restart
+                  press <span class="text-editor-text">enter</span> to restart
                 </div>
               </div>
 
