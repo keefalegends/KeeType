@@ -157,16 +157,54 @@ body {
 
 /* Handle indicator in the middle of left edge */
 .sidebar-hover-indicator {
-  width: 4px;
-  height: 60px;
-  background: color-mix(in srgb, var(--sub) 30%, transparent);
-  border-radius: 0 4px 4px 0;
-  transition: background 0.2s, width 0.2s;
+  width: 14px;
+  height: 80px;
+  border-radius: 0 12px 12px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  animation: pulseIndicator 2.5s infinite;
+}
+
+.indicator-gold {
+  background: var(--gold);
+  color: #202940; /* Navy dark text for gold contrast */
+}
+
+.indicator-accent {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.indicator-icon {
+  animation: bounceArrow 1.5s infinite;
+  transition: transform 0.2s ease;
+}
+
+@keyframes pulseIndicator {
+  0%, 100% {
+    box-shadow: 2px 0 6px rgba(0, 0, 0, 0.1), 0 0 0 0 color-mix(in srgb, var(--accent) 40%, transparent);
+  }
+  50% {
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.15), 0 0 0 6px color-mix(in srgb, var(--accent) 25%, transparent);
+  }
+}
+
+@keyframes bounceArrow {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(3px); }
 }
 
 .sidebar-hover-trigger:hover .sidebar-hover-indicator {
-  background: var(--accent);
-  width: 6px;
+  width: 22px;
+  height: 100px;
+  box-shadow: 3px 0 15px rgba(0, 0, 0, 0.15);
+}
+
+.sidebar-hover-trigger:hover .indicator-icon {
+  transform: scale(1.2);
 }
 
 /* Sidebar Panel */

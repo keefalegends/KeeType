@@ -87,7 +87,11 @@ onUnmounted(() => {
         (isActive || isFinished) ? 'opacity-0 pointer-events-none' : 'opacity-100',
       ]"
     >
-      <div class="sidebar-hover-indicator"></div>
+      <div class="sidebar-hover-indicator" :class="theme === 'theme-default' ? 'indicator-gold' : 'indicator-accent'">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="indicator-icon">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </div>
     </div>
 
     <!-- LEFT SIDEBAR (Modern floating card, auto-closes on mouseleave) -->
