@@ -28,9 +28,12 @@ class LeaderboardController extends Controller
         $scores = $query
             ->orderByDesc('wpm')
             ->orderByDesc('accuracy')
-            ->orderBy('created_at')
-            ->limit($limit)
-            ->get();
+            ->orderBy('created_at', 'asc') // Kalau WPM & Acc sama, ambil yg pertama kali dicetak
+            ->get()
+            // Deduplicate by nickname, keeping the one with highest WPM (since we already ordered by WPM descending)
+            ->unique('nickname')
+            ->take($limit)
+            ->values();
 
         return response()->json([
             'status' => 'success',
