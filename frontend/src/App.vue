@@ -181,7 +181,6 @@ onUnmounted(() => {
     <!-- RIGHT MAIN CONTENT AREA -->
     <div 
       class="flex-1 flex flex-col min-h-screen relative transition-all duration-300 ease-in-out"
-      :class="isSidebarOpen ? 'ml-36' : 'ml-0'"
     >
       
       <!-- Top Header (Logo) - Fixed position in left top corner, does not move with sidebar -->
@@ -202,13 +201,13 @@ onUnmounted(() => {
       <!-- Centered Play / View Area -->
       <main 
         ref="gameContainer"
-        class="flex-1 flex flex-col items-center justify-center px-12 pb-16 pt-20"
+        class="flex-1 flex flex-col items-center justify-center px-6 md:px-12 pb-16 pt-20"
       >
-        <div class="w-full max-w-4xl">
+        <div class="w-full max-w-4xl flex flex-col items-center justify-center">
           <Transition name="fade" mode="out-in">
             
             <!-- View: Write (Game View) -->
-            <div v-if="activeView === 'write'" key="write">
+            <div v-if="activeView === 'write'" key="write" class="w-full">
               <div v-if="!isFinished" key="game">
                 <ModeSelector
                   :mode="mode"
@@ -261,7 +260,7 @@ onUnmounted(() => {
               </div>
             </div>
             <!-- View: Setting (Modern Glassmorphism) -->
-            <div v-else-if="activeView === 'setting'" key="setting" class="max-w-2xl mx-auto py-4 animate-slide-up">
+            <div v-else-if="activeView === 'setting'" key="setting" class="w-full max-w-2xl py-4 animate-slide-up">
               
               <div class="flex items-center gap-4 mb-8">
                 <div class="h-px bg-editor-sub/20 flex-1"></div>
@@ -400,7 +399,7 @@ onUnmounted(() => {
             </div>
 
             <!-- View: About (Modern Glassmorphism) -->
-            <div v-else-if="activeView === 'about'" key="about" class="max-w-xl mx-auto py-10 animate-slide-up">
+            <div v-else-if="activeView === 'about'" key="about" class="w-full max-w-xl py-10 animate-slide-up">
               <div class="flex flex-col items-center text-center">
                 
                 <!-- Logo Display -->
