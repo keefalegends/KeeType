@@ -14,6 +14,7 @@ const modes = [
 ]
 
 const selectedMode = ref('time-15')
+const selectedPeriod = ref('all') // 'daily', 'weekly', 'all'
 const leaderboards = ref([])
 const isLoading = ref(false)
 const apiBaseUrl = 'http://localhost:8000/api'
@@ -23,7 +24,7 @@ async function fetchLeaderboard() {
   leaderboards.value = []
   try {
     const res = await axios.get(`${apiBaseUrl}/leaderboard`, {
-      params: { mode: selectedMode.value, limit: 10 }
+      params: { mode: selectedMode.value, period: selectedPeriod.value, limit: 10 }
     })
     if (res.data.status === 'success') {
       leaderboards.value = res.data.data
@@ -35,7 +36,7 @@ async function fetchLeaderboard() {
   }
 }
 
-watch(selectedMode, fetchLeaderboard)
+watch([selectedMode, selectedPeriod], fetchLeaderboard)
 
 onMounted(() => {
   fetchLeaderboard()
@@ -61,6 +62,31 @@ function rankBadge(i) {
         Global Leaderboard
       </h2>
       <div class="h-px bg-editor-sub/20 flex-1"></div>
+    </div>
+
+    <!-- Period Filters -->
+    <div class="flex justify-center gap-6 mb-6 text-sm font-bold tracking-widest font-mono">
+      <button 
+        @click="selectedPeriod = 'daily'"
+        class="transition-colors"
+        :class="selectedPeriod === 'daily' ? 'text-editor-accent border-b-2 border-editor-accent pb-1' : 'text-editor-sub hover:text-editor-text'"
+      >
+        daily
+      </button>
+      <button 
+        @click="selectedPeriod = 'weekly'"
+        class="transition-colors"
+        :class="selectedPeriod === 'weekly' ? 'text-editor-accent border-b-2 border-editor-accent pb-1' : 'text-editor-sub hover:text-editor-text'"
+      >
+        weekly
+      </button>
+      <button 
+        @click="selectedPeriod = 'all'"
+        class="transition-colors"
+        :class="selectedPeriod === 'all' ? 'text-editor-accent border-b-2 border-editor-accent pb-1' : 'text-editor-sub hover:text-editor-text'"
+      >
+        all-time
+      </button>
     </div>
 
     <div class="setting-card flex flex-col gap-6">

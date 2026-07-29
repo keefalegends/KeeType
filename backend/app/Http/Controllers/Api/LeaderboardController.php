@@ -13,10 +13,19 @@ class LeaderboardController extends Controller
      */
     public function index(Request $request)
     {
-        $mode = $request->query('mode', 'time-30');
-        $limit = $request->query('limit', 10);
+        $mode   = $request->query('mode', 'time-30');
+        $limit  = $request->query('limit', 10);
+        $period = $request->query('period', 'all'); // all | daily | weekly
 
-        $scores = Leaderboard::where('mode', $mode)
+        $query = Leaderboard::where('mode', $mode);
+
+        if ($period === 'daily') {
+            $query->whereDate('created_at', today());
+        } elseif ($period === 'weekly') {
+            $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
+        }
+
+        $scores = $query
             ->orderByDesc('wpm')
             ->orderByDesc('accuracy')
             ->orderBy('created_at')
@@ -25,7 +34,7 @@ class LeaderboardController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => $scores
+            'data'   => $scores
         ]);
     }
 
