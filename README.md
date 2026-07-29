@@ -11,14 +11,17 @@ Built with **Laravel 13** (REST API) and **Vue 3 + Vite** (SPA Frontend), styled
 
 - 🎯 **Multiple Modes** — Choose between **Time mode** (`15s`, `30s`, `60s`, `120s`) or **Words mode** (`10`, `25`, `50`, `100` words).
 - 🌍 **Multi-Language Support** — Practice in **English** (Top 200 common words) or **Indonesian** (Top 300 daily common words).
-- 🎨 **Dynamic Themes** — Switch instantly between 3 carefully crafted color palettes:
-  - `charcoal` — Refined dark mode with warm amber accents (Default).
-  - `crt` — Retro hacker terminal with pure black background, phosphor green text, and a solid block caret.
+- 🎨 **Dynamic Themes** — Switch instantly between 5 carefully crafted color palettes:
+  - `navy` — Deep navy blue with golden highlights (Default).
+  - `terminal` — Retro hacker CRT terminal with pure black background, phosphor green text, and a solid block caret.
   - `paper` — Editorial off-white light mode with ink text and cobalt blue accents.
-- 🌊 **Smooth Animations & UX** — Gliding cubic-bezier caret, character pop-in on keystroke, subtle error shake feedback, and automatic smooth vertical scrolling as you progress through lines.
-- 🏆 **Frictionless Leaderboard** — Finished a fast run? Submit your score to the global/local leaderboard instantly using just a nickname—no registration or account setup needed.
+  - `serika-dark` — Charcoal dark theme with yellow accents.
+  - `darling` — Kawaii pastel pink theme with white/navy blue highlights.
+- 🔊 **ASMR Mechanical Keyboard Sounds** — Experience simulated mechanical keyboard sound profiles (Cherry MX Brown, Bubble Pop, Tactile Switch, Vintage Typewriter) with volume adjuster, synthesized natively using the Web Audio API.
+- 🚪 **Hover Sidebar Navigation** — Futuristic floating navigation panel that slides in/out automatically via hover indicator areas, complete with smooth animations and layout anti-flicker protection.
+- 🏆 **Frictionless Leaderboard** — Filter scoreboards dynamically by **Time Frame** (`daily`, `weekly`, `all-time`) and typing modes. The API automatically deduplicates scores, maintaining only the personal best entry per nickname.
 - 📊 **Detailed Post-Game Analytics** — Track your WPM, raw WPM, accuracy %, character breakdown (`correct` / `incorrect` / `extra` / `missed`), and visualize your per-second typing consistency with an aesthetic bar chart.
-- ⚡ **Smart Keydown Handling** — Press `Tab` anywhere during gameplay to instantly restart. Disabled automatically on the results screen so you can navigate the score submission form safely.
+- ⚡ **Smart Keydown Handling** — Press `Enter` anywhere during gameplay to instantly restart. Disabled automatically on the results screen so you can navigate the score submission form safely.
 
 ---
 
@@ -47,6 +50,7 @@ KeeType/
     │   ├── components/
     │   │   ├── ModeSelector.vue      # Language, Mode, and Option selector
     │   │   ├── TypingArea.vue        # Active typing test, caret, and animations
+    │   │   ├── LeaderboardView.vue   # Global ranking viewer and period filters
     │   │   └── ResultScreen.vue      # Analytics, WPM chart, and Leaderboard
     │   ├── composables/useTypingGame.js # Core game loop, state, and localStorage manager
     │   ├── data/words.js             # English and Indonesian word banks
@@ -99,7 +103,10 @@ Open `http://localhost:5173` in your browser and start typing!
 | POST   | `/api/leaderboard` | Submit a new score to leaderboard  |
 
 ### **GET** `/api/leaderboard`
-- **Query Params:** `mode` (e.g. `time-30`, `words-25`), `limit` (default `10`)
+- **Query Params:** 
+  - `mode` (e.g. `time-30`, `words-25`)
+  - `period` (e.g. `daily`, `weekly`, `all` — default: `all`)
+  - `limit` (default: `10`)
 
 ### **POST** `/api/leaderboard`
 - **Request Body:**
