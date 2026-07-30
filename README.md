@@ -1,4 +1,4 @@
-# KeeType ⚡
+# KeeType 
 
 A hyper-minimalist, distraction-free typing speed test application. 
 No login required. Zero bloat. Pure typing focus.
