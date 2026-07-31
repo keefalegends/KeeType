@@ -85,91 +85,135 @@ function realPlayerCount(room) {
     <!-- ════════════════════════════════════════════ -->
     <!-- SCREEN: HOME (Lobby + public rooms list)    -->
     <!-- ════════════════════════════════════════════ -->
-    <div v-if="screen === 'home'" class="flex flex-col gap-8">
+    <div v-if="screen === 'home'" class="flex flex-col gap-7">
 
-      <!-- Header -->
-      <div class="text-center">
-        <div class="inline-flex items-center gap-3 mb-3">
-          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-editor-accent">
+      <!-- Hero Header -->
+      <div class="text-center pt-1">
+        <div class="arena-hero-badge">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
           </svg>
-          <h2 class="text-2xl font-bold text-editor-text tracking-tight">Arena</h2>
+          <span>Arena Mode</span>
         </div>
-        <p class="text-sm text-editor-sub">Race against real players & bots. No login needed.</p>
+        <h2 class="text-3xl font-bold text-editor-text tracking-tight mt-3 mb-1">Race. Type. Win.</h2>
+        <p class="text-sm text-editor-sub">Compete against real players &amp; bots in real-time.</p>
       </div>
 
-      <!-- Nickname Input -->
-      <div class="flex flex-col gap-2">
-        <label class="text-[10px] uppercase tracking-[0.25em] text-editor-sub font-semibold">Your Nickname</label>
-        <input
-          v-model="nickname"
-          type="text"
-          maxlength="20"
-          placeholder="enter nickname..."
-          class="arena-input text-center text-lg font-bold"
-          @keyup.enter="nickname = nickname.trim()"
-        />
-        <p class="text-xs text-editor-sub/60 text-center">letters, numbers, underscores only</p>
-      </div>
+      <!-- Two-column grid: Nickname left, Create Room right -->
+      <div class="arena-home-grid">
 
-      <!-- Create Room Card -->
-      <div class="arena-card">
-        <div class="arena-card-header">
-          <span class="text-editor-accent">⚔️</span>
-          <span class="font-semibold text-editor-text">Create New Room</span>
-        </div>
+        <!-- LEFT: Nickname + feature hints -->
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-1.5">
+            <label class="arena-label">
+              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="5"/><path d="M3 21a9 9 0 0 1 18 0"/></svg>
+              Your Nickname
+            </label>
+            <input
+              v-model="nickname"
+              type="text"
+              maxlength="20"
+              placeholder="enter nickname..."
+              class="arena-input"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <p class="text-[10px] text-editor-sub/50">letters, numbers, underscores · max 20</p>
+          </div>
 
-        <!-- Language -->
-        <div class="flex flex-col gap-2 mb-4">
-          <label class="text-[10px] uppercase tracking-[0.2em] text-editor-sub">Language</label>
-          <div class="flex gap-2">
-            <button
-              v-for="lang in ['english', 'indonesian']"
-              :key="lang"
-              @click="lobbyLanguage = lang"
-              class="arena-pill"
-              :class="lobbyLanguage === lang ? 'arena-pill--active' : ''"
-            >{{ lang }}</button>
+          <div class="flex flex-col gap-2">
+            <div class="arena-info-pill">
+              <span>🤖</span><span>Bots fill empty slots automatically</span>
+            </div>
+            <div class="arena-info-pill">
+              <span>⚡</span><span>No login required to play</span>
+            </div>
+            <div class="arena-info-pill">
+              <span>🌍</span><span>Public rooms, open to anyone</span>
+            </div>
           </div>
         </div>
 
-        <!-- Word Count -->
-        <div class="flex flex-col gap-2 mb-5">
-          <label class="text-[10px] uppercase tracking-[0.2em] text-editor-sub">Words</label>
-          <div class="flex gap-2">
+        <!-- RIGHT: Create Room Card -->
+        <div class="arena-create-card">
+          <div class="arena-create-card__accent"></div>
+          <div class="arena-create-card__body">
+
+            <div class="flex items-center gap-2.5 mb-5">
+              <div class="arena-create-icon">⚔️</div>
+              <div>
+                <div class="text-sm font-bold text-editor-text leading-tight">Create New Room</div>
+                <div class="text-[10px] text-editor-sub mt-0.5">You'll be the host</div>
+              </div>
+            </div>
+
+            <!-- Language segmented control -->
+            <div class="flex flex-col gap-1.5 mb-4">
+              <label class="arena-label">Language</label>
+              <div class="arena-segment">
+                <button
+                  v-for="lang in ['english', 'indonesian']"
+                  :key="lang"
+                  @click="lobbyLanguage = lang"
+                  class="arena-segment__btn"
+                  :class="lobbyLanguage === lang ? 'arena-segment__btn--active' : ''"
+                >
+                  <span>{{ lang === 'english' ? '🇬🇧' : '🇮🇩' }}</span>
+                  <span>{{ lang }}</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Word count tile grid -->
+            <div class="flex flex-col gap-1.5 mb-5">
+              <label class="arena-label">Word Count</label>
+              <div class="arena-wc-grid">
+                <button
+                  v-for="wc in wordCountOptions"
+                  :key="wc"
+                  @click="lobbyWordCount = wc"
+                  class="arena-wc-btn"
+                  :class="lobbyWordCount === wc ? 'arena-wc-btn--active' : ''"
+                >
+                  <span class="arena-wc-btn__num">{{ wc }}</span>
+                  <span class="arena-wc-btn__label">words</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Create button -->
             <button
-              v-for="wc in wordCountOptions"
-              :key="wc"
-              @click="lobbyWordCount = wc"
-              class="arena-pill"
-              :class="lobbyWordCount === wc ? 'arena-pill--active' : ''"
-            >{{ wc }}</button>
+              @click="createRoom(lobbyLanguage, lobbyWordCount)"
+              :disabled="loading || !nickname.trim()"
+              class="arena-create-btn"
+            >
+              <svg v-if="!loading" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <svg v-else xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="animate-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+              <span>{{ loading ? 'Creating...' : 'Create Room' }}</span>
+            </button>
+
           </div>
         </div>
-
-        <button
-          @click="createRoom(lobbyLanguage, lobbyWordCount)"
-          :disabled="loading || !nickname.trim()"
-          class="arena-btn arena-btn--primary w-full"
-        >
-          <span v-if="loading">Creating...</span>
-          <span v-else>Create Room</span>
-        </button>
       </div>
 
       <!-- Error -->
-      <p v-if="error" class="text-center text-editor-error text-sm animate-pulse">⚠ {{ error }}</p>
+      <p v-if="error" class="text-center text-sm font-medium text-editor-error">⚠ {{ error }}</p>
 
       <!-- Public Rooms List -->
       <div class="flex flex-col gap-3">
         <div class="flex items-center gap-3">
           <div class="h-px bg-editor-sub/20 flex-1"></div>
-          <span class="text-[10px] uppercase tracking-[0.25em] text-editor-sub">Open Rooms</span>
+          <span class="text-[10px] uppercase tracking-[0.25em] text-editor-sub flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-editor-accent inline-block animate-pulse"></span>
+            Open Rooms
+          </span>
           <div class="h-px bg-editor-sub/20 flex-1"></div>
         </div>
 
-        <div v-if="publicRooms.length === 0" class="text-center text-editor-sub/60 text-sm py-6">
-          No open rooms yet. Create one!
+        <div v-if="publicRooms.length === 0" class="arena-empty-state">
+          <div class="text-2xl mb-2">🏁</div>
+          <div class="text-sm text-editor-sub">No open rooms yet.</div>
+          <div class="text-xs text-editor-sub/50 mt-0.5">Create one and start the race!</div>
         </div>
 
         <div v-for="r in publicRooms" :key="r.room_code" class="arena-room-row">
@@ -404,13 +448,14 @@ function realPlayerCount(room) {
 /* ── Inputs ── */
 .arena-input {
   width: 100%;
-  background: color-mix(in srgb, var(--color-editor-bg) 80%, transparent);
+  background: color-mix(in srgb, var(--color-editor-bg) 60%, transparent);
   border: 1.5px solid color-mix(in srgb, var(--color-editor-sub) 25%, transparent);
   border-radius: 10px;
-  padding: 0.65rem 1rem;
+  padding: 0.7rem 1rem;
   color: var(--color-editor-text);
   font-family: 'JetBrains Mono', monospace;
-  font-size: 1rem;
+  font-size: 0.95rem;
+  font-weight: 700;
   transition: border-color 0.2s, box-shadow 0.2s;
   outline: none;
 }
@@ -418,8 +463,218 @@ function realPlayerCount(room) {
   border-color: var(--color-editor-accent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-editor-accent) 15%, transparent);
 }
+.arena-input::placeholder {
+  color: color-mix(in srgb, var(--color-editor-sub) 60%, transparent);
+  font-weight: 400;
+}
 
-/* ── Cards ── */
+/* ── Labels ── */
+.arena-label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--color-editor-sub);
+  font-weight: 600;
+}
+
+/* ── Hero badge ── */
+.arena-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--color-editor-accent) 35%, transparent);
+  background: color-mix(in srgb, var(--color-editor-accent) 10%, transparent);
+  color: var(--color-editor-accent);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ── Two-column home grid ── */
+.arena-home-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+@media (max-width: 640px) {
+  .arena-home-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Info pills ── */
+.arena-info-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--color-editor-sub) 7%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-editor-sub) 13%, transparent);
+  font-size: 0.75rem;
+  color: var(--color-editor-sub);
+  line-height: 1.3;
+}
+
+/* ── Create Room Card ── */
+.arena-create-card {
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--color-editor-sub) 20%, transparent);
+  overflow: hidden;
+  position: relative;
+}
+.arena-create-card__accent {
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--color-editor-accent),
+    color-mix(in srgb, var(--color-editor-accent) 40%, transparent)
+  );
+}
+.arena-create-card__body {
+  padding: 1.25rem;
+  background: color-mix(in srgb, var(--color-editor-bg) 80%, var(--color-editor-sub));
+}
+.arena-create-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--color-editor-accent) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-editor-accent) 25%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* ── Segmented language control ── */
+.arena-segment {
+  display: flex;
+  background: color-mix(in srgb, var(--color-editor-sub) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-editor-sub) 18%, transparent);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 2px;
+}
+.arena-segment__btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: var(--color-editor-sub);
+  transition: all 0.15s;
+}
+.arena-segment__btn:hover:not(.arena-segment__btn--active) {
+  color: var(--color-editor-text);
+}
+.arena-segment__btn--active {
+  background: var(--color-editor-accent);
+  color: var(--color-editor-bg);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+/* ── Word count grid ── */
+.arena-wc-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.4rem;
+}
+.arena-wc-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.55rem 0.25rem;
+  border-radius: 8px;
+  border: 1.5px solid color-mix(in srgb, var(--color-editor-sub) 20%, transparent);
+  background: color-mix(in srgb, var(--color-editor-bg) 50%, transparent);
+  cursor: pointer;
+  transition: all 0.15s;
+  gap: 0.05rem;
+  font-family: inherit;
+}
+.arena-wc-btn:hover:not(.arena-wc-btn--active) {
+  border-color: color-mix(in srgb, var(--color-editor-sub) 45%, transparent);
+  background: color-mix(in srgb, var(--color-editor-sub) 8%, transparent);
+}
+.arena-wc-btn--active {
+  border-color: var(--color-editor-accent);
+  background: color-mix(in srgb, var(--color-editor-accent) 12%, transparent);
+}
+.arena-wc-btn__num {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--color-editor-text);
+  line-height: 1;
+  font-family: 'JetBrains Mono', monospace;
+}
+.arena-wc-btn--active .arena-wc-btn__num {
+  color: var(--color-editor-accent);
+}
+.arena-wc-btn__label {
+  font-size: 0.6rem;
+  color: var(--color-editor-sub);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── Create CTA button ── */
+.arena-create-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1rem;
+  border-radius: 9px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: var(--color-editor-accent);
+  color: var(--color-editor-bg);
+  transition: opacity 0.15s, transform 0.1s;
+  letter-spacing: 0.03em;
+}
+.arena-create-btn:hover:not(:disabled) {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+.arena-create-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+.arena-create-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ── Empty state ── */
+.arena-empty-state {
+  text-align: center;
+  padding: 2rem 1rem;
+  border: 1px dashed color-mix(in srgb, var(--color-editor-sub) 20%, transparent);
+  border-radius: 12px;
+}
+
+/* ── Old cards (kept for lobby/result screens) ── */
 .arena-card {
   background: color-mix(in srgb, var(--color-editor-bg) 85%, var(--color-editor-sub));
   border: 1px solid color-mix(in srgb, var(--color-editor-sub) 20%, transparent);
@@ -433,6 +688,7 @@ function realPlayerCount(room) {
   margin-bottom: 1.25rem;
   font-size: 0.9rem;
 }
+
 
 /* ── Pills ── */
 .arena-pill {
