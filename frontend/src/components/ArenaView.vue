@@ -119,12 +119,21 @@ function realPlayerCount(room) {
         <p class="text-sm text-editor-sub">Compete against real players &amp; bots in real-time.</p>
       </div>
 
-      <!-- Two-column grid: Nickname left, Create Room right -->
-      <div class="arena-home-grid">
+      <!-- Single Unified Create Room Card -->
+      <div class="arena-create-card w-full max-w-xl mx-auto">
+        <div class="arena-create-card__accent"></div>
+        <div class="arena-create-card__body">
 
-        <!-- LEFT: Nickname + feature hints -->
-        <div class="flex flex-col gap-4">
-          <div class="flex flex-col gap-1.5">
+          <div class="flex items-center gap-2.5" style="margin-bottom: 1.5rem;">
+            <div class="arena-create-icon">⚔️</div>
+            <div>
+              <div class="text-base font-bold text-editor-text leading-tight">Create New Room</div>
+              <div class="text-[10px] text-editor-sub mt-0.5">Set up your match &amp; race!</div>
+            </div>
+          </div>
+
+          <!-- Your Nickname -->
+          <div class="flex flex-col gap-1.5" style="margin-bottom: 1.5rem;">
             <label class="arena-label">
               <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="5"/><path d="M3 21a9 9 0 0 1 18 0"/></svg>
               Your Nickname
@@ -138,99 +147,71 @@ function realPlayerCount(room) {
               autocomplete="off"
               spellcheck="false"
             />
-            <p class="text-[10px] text-editor-sub/50">letters, numbers, underscores · max 20</p>
           </div>
 
-          <div class="flex flex-col gap-2">
-            <div class="arena-info-pill">
-              <span>🤖</span><span>Bots fill empty slots automatically</span>
-            </div>
-            <div class="arena-info-pill">
-              <span>⚡</span><span>No login required to play</span>
-            </div>
-            <div class="arena-info-pill">
-              <span>🌍</span><span>Public rooms, open to anyone</span>
+          <!-- Language segmented control -->
+          <div class="flex flex-col gap-2" style="margin-bottom: 1.25rem;">
+            <label class="arena-label">Language</label>
+            <div class="arena-segment">
+              <button
+                v-for="lang in ['english', 'indonesian']"
+                :key="lang"
+                @click="lobbyLanguage = lang"
+                class="arena-segment__btn"
+                :class="lobbyLanguage === lang ? 'arena-segment__btn--active' : ''"
+              >
+                <span>{{ lang === 'english' ? '🇬🇧' : '🇮🇩' }}</span>
+                <span>{{ lang }}</span>
+              </button>
             </div>
           </div>
-        </div>
 
-        <!-- RIGHT: Create Room Card -->
-        <div class="arena-create-card">
-          <div class="arena-create-card__accent"></div>
-          <div class="arena-create-card__body">
-
-            <div class="flex items-center gap-2.5" style="margin-bottom: 1.5rem;">
-              <div class="arena-create-icon">⚔️</div>
-              <div>
-                <div class="text-sm font-bold text-editor-text leading-tight">Create New Room</div>
-                <div class="text-[10px] text-editor-sub mt-0.5">You'll be the host</div>
-              </div>
+          <!-- Word count tile grid -->
+          <div class="flex flex-col gap-2" style="margin-bottom: 1.5rem;">
+            <label class="arena-label">Word Count</label>
+            <div class="arena-wc-grid">
+              <button
+                v-for="wc in wordCountOptions"
+                :key="wc"
+                @click="lobbyWordCount = wc"
+                class="arena-wc-btn"
+                :class="lobbyWordCount === wc ? 'arena-wc-btn--active' : ''"
+              >
+                <span class="arena-wc-btn__num">{{ wc }}</span>
+                <span class="arena-wc-btn__label">words</span>
+              </button>
             </div>
-
-            <!-- Language segmented control -->
-            <div class="flex flex-col gap-2" style="margin-bottom: 1.25rem;">
-              <label class="arena-label">Language</label>
-              <div class="arena-segment">
-                <button
-                  v-for="lang in ['english', 'indonesian']"
-                  :key="lang"
-                  @click="lobbyLanguage = lang"
-                  class="arena-segment__btn"
-                  :class="lobbyLanguage === lang ? 'arena-segment__btn--active' : ''"
-                >
-                  <span>{{ lang === 'english' ? '🇬🇧' : '🇮🇩' }}</span>
-                  <span>{{ lang }}</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Word count tile grid -->
-            <div class="flex flex-col gap-2" style="margin-bottom: 1.75rem;">
-              <label class="arena-label">Word Count</label>
-              <div class="arena-wc-grid">
-                <button
-                  v-for="wc in wordCountOptions"
-                  :key="wc"
-                  @click="lobbyWordCount = wc"
-                  class="arena-wc-btn"
-                  :class="lobbyWordCount === wc ? 'arena-wc-btn--active' : ''"
-                >
-                  <span class="arena-wc-btn__num">{{ wc }}</span>
-                  <span class="arena-wc-btn__label">words</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Bot Difficulty selector -->
-            <div class="flex flex-col gap-2" style="margin-bottom: 1.75rem;">
-              <label class="arena-label">Bot Difficulty</label>
-              <div class="arena-diff-grid">
-                <button
-                  v-for="d in difficultyOptions"
-                  :key="d.key"
-                  @click="lobbyBotDifficulty = d.key"
-                  class="arena-diff-btn"
-                  :class="lobbyBotDifficulty === d.key ? 'arena-diff-btn--active' : ''"
-                >
-                  <span class="arena-diff-btn__icon">{{ d.icon }}</span>
-                  <span class="arena-diff-btn__label">{{ d.label }}</span>
-                  <span class="arena-diff-btn__sub">{{ d.wpm }}</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Create button -->
-            <button
-              @click="createRoom(lobbyLanguage, lobbyWordCount, lobbyBotDifficulty)"
-              :disabled="loading || !nickname.trim()"
-              class="arena-create-btn"
-            >
-              <svg v-if="!loading" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              <svg v-else xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="animate-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-              <span>{{ loading ? 'Creating...' : 'Create Room' }}</span>
-            </button>
-
           </div>
+
+          <!-- Bot Difficulty selector -->
+          <div class="flex flex-col gap-2" style="margin-bottom: 1.75rem;">
+            <label class="arena-label">Bot Difficulty</label>
+            <div class="arena-diff-grid">
+              <button
+                v-for="d in difficultyOptions"
+                :key="d.key"
+                @click="lobbyBotDifficulty = d.key"
+                class="arena-diff-btn"
+                :class="lobbyBotDifficulty === d.key ? 'arena-diff-btn--active' : ''"
+              >
+                <span class="arena-diff-btn__icon">{{ d.icon }}</span>
+                <span class="arena-diff-btn__label">{{ d.label }}</span>
+                <span class="arena-diff-btn__sub">{{ d.wpm }}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Create button -->
+          <button
+            @click="createRoom(lobbyLanguage, lobbyWordCount, lobbyBotDifficulty)"
+            :disabled="loading || !nickname.trim()"
+            class="arena-create-btn"
+          >
+            <svg v-if="!loading" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <svg v-else xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="animate-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+            <span>{{ loading ? 'Creating...' : 'Create Room' }}</span>
+          </button>
+
         </div>
       </div>
 
