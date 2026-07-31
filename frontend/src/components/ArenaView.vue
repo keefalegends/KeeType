@@ -165,7 +165,7 @@ function realPlayerCount(room) {
             </div>
 
             <!-- Word count tile grid -->
-            <div class="flex flex-col gap-2 mb-6">
+            <div class="flex flex-col gap-2 mb-8">
               <label class="arena-label">Word Count</label>
               <div class="arena-wc-grid">
                 <button
@@ -185,7 +185,7 @@ function realPlayerCount(room) {
             <button
               @click="createRoom(lobbyLanguage, lobbyWordCount)"
               :disabled="loading || !nickname.trim()"
-              class="arena-create-btn mt-3"
+              class="arena-create-btn mt-1"
             >
               <svg v-if="!loading" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
               <svg v-else xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="animate-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
