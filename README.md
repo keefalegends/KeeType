@@ -5,8 +5,7 @@ No login required. Zero bloat. Pure typing focus, Inspired by **monkeytype.com**
 
 Built with **Laravel 13** (REST API) and **Vue 3 + Vite** (SPA Frontend), styled with **Tailwind CSS v4** and **JetBrains Mono**.
 
-![Uploading image.png…]()
-
+<img width="1914" height="877" alt="image" src="https://github.com/user-attachments/assets/7771c233-7cd6-4823-987d-192cf4835651" />
 
 ---
 
