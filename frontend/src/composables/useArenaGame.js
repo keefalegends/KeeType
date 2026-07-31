@@ -1,4 +1,5 @@
 import { ref, computed, onUnmounted } from 'vue'
+import { playKeyboardClick, preloadMp3Sounds } from '../utils/sound.js'
 
 const API_BASE = 'http://localhost:8000/api'
 
@@ -203,6 +204,15 @@ export function useArenaGame() {
     }, 100)
   }
 
+  // ── Audio preference helper ──
+  function playRaceSound(type = 'default') {
+    const sound = localStorage.getItem('keetype_sound') || 'cherry-mx-brown'
+    if (sound === 'off') return
+    const volStr = localStorage.getItem('keetype_volume')
+    const vol = volStr !== null ? parseFloat(volStr) : 0.5
+    playKeyboardClick(type, vol, sound)
+  }
+
   // ── Typing logic ──
   function handleRaceKeyDown(e) {
     if (screen.value !== 'racing' || localFinished.value) return
@@ -215,6 +225,7 @@ export function useArenaGame() {
 
     if (e.key === 'Backspace') {
       e.preventDefault()
+      playRaceSound('backspace')
       if (ci > 0) {
         currentCharIndex.value--
         const newCi = currentCharIndex.value
@@ -233,6 +244,7 @@ export function useArenaGame() {
 
     if (e.key === ' ') {
       e.preventDefault()
+      playRaceSound('space')
       if (ci > 0) {
         for (let i = ci; i < currentWord.length; i++) {
           if (!typedChars.value[wi][i]) typedChars.value[wi][i] = { char: '', status: 'missed' }
@@ -249,6 +261,7 @@ export function useArenaGame() {
 
     if (e.key.length === 1) {
       e.preventDefault()
+      playRaceSound('default')
       if (!isTypingActive.value) isTypingActive.value = true
 
       const expected = currentWord[ci]
@@ -260,6 +273,7 @@ export function useArenaGame() {
       currentCharIndex.value++
     }
   }
+
 
   function finishRace() {
     localFinished.value = true

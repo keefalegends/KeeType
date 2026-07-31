@@ -1,7 +1,7 @@
-<script setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useArenaGame } from '../composables/useArenaGame.js'
 import TypingArea from './TypingArea.vue'
+import { preloadMp3Sounds } from '../utils/sound.js'
 
 const {
   nickname, roomCode, playerId, isHost, screen,
@@ -24,10 +24,12 @@ const wordCountOptions = [25, 50, 75, 100]
 let publicRoomRefresh = null
 
 onMounted(() => {
+  preloadMp3Sounds()
   fetchPublicRooms()
   publicRoomRefresh = setInterval(fetchPublicRooms, 4000)
   window.addEventListener('keydown', handleRaceKeyDown)
 })
+
 
 onUnmounted(() => {
   clearInterval(publicRoomRefresh)
