@@ -58,7 +58,12 @@ const restartGame = () => {
   initGame()
 }
 
+
 function onKeyDown(e) {
+  // Don't intercept keys when user is typing in any input/textarea
+  const tag = e.target?.tagName?.toLowerCase()
+  if (tag === 'input' || tag === 'textarea') return
+
   if (isCustomPromptOpen.value) return
   if (isFinished.value && e.key === 'Enter') {
     e.preventDefault()
@@ -66,6 +71,7 @@ function onKeyDown(e) {
     return
   }
   handleKeyDown(e)
+
 }
 
 onMounted(() => {
