@@ -106,12 +106,24 @@ export function useArenaGame() {
   function applyRoomState(newRoom) {
     room.value = newRoom
 
-    if (newRoom.status === 'countdown' && screen.value !== 'racing') {
-      startCountdown(newRoom.race_starts_at)
+    // Only start countdown if not already in countdown/racing/finished
+    if (newRoom.status === 'countdown' && screen.value === 'lobby') {
+      startCountdown(newRoom.race_starts_at, newRoom)
     }
 
+    // If server already says racing (e.g. joined late), enter racing directly
     if (newRoom.status === 'racing' && screen.value !== 'racing') {
       enterRacing(newRoom)
+    }
+
+    // If server says countdown but time has already passed client-side → enter racing
+    if (newRoom.status === 'countdown' && screen.value === 'countdown' && newRoom.race_starts_at) {
+      const timeLeft = new Date(newRoom.race_starts_at) - Date.now()
+      if (timeLeft <= 0) {
+        clearInterval(countdownTimer)
+        countdownTimer = null
+        enterRacing(newRoom)
+      }
     }
 
     if (newRoom.status === 'finished' && localFinished.value) {
@@ -121,17 +133,21 @@ export function useArenaGame() {
   }
 
   // ── Countdown ──
-  function startCountdown(raceStartsAtISO) {
+  function startCountdown(raceStartsAtISO, roomData) {
     screen.value = 'countdown'
     raceStartedAt.value = new Date(raceStartsAtISO)
 
+    clearInterval(countdownTimer) // Ensure no duplicate timers
     countdownTimer = setInterval(() => {
       const diff = Math.ceil((raceStartedAt.value - Date.now()) / 1000)
       countdownSeconds.value = Math.max(0, diff)
       if (diff <= 0) {
         clearInterval(countdownTimer)
         countdownTimer = null
-        // enterRacing will be triggered by next poll
+        // Directly enter racing — don't wait for server poll
+        if (screen.value !== 'racing') {
+          enterRacing(room.value)
+        }
       }
     }, 200)
   }
