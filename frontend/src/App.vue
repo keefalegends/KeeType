@@ -485,7 +485,9 @@ onUnmounted(() => {
                 <div class="mt-8 text-[10px] text-editor-sub uppercase tracking-[0.2em]">
                   Crafted by <a href="#" class="text-editor-accent hover:opacity-80 transition-opacity">keefalegends</a>
                 </div>
-
+                <div class="mt-8 text-[10px] text-editor-sub uppercase tracking-[0.2em]">
+                  Inspired by <a href="#" class="text-editor-accent hover:opacity-80 transition-opacity">MonkeyType</a>
+                </div>
               </div>
             </div>
 
