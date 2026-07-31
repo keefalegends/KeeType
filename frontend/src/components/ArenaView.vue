@@ -119,11 +119,12 @@ function realPlayerCount(room) {
         <p class="text-sm text-editor-sub">Compete against real players &amp; bots in real-time.</p>
       </div>
 
-      <!-- Single Unified Create Room Card -->
-      <div class="arena-create-card w-full max-w-xl mx-auto">
+      <!-- Single Unified Create Room Card (Wide Landscape Rectangle) -->
+      <div class="arena-create-card w-full max-w-3xl mx-auto">
         <div class="arena-create-card__accent"></div>
         <div class="arena-create-card__body">
 
+          <!-- Header -->
           <div class="flex items-center gap-2.5" style="margin-bottom: 1.5rem;">
             <div class="arena-create-icon">⚔️</div>
             <div>
@@ -132,42 +133,45 @@ function realPlayerCount(room) {
             </div>
           </div>
 
-          <!-- Your Nickname -->
-          <div class="flex flex-col gap-1.5" style="margin-bottom: 1.5rem;">
-            <label class="arena-label">
-              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="5"/><path d="M3 21a9 9 0 0 1 18 0"/></svg>
-              Your Nickname
-            </label>
-            <input
-              v-model="nickname"
-              type="text"
-              maxlength="20"
-              placeholder="enter nickname..."
-              class="arena-input"
-              autocomplete="off"
-              spellcheck="false"
-            />
-          </div>
+          <!-- Top Row: Nickname (Left) + Language (Right) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4" style="margin-bottom: 1.25rem;">
+            <!-- Your Nickname -->
+            <div class="flex flex-col gap-1.5">
+              <label class="arena-label">
+                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="5"/><path d="M3 21a9 9 0 0 1 18 0"/></svg>
+                Your Nickname
+              </label>
+              <input
+                v-model="nickname"
+                type="text"
+                maxlength="20"
+                placeholder="enter nickname..."
+                class="arena-input"
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </div>
 
-          <!-- Language segmented control -->
-          <div class="flex flex-col gap-2" style="margin-bottom: 1.25rem;">
-            <label class="arena-label">Language</label>
-            <div class="arena-segment">
-              <button
-                v-for="lang in ['english', 'indonesian']"
-                :key="lang"
-                @click="lobbyLanguage = lang"
-                class="arena-segment__btn"
-                :class="lobbyLanguage === lang ? 'arena-segment__btn--active' : ''"
-              >
-                <span>{{ lang === 'english' ? '🇬🇧' : '🇮🇩' }}</span>
-                <span>{{ lang }}</span>
-              </button>
+            <!-- Language segmented control -->
+            <div class="flex flex-col gap-1.5">
+              <label class="arena-label">Language</label>
+              <div class="arena-segment">
+                <button
+                  v-for="lang in ['english', 'indonesian']"
+                  :key="lang"
+                  @click="lobbyLanguage = lang"
+                  class="arena-segment__btn"
+                  :class="lobbyLanguage === lang ? 'arena-segment__btn--active' : ''"
+                >
+                  <span>{{ lang === 'english' ? '🇬🇧' : '🇮🇩' }}</span>
+                  <span>{{ lang }}</span>
+                </button>
+              </div>
             </div>
           </div>
 
           <!-- Word count tile grid -->
-          <div class="flex flex-col gap-2" style="margin-bottom: 1.5rem;">
+          <div class="flex flex-col gap-1.5" style="margin-bottom: 1.25rem;">
             <label class="arena-label">Word Count</label>
             <div class="arena-wc-grid">
               <button
@@ -184,7 +188,7 @@ function realPlayerCount(room) {
           </div>
 
           <!-- Bot Difficulty selector -->
-          <div class="flex flex-col gap-2" style="margin-bottom: 1.75rem;">
+          <div class="flex flex-col gap-1.5" style="margin-bottom: 1.75rem;">
             <label class="arena-label">Bot Difficulty</label>
             <div class="arena-diff-grid">
               <button
