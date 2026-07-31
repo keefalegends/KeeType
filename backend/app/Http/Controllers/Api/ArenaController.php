@@ -200,7 +200,7 @@ class ArenaController extends Controller
             'nickname'       => 'required|string|max:20|regex:/^[a-zA-Z0-9_]+$/',
             'language'       => 'required|in:english,indonesian',
             'word_count'     => 'required|integer|in:25,50,75,100',
-            'bot_difficulty' => 'nullable|in:easy,medium,hard,insane',
+            'bot_difficulty' => 'nullable|in:easy,medium,hard,player_only',
         ], [
             'nickname.regex' => 'Nickname only allows letters, numbers, and underscores.',
         ]);
@@ -212,13 +212,16 @@ class ArenaController extends Controller
             $code = strtoupper(Str::random(6));
         } while (ArenaRoom::where('room_code', $code)->exists());
 
-        // Host player + 3 bots
         $players = [$this->makeRealPlayer($validated['nickname'])];
-        $usedNames = [];
-        for ($i = 0; $i < 3; $i++) {
-            $bot = $this->makeBotPlayer($i, $difficulty, $usedNames);
-            $usedNames[] = $bot['nickname'];
-            $players[] = $bot;
+
+        // Fill remaining 3 slots with bots ONLY if not in player_only mode
+        if ($difficulty !== 'player_only') {
+            $usedNames = [];
+            for ($i = 0; $i < 3; $i++) {
+                $bot = $this->makeBotPlayer($i, $difficulty, $usedNames);
+                $usedNames[] = $bot['nickname'];
+                $players[] = $bot;
+            }
         }
 
         $words = $this->generateWords($validated['word_count'], $validated['language']);
@@ -274,15 +277,23 @@ class ArenaController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Nickname already taken in this room.'], 422);
         }
 
-        // Find first bot slot to replace
-        $botIndex = collect($players)->search(fn($p) => $p['is_bot'] === true);
-
-        if ($botIndex === false) {
-            return response()->json(['status' => 'error', 'message' => 'Room is full.'], 422);
-        }
-
+        // Join logic depending on player_only vs bot room
         $newPlayer = $this->makeRealPlayer($validated['nickname']);
-        $players[$botIndex] = $newPlayer;
+
+        if ($room->bot_difficulty === 'player_only') {
+            if (count($players) >= 4) {
+                return response()->json(['status' => 'error', 'message' => 'Room is full.'], 422);
+            }
+            $players[] = $newPlayer;
+        } else {
+            // Find first bot slot to replace
+            $botIndex = collect($players)->search(fn($p) => $p['is_bot'] === true);
+
+            if ($botIndex === false) {
+                return response()->json(['status' => 'error', 'message' => 'Room is full.'], 422);
+            }
+            $players[$botIndex] = $newPlayer;
+        }
 
         $room->players_json     = $players;
         $room->last_activity_at = now();
@@ -334,6 +345,14 @@ class ArenaController extends Controller
 
         if ($room->status !== 'waiting') {
             return response()->json(['status' => 'error', 'message' => 'Race already started.'], 422);
+        }
+
+        // Require at least 2 real players for player_only mode
+        if ($room->bot_difficulty === 'player_only') {
+            $realCount = collect($room->players_json)->where('is_bot', false)->count();
+            if ($realCount < 2) {
+                return response()->json(['status' => 'error', 'message' => 'Player Only mode requires at least 2 players to start.'], 422);
+            }
         }
 
         // Set countdown: race_started_at = 5 seconds from now (countdown period)
@@ -444,13 +463,19 @@ class ArenaController extends Controller
             return response()->json(['status' => 'success', 'message' => 'Room deleted (host left).']);
         }
 
-        // Non-host player leaving: replace their slot with a bot
+        // Non-host player leaving
         $players = $room->players_json;
-        $playerIndex = collect($players)->search(fn($p) => $p['id'] === $validated['player_id']);
 
-        if ($playerIndex !== false) {
-            $existingBotNames = collect($players)->where('is_bot', true)->pluck('nickname')->toArray();
-            $players[$playerIndex] = $this->makeBotPlayer($playerIndex, $room->bot_difficulty ?? 'medium', $existingBotNames);
+        if ($room->bot_difficulty === 'player_only') {
+            // Simply remove the player from the list
+            $players = collect($players)->reject(fn($p) => $p['id'] === $validated['player_id'])->values()->all();
+        } else {
+            // Bot mode: replace leaving player's slot with a bot
+            $playerIndex = collect($players)->search(fn($p) => $p['id'] === $validated['player_id']);
+            if ($playerIndex !== false) {
+                $existingBotNames = collect($players)->where('is_bot', true)->pluck('nickname')->toArray();
+                $players[$playerIndex] = $this->makeBotPlayer($playerIndex, $room->bot_difficulty ?? 'medium', $existingBotNames);
+            }
         }
 
         $room->players_json     = $players;

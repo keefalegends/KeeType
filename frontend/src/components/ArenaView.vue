@@ -24,16 +24,16 @@ const lobbyBotDifficulty = ref('medium')
 const wordCountOptions   = [25, 50, 75, 100]
 
 const difficultyOptions = [
-  { key: 'easy',   label: 'Easy',   icon: '🟢', wpm: '30-50' },
-  { key: 'medium', label: 'Medium', icon: '🟡', wpm: '55-85' },
-  { key: 'hard',   label: 'Hard',   icon: '🔴', wpm: '90-120' },
-  { key: 'insane', label: 'Insane', icon: '⚡', wpm: '125-160' },
+  { key: 'easy',        label: 'Easy',        icon: '🟢', wpm: '30-50 WPM' },
+  { key: 'medium',      label: 'Medium',      icon: '🟡', wpm: '55-85 WPM' },
+  { key: 'hard',        label: 'Hard',        icon: '🔴', wpm: '90-120 WPM' },
+  { key: 'player_only', label: 'Player Only', icon: '👤', wpm: 'No Bots' },
 ]
 
 function getDifficultyBadge(diff) {
-  if (diff === 'easy')   return { label: 'Easy',   icon: '🟢' }
-  if (diff === 'hard')   return { label: 'Hard',   icon: '🔴' }
-  if (diff === 'insane') return { label: 'Insane', icon: '⚡' }
+  if (diff === 'easy')        return { label: 'Easy',        icon: '🟢' }
+  if (diff === 'hard')        return { label: 'Hard',        icon: '🔴' }
+  if (diff === 'player_only') return { label: 'Player Only', icon: '👤' }
   return { label: 'Medium', icon: '🟡' }
 }
 
@@ -280,15 +280,20 @@ function realPlayerCount(room) {
         <div class="flex flex-col items-end gap-1 text-xs text-editor-sub">
           <span>{{ room?.language }} · {{ room?.word_count }} words</span>
           <span class="arena-diff-badge" :class="'arena-diff-badge--' + (room?.bot_difficulty || 'medium')">
-            {{ getDifficultyBadge(room?.bot_difficulty).icon }} {{ getDifficultyBadge(room?.bot_difficulty).label }} Bots
+            {{ getDifficultyBadge(room?.bot_difficulty).icon }} {{ getDifficultyBadge(room?.bot_difficulty).label }}
           </span>
-          <span class="text-editor-accent/70">{{ realPlayerCount(room) }}/4 players</span>
+          <span class="text-editor-accent/70">{{ realPlayerCount(room) }}/{{ room?.bot_difficulty === 'player_only' ? '4' : '4' }} players</span>
         </div>
       </div>
 
       <!-- Player Slots -->
       <div class="flex flex-col gap-3">
-        <div class="text-[10px] uppercase tracking-[0.25em] text-editor-sub">Players</div>
+        <div class="text-[10px] uppercase tracking-[0.25em] text-editor-sub flex justify-between items-center">
+          <span>Players</span>
+          <span v-if="room?.bot_difficulty === 'player_only'" class="text-editor-accent/80 font-normal">Real Players Only</span>
+        </div>
+        
+        <!-- Active Players -->
         <div
           v-for="(racer, idx) in racers"
           :key="racer.id"
@@ -310,19 +315,43 @@ function realPlayerCount(room) {
           </div>
           <div class="w-2 h-2 rounded-full" :style="{ background: racer.is_bot ? 'var(--color-editor-sub)' : 'var(--color-editor-accent)' }"></div>
         </div>
+
+        <!-- Empty Slot Placeholders (Player Only mode) -->
+        <template v-if="room?.bot_difficulty === 'player_only' && racers.length < 4">
+          <div
+            v-for="emptyIdx in (4 - racers.length)"
+            :key="'empty-' + emptyIdx"
+            class="arena-player-slot opacity-50 border-dashed"
+          >
+            <div class="flex items-center gap-3">
+              <div class="arena-player-avatar border-dashed text-editor-sub">
+                👤
+              </div>
+              <div>
+                <div class="font-semibold text-editor-sub text-sm italic">
+                  Waiting for player...
+                </div>
+                <div class="text-xs text-editor-sub/60">Share room code {{ room?.room_code }}</div>
+              </div>
+            </div>
+          </div>
+        </template>
       </div>
 
       <!-- Host Controls -->
       <div v-if="isHost" class="flex flex-col gap-3 mt-2">
         <button
           @click="startRace"
-          :disabled="loading"
+          :disabled="loading || (room?.bot_difficulty === 'player_only' && realPlayerCount(room) < 2)"
           class="arena-btn arena-btn--primary w-full text-base py-3"
         >
           <span v-if="loading">Starting...</span>
           <span v-else>🚀 Start Race!</span>
         </button>
-        <p class="text-xs text-editor-sub text-center">Bots fill empty slots and race too</p>
+        <p class="text-xs text-editor-sub text-center">
+          <span v-if="room?.bot_difficulty === 'player_only'">Need at least 2 real players to start the race</span>
+          <span v-else>Bots fill empty slots and race too</span>
+        </p>
       </div>
       <div v-else class="text-center text-sm text-editor-sub py-2">
         Waiting for host to start the race...
