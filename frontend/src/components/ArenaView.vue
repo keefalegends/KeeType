@@ -139,7 +139,7 @@ function realPlayerCount(room) {
           <div class="arena-create-card__accent"></div>
           <div class="arena-create-card__body">
 
-            <div class="flex items-center gap-2.5 mb-5">
+            <div class="flex items-center gap-2.5 mb-6">
               <div class="arena-create-icon">⚔️</div>
               <div>
                 <div class="text-sm font-bold text-editor-text leading-tight">Create New Room</div>
@@ -148,7 +148,7 @@ function realPlayerCount(room) {
             </div>
 
             <!-- Language segmented control -->
-            <div class="flex flex-col gap-1.5 mb-4">
+            <div class="flex flex-col gap-2 mb-5">
               <label class="arena-label">Language</label>
               <div class="arena-segment">
                 <button
@@ -165,7 +165,7 @@ function realPlayerCount(room) {
             </div>
 
             <!-- Word count tile grid -->
-            <div class="flex flex-col gap-1.5 mb-5">
+            <div class="flex flex-col gap-2 mb-6">
               <label class="arena-label">Word Count</label>
               <div class="arena-wc-grid">
                 <button
@@ -539,7 +539,7 @@ function realPlayerCount(room) {
   );
 }
 .arena-create-card__body {
-  padding: 1.25rem;
+  padding: 1.5rem;
   background: color-mix(in srgb, var(--color-editor-bg) 80%, var(--color-editor-sub));
 }
 .arena-create-icon {
@@ -594,20 +594,20 @@ function realPlayerCount(room) {
 .arena-wc-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 0.4rem;
+  gap: 0.5rem;
 }
 .arena-wc-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0.55rem 0.25rem;
+  padding: 0.7rem 0.25rem;
   border-radius: 8px;
   border: 1.5px solid color-mix(in srgb, var(--color-editor-sub) 20%, transparent);
   background: color-mix(in srgb, var(--color-editor-bg) 50%, transparent);
   cursor: pointer;
   transition: all 0.15s;
-  gap: 0.05rem;
+  gap: 0.15rem;
   font-family: inherit;
 }
 .arena-wc-btn:hover:not(.arena-wc-btn--active) {
