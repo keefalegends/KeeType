@@ -12,6 +12,7 @@ class ArenaRoom extends Model
         'status',
         'language',
         'word_count',
+        'bot_difficulty',
         'words_json',
         'players_json',
         'race_started_at',

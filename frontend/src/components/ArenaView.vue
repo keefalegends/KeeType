@@ -18,9 +18,25 @@ const {
 } = useArenaGame()
 
 // ── Lobby settings ──
-const lobbyLanguage  = ref('english')
-const lobbyWordCount = ref(25)
-const wordCountOptions = [25, 50, 75, 100]
+const lobbyLanguage      = ref('english')
+const lobbyWordCount     = ref(25)
+const lobbyBotDifficulty = ref('medium')
+const wordCountOptions   = [25, 50, 75, 100]
+
+const difficultyOptions = [
+  { key: 'easy',   label: 'Easy',   icon: '🟢', wpm: '30-50' },
+  { key: 'medium', label: 'Medium', icon: '🟡', wpm: '55-85' },
+  { key: 'hard',   label: 'Hard',   icon: '🔴', wpm: '90-120' },
+  { key: 'insane', label: 'Insane', icon: '⚡', wpm: '125-160' },
+]
+
+function getDifficultyBadge(diff) {
+  if (diff === 'easy')   return { label: 'Easy',   icon: '🟢' }
+  if (diff === 'hard')   return { label: 'Hard',   icon: '🔴' }
+  if (diff === 'insane') return { label: 'Insane', icon: '⚡' }
+  return { label: 'Medium', icon: '🟡' }
+}
+
 
 // ── Public room auto-refresh ──
 let publicRoomRefresh = null
@@ -185,9 +201,27 @@ function realPlayerCount(room) {
               </div>
             </div>
 
+            <!-- Bot Difficulty selector -->
+            <div class="flex flex-col gap-2" style="margin-bottom: 1.75rem;">
+              <label class="arena-label">Bot Difficulty</label>
+              <div class="arena-diff-grid">
+                <button
+                  v-for="d in difficultyOptions"
+                  :key="d.key"
+                  @click="lobbyBotDifficulty = d.key"
+                  class="arena-diff-btn"
+                  :class="lobbyBotDifficulty === d.key ? 'arena-diff-btn--active' : ''"
+                >
+                  <span class="arena-diff-btn__icon">{{ d.icon }}</span>
+                  <span class="arena-diff-btn__label">{{ d.label }}</span>
+                  <span class="arena-diff-btn__sub">{{ d.wpm }}</span>
+                </button>
+              </div>
+            </div>
+
             <!-- Create button -->
             <button
-              @click="createRoom(lobbyLanguage, lobbyWordCount)"
+              @click="createRoom(lobbyLanguage, lobbyWordCount, lobbyBotDifficulty)"
               :disabled="loading || !nickname.trim()"
               class="arena-create-btn"
             >
@@ -224,7 +258,12 @@ function realPlayerCount(room) {
           <div class="flex items-center gap-3 flex-1 min-w-0">
             <div class="arena-room-badge">{{ r.room_code }}</div>
             <div class="min-w-0">
-              <div class="text-sm font-semibold text-editor-text truncate">{{ r.host_nickname }}'s room</div>
+              <div class="text-sm font-semibold text-editor-text truncate flex items-center gap-2">
+                <span>{{ r.host_nickname }}'s room</span>
+                <span class="arena-diff-badge" :class="'arena-diff-badge--' + (r.bot_difficulty || 'medium')">
+                  {{ getDifficultyBadge(r.bot_difficulty).icon }} {{ getDifficultyBadge(r.bot_difficulty).label }}
+                </span>
+              </div>
               <div class="text-xs text-editor-sub">{{ r.language }} · {{ r.word_count }} words</div>
             </div>
           </div>
@@ -255,6 +294,9 @@ function realPlayerCount(room) {
         </div>
         <div class="flex flex-col items-end gap-1 text-xs text-editor-sub">
           <span>{{ room?.language }} · {{ room?.word_count }} words</span>
+          <span class="arena-diff-badge" :class="'arena-diff-badge--' + (room?.bot_difficulty || 'medium')">
+            {{ getDifficultyBadge(room?.bot_difficulty).icon }} {{ getDifficultyBadge(room?.bot_difficulty).label }} Bots
+          </span>
           <span class="text-editor-accent/70">{{ realPlayerCount(room) }}/4 players</span>
         </div>
       </div>
@@ -439,7 +481,7 @@ function realPlayerCount(room) {
       <!-- Actions -->
       <div class="flex items-center gap-3 w-full">
         <button @click="leaveRoom" class="arena-btn flex-1">Back to Lobby</button>
-        <button @click="createRoom(room?.language || 'english', room?.word_count || 25)" class="arena-btn arena-btn--primary flex-1">
+        <button @click="createRoom(room?.language || 'english', room?.word_count || 25, room?.bot_difficulty || 'medium')" class="arena-btn arena-btn--primary flex-1">
           Play Again
         </button>
       </div>
@@ -639,6 +681,67 @@ function realPlayerCount(room) {
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
+
+/* ── Bot Difficulty Grid ── */
+.arena-diff-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.4rem;
+}
+.arena-diff-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.55rem 0.2rem;
+  border-radius: 8px;
+  border: 1.5px solid color-mix(in srgb, var(--color-editor-sub) 20%, transparent);
+  background: color-mix(in srgb, var(--color-editor-bg) 50%, transparent);
+  cursor: pointer;
+  transition: all 0.15s;
+  gap: 0.1rem;
+  font-family: inherit;
+}
+.arena-diff-btn:hover:not(.arena-diff-btn--active) {
+  border-color: color-mix(in srgb, var(--color-editor-sub) 45%, transparent);
+  background: color-mix(in srgb, var(--color-editor-sub) 8%, transparent);
+}
+.arena-diff-btn--active {
+  border-color: var(--color-editor-accent);
+  background: color-mix(in srgb, var(--color-editor-accent) 12%, transparent);
+}
+.arena-diff-btn__icon {
+  font-size: 0.85rem;
+}
+.arena-diff-btn__label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-editor-text);
+  line-height: 1;
+}
+.arena-diff-btn--active .arena-diff-btn__label {
+  color: var(--color-editor-accent);
+}
+.arena-diff-btn__sub {
+  font-size: 0.58rem;
+  color: var(--color-editor-sub);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ── Difficulty Badges ── */
+.arena-diff-badge {
+  font-size: 0.65rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  font-weight: 600;
+  border: 1px solid color-mix(in srgb, var(--color-editor-sub) 30%, transparent);
+  color: var(--color-editor-sub);
+  background: color-mix(in srgb, var(--color-editor-sub) 8%, transparent);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
 
 /* ── Create CTA button ── */
 .arena-create-btn {

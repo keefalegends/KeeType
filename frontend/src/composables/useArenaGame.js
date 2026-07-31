@@ -5,15 +5,26 @@ const API_BASE = 'http://localhost:8000/api'
 
 // ──────────────────────────────────────────────
 // Bot simulation: compute progress given elapsed seconds and bot WPM
-// Average word length ≈ 5 chars. WPM = words/min.
+// Includes sinusoidal speed waves & natural human-like variation
 // ──────────────────────────────────────────────
-function computeBotProgress(botWpm, wordCount, elapsedMs) {
+function computeBotProgress(botWpm, wordCount, elapsedMs, botId = '') {
   if (elapsedMs <= 0) return 0
   const elapsedMinutes = elapsedMs / 60000
-  const wordsTyped = botWpm * elapsedMinutes
-  // Add small randomness jitter (±5%) for natural feel
-  const jitter = 0.95 + Math.random() * 0.10
-  return Math.min(100, (wordsTyped / wordCount) * 100 * jitter)
+
+  // Hash botId to generate a unique phase shift for speed fluctuation curve
+  let hash = 0
+  for (let i = 0; i < botId.length; i++) {
+    hash = (hash << 5) - hash + botId.charCodeAt(i)
+  }
+  const phase = (Math.abs(hash) % 100) / 10
+
+  // Sinusoidal speed wave: fluctuates ±8% over time + micro jitter
+  const wave = Math.sin((elapsedMs / 700) + phase) * 0.08
+  const jitter = 0.98 + Math.random() * 0.04
+  const effectiveWpm = botWpm * (1 + wave) * jitter
+  const wordsTyped = effectiveWpm * elapsedMinutes
+
+  return Math.min(100, (wordsTyped / wordCount) * 100)
 }
 
 export function useArenaGame() {
@@ -182,7 +193,7 @@ export function useArenaGame() {
 
       const updatedPlayers = room.value.players.map(p => {
         if (!p.is_bot || p.finished) return p
-        const newProgress = computeBotProgress(p.bot_wpm, totalWords, elapsed)
+        const newProgress = computeBotProgress(p.bot_wpm, totalWords, elapsed, p.id)
         const updatedP = { ...p, progress: newProgress, wpm: p.bot_wpm }
         if (newProgress >= 100 && !updatedP.finished) {
           updatedP.finished    = true
@@ -359,14 +370,19 @@ export function useArenaGame() {
   }
 
   // ── Create room ──
-  async function createRoom(language, wordCount) {
+  async function createRoom(language, wordCount, botDifficulty = 'medium') {
     if (!nickname.value.trim()) { error.value = 'Please enter a nickname.'; return }
     loading.value = true; error.value = ''
     try {
       localStorage.setItem('keetype_arena_nickname', nickname.value)
       const data = await apiFetch('/arena/create', {
         method: 'POST',
-        body: JSON.stringify({ nickname: nickname.value, language, word_count: wordCount }),
+        body: JSON.stringify({
+          nickname: nickname.value,
+          language,
+          word_count: wordCount,
+          bot_difficulty: botDifficulty,
+        }),
       })
       roomCode.value = data.room_code
       playerId.value = data.player_id

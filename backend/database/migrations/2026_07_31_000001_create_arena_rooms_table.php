@@ -18,6 +18,7 @@ return new class extends Migration
             $table->enum('status', ['waiting', 'countdown', 'racing', 'finished'])->default('waiting');
             $table->string('language', 20)->default('english');
             $table->integer('word_count')->default(25);
+            $table->string('bot_difficulty', 20)->default('medium');
             // JSON array of word strings shared for all players
             $table->text('words_json');
             // JSON array of player objects:

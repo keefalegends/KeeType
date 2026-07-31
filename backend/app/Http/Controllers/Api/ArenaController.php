@@ -67,10 +67,35 @@ class ArenaController extends Controller
         'mulai', 'selesai', 'berhenti', 'lanjut', 'kembali', 'pindah', 'tinggal', 'duduk', 'berdiri', 'bangun',
     ];
 
-    private array $botProfiles = [
-        ['name' => 'Bot Shadow',   'bot_wpm' => 45],
-        ['name' => 'Bot Racer',    'bot_wpm' => 65],
-        ['name' => 'Bot Turbo',    'bot_wpm' => 85],
+    private array $botDifficultyConfigs = [
+        'easy' => [
+            'wpm_min'  => 30,
+            'wpm_max'  => 50,
+            'acc_min'  => 95.0,
+            'acc_max'  => 99.0,
+            'names'    => ['NoobBot', 'ChillBot', 'Slowpoke', 'SnailRacer', 'BotBreeze', 'EasyDriver'],
+        ],
+        'medium' => [
+            'wpm_min'  => 55,
+            'wpm_max'  => 85,
+            'acc_min'  => 96.0,
+            'acc_max'  => 100.0,
+            'names'    => ['BotRacer', 'CruiserBot', 'ByteRacer', 'BotShadow', 'SwiftKeys', 'MiddleDrive'],
+        ],
+        'hard' => [
+            'wpm_min'  => 90,
+            'wpm_max'  => 120,
+            'acc_min'  => 97.0,
+            'acc_max'  => 100.0,
+            'names'    => ['BotTurbo', 'CyberRacer', 'SpeedDemon', 'BotViper', 'HyperTypist', 'NitroRacer'],
+        ],
+        'insane' => [
+            'wpm_min'  => 125,
+            'wpm_max'  => 160,
+            'acc_min'  => 98.0,
+            'acc_max'  => 100.0,
+            'names'    => ['Overclocked', 'ApexTypist', 'BotOverlord', 'QuantumTyper', 'LightSpeed', 'GodModeBot'],
+        ],
     ];
 
     // ──────────────────────────────────────────────
@@ -89,17 +114,26 @@ class ArenaController extends Controller
     // ──────────────────────────────────────────────
     // Helper: build a player slot (bot or real)
     // ──────────────────────────────────────────────
-    private function makeBotPlayer(int $slotIndex): array
+    private function makeBotPlayer(int $slotIndex, string $difficulty = 'medium', array $existingBotNames = []): array
     {
-        $profile = $this->botProfiles[$slotIndex] ?? ['name' => 'Bot Alpha', 'bot_wpm' => 50];
+        $config = $this->botDifficultyConfigs[$difficulty] ?? $this->botDifficultyConfigs['medium'];
+        $availableNames = array_values(array_diff($config['names'], $existingBotNames));
+        if (empty($availableNames)) {
+            $availableNames = $config['names'];
+        }
+
+        $botName = $availableNames[array_rand($availableNames)];
+        $botWpm  = rand($config['wpm_min'], $config['wpm_max']);
+        $botAcc  = round(rand((int)($config['acc_min'] * 10), (int)($config['acc_max'] * 10)) / 10, 1);
+
         return [
-            'id'          => 'bot-' . $slotIndex,
-            'nickname'    => $profile['name'],
+            'id'          => 'bot-' . $slotIndex . '-' . Str::random(4),
+            'nickname'    => $botName,
             'is_bot'      => true,
-            'bot_wpm'     => $profile['bot_wpm'],
+            'bot_wpm'     => $botWpm,
             'progress'    => 0.0,
             'wpm'         => 0,
-            'accuracy'    => 100,
+            'accuracy'    => $botAcc,
             'finished'    => false,
             'finish_time' => null,
             'joined_at'   => now()->toISOString(),
@@ -146,6 +180,7 @@ class ArenaController extends Controller
                     'host_nickname'   => $room->host_nickname,
                     'language'        => $room->language,
                     'word_count'      => $room->word_count,
+                    'bot_difficulty'  => $room->bot_difficulty ?? 'medium',
                     'player_count'    => $realCount,
                     'total_slots'     => $totalSlots,
                     'created_at'      => $room->created_at,
@@ -157,17 +192,20 @@ class ArenaController extends Controller
 
     // ──────────────────────────────────────────────
     // POST /api/arena/create
-    // Body: { nickname, language, word_count }
+    // Body: { nickname, language, word_count, bot_difficulty }
     // ──────────────────────────────────────────────
     public function create(Request $request)
     {
         $validated = $request->validate([
-            'nickname'   => 'required|string|max:20|regex:/^[a-zA-Z0-9_]+$/',
-            'language'   => 'required|in:english,indonesian',
-            'word_count' => 'required|integer|in:25,50,75,100',
+            'nickname'       => 'required|string|max:20|regex:/^[a-zA-Z0-9_]+$/',
+            'language'       => 'required|in:english,indonesian',
+            'word_count'     => 'required|integer|in:25,50,75,100',
+            'bot_difficulty' => 'nullable|in:easy,medium,hard,insane',
         ], [
             'nickname.regex' => 'Nickname only allows letters, numbers, and underscores.',
         ]);
+
+        $difficulty = $validated['bot_difficulty'] ?? 'medium';
 
         // Generate unique 6-char room code
         do {
@@ -176,8 +214,11 @@ class ArenaController extends Controller
 
         // Host player + 3 bots
         $players = [$this->makeRealPlayer($validated['nickname'])];
+        $usedNames = [];
         for ($i = 0; $i < 3; $i++) {
-            $players[] = $this->makeBotPlayer($i);
+            $bot = $this->makeBotPlayer($i, $difficulty, $usedNames);
+            $usedNames[] = $bot['nickname'];
+            $players[] = $bot;
         }
 
         $words = $this->generateWords($validated['word_count'], $validated['language']);
@@ -188,6 +229,7 @@ class ArenaController extends Controller
             'status'           => 'waiting',
             'language'         => $validated['language'],
             'word_count'       => $validated['word_count'],
+            'bot_difficulty'   => $difficulty,
             'words_json'       => $words,
             'players_json'     => $players,
             'last_activity_at' => now(),
@@ -368,6 +410,7 @@ class ArenaController extends Controller
             'status'         => $room->status,
             'language'       => $room->language,
             'word_count'     => $room->word_count,
+            'bot_difficulty' => $room->bot_difficulty ?? 'medium',
             'words'          => $room->words_json,
             'players'        => $room->players_json,
             'race_starts_at' => $room->race_started_at?->toISOString(),
@@ -406,9 +449,8 @@ class ArenaController extends Controller
         $playerIndex = collect($players)->search(fn($p) => $p['id'] === $validated['player_id']);
 
         if ($playerIndex !== false) {
-            // Count existing bots to pick the next bot profile index
-            $existingBotCount = collect($players)->filter(fn($p) => $p['is_bot'])->count();
-            $players[$playerIndex] = $this->makeBotPlayer($existingBotCount);
+            $existingBotNames = collect($players)->where('is_bot', true)->pluck('nickname')->toArray();
+            $players[$playerIndex] = $this->makeBotPlayer($playerIndex, $room->bot_difficulty ?? 'medium', $existingBotNames);
         }
 
         $room->players_json     = $players;
