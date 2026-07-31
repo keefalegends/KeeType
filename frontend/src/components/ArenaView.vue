@@ -336,7 +336,7 @@ function realPlayerCount(room) {
               <div class="text-xs font-semibold text-editor-text truncate">
                 {{ isMe(racer) ? 'You' : racer.nickname }}
               </div>
-              <div class="text-[10px] text-editor-sub tabular-nums">{{ racer.wpm || 0 }} wpm</div>
+              <div class="text-[10px] text-editor-sub tabular-nums">{{ racer.is_bot ? racer.bot_wpm : (racer.wpm || 0) }} wpm</div>
             </div>
           </div>
 
@@ -426,7 +426,7 @@ function realPlayerCount(room) {
             </div>
           </div>
           <div class="text-right flex-shrink-0">
-            <div class="font-bold text-editor-accent tabular-nums">{{ racer.wpm || 0 }} <span class="text-xs text-editor-sub font-normal">wpm</span></div>
+            <div class="font-bold text-editor-accent tabular-nums">{{ racer.is_bot ? racer.bot_wpm : (racer.wpm || 0) }} <span class="text-xs text-editor-sub font-normal">wpm</span></div>
             <div class="text-xs text-editor-sub tabular-nums">{{ racer.accuracy || 100 }}% acc</div>
           </div>
         </div>
