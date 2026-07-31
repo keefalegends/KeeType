@@ -64,6 +64,9 @@ function onKeyDown(e) {
   const tag = e.target?.tagName?.toLowerCase()
   if (tag === 'input' || tag === 'textarea') return
 
+  // Only run the game engine when on the Write view
+  if (activeView.value !== 'write') return
+
   if (isCustomPromptOpen.value) return
   if (isFinished.value && e.key === 'Enter') {
     e.preventDefault()
