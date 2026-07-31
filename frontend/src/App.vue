@@ -5,6 +5,7 @@ import ModeSelector from './components/ModeSelector.vue'
 import TypingArea from './components/TypingArea.vue'
 import ResultScreen from './components/ResultScreen.vue'
 import LeaderboardView from './components/LeaderboardView.vue'
+import ArenaView from './components/ArenaView.vue'
 
 const {
   mode, timeOption, wordOption, language, theme, keyboardSound, keyboardVolume,
@@ -132,13 +133,18 @@ onUnmounted(() => {
         </button>
 
         <!-- Arena -->
-        <div class="sidebar-item sidebar-item--disabled">
+        <button
+          @click="activeView = 'arena'"
+          class="sidebar-item"
+          :class="[
+            activeView === 'arena' ? 'sidebar-item--active' : ''
+          ]"
+        >
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
           </svg>
           <span>Arena</span>
-          <span class="sidebar-soon">soon</span>
-        </div>
+        </button>
 
         <!-- Leaderboard -->
         <button
@@ -281,6 +287,11 @@ onUnmounted(() => {
                 />
               </div>
             </div>
+            <!-- View: Arena -->
+            <div v-else-if="activeView === 'arena'" key="arena" class="w-full max-w-3xl">
+              <ArenaView />
+            </div>
+
             <!-- View: Leaderboard -->
             <div v-else-if="activeView === 'leaderboard'" key="leaderboard" class="w-full max-w-3xl">
               <LeaderboardView />
