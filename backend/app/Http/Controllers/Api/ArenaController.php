@@ -374,4 +374,48 @@ class ArenaController extends Controller
             'created_at'     => $room->created_at->toISOString(),
         ];
     }
+
+    // ──────────────────────────────────────────────
+    // POST /api/arena/{code}/leave
+    // Body: { player_id, nickname }
+    // If host leaves → delete room entirely
+    // If player leaves → replace slot with a bot
+    // ──────────────────────────────────────────────
+    public function leave(Request $request, string $code)
+    {
+        $validated = $request->validate([
+            'player_id' => 'required|string',
+            'nickname'  => 'required|string',
+        ]);
+
+        $room = ArenaRoom::where('room_code', strtoupper($code))->first();
+
+        if (!$room) {
+            // Room already gone — just return success
+            return response()->json(['status' => 'success', 'message' => 'Room already deleted.']);
+        }
+
+        // If the leaver is the host → delete the whole room
+        if ($room->host_nickname === $validated['nickname']) {
+            $room->delete();
+            return response()->json(['status' => 'success', 'message' => 'Room deleted (host left).']);
+        }
+
+        // Non-host player leaving: replace their slot with a bot
+        $players = $room->players_json;
+        $playerIndex = collect($players)->search(fn($p) => $p['id'] === $validated['player_id']);
+
+        if ($playerIndex !== false) {
+            // Count existing bots to pick the next bot profile index
+            $existingBotCount = collect($players)->filter(fn($p) => $p['is_bot'])->count();
+            $players[$playerIndex] = $this->makeBotPlayer($existingBotCount);
+        }
+
+        $room->players_json     = $players;
+        $room->last_activity_at = now();
+        $room->save();
+
+        return response()->json(['status' => 'success', 'message' => 'Left room.']);
+    }
 }
+

@@ -15,4 +15,6 @@ Route::prefix('arena')->group(function () {
     Route::get('/{code}',           [ArenaController::class, 'show']);
     Route::post('/{code}/start',    [ArenaController::class, 'start']);
     Route::post('/{code}/progress', [ArenaController::class, 'progress']);
+    Route::post('/{code}/leave',    [ArenaController::class, 'leave']);
 });
+

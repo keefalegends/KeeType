@@ -409,6 +409,14 @@ export function useArenaGame() {
 
   // ── Leave / reset ──
   function leaveRoom() {
+    // Notify server: host leave → delete room, player leave → replace with bot
+    if (roomCode.value && playerId.value) {
+      apiFetch(`/arena/${roomCode.value}/leave`, {
+        method: 'POST',
+        body: JSON.stringify({ player_id: playerId.value, nickname: nickname.value }),
+      }).catch(() => {}) // Fire-and-forget, ignore errors
+    }
+
     stopAll()
     screen.value   = 'home'
     room.value     = null
