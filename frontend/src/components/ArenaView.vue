@@ -1,5 +1,7 @@
+<script setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useArenaGame } from '../composables/useArenaGame.js'
+
 import TypingArea from './TypingArea.vue'
 import { preloadMp3Sounds } from '../utils/sound.js'
 
