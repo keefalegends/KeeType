@@ -165,7 +165,7 @@ function realPlayerCount(room) {
             </div>
 
             <!-- Word count tile grid -->
-            <div class="flex flex-col gap-2 mb-8">
+            <div class="flex flex-col gap-2 mb-4">
               <label class="arena-label">Word Count</label>
               <div class="arena-wc-grid">
                 <button
@@ -527,20 +527,21 @@ function realPlayerCount(room) {
 .arena-create-card {
   border-radius: 14px;
   border: 1px solid color-mix(in srgb, var(--color-editor-sub) 20%, transparent);
-  overflow: hidden;
   position: relative;
 }
 .arena-create-card__accent {
-  height: 3px;
+  height: 4px;
   background: linear-gradient(
     90deg,
     var(--color-editor-accent),
     color-mix(in srgb, var(--color-editor-accent) 40%, transparent)
   );
+  border-radius: 14px 14px 0 0;
 }
 .arena-create-card__body {
-  padding: 1.5rem;
+  padding: 1.5rem 1.5rem 2rem;
   background: color-mix(in srgb, var(--color-editor-bg) 80%, var(--color-editor-sub));
+  border-radius: 0 0 14px 14px;
 }
 .arena-create-icon {
   width: 36px;
