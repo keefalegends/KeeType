@@ -139,7 +139,7 @@ function realPlayerCount(room) {
           <div class="arena-create-card__accent"></div>
           <div class="arena-create-card__body">
 
-            <div class="flex items-center gap-2.5 mb-6">
+            <div class="flex items-center gap-2.5" style="margin-bottom: 1.5rem;">
               <div class="arena-create-icon">⚔️</div>
               <div>
                 <div class="text-sm font-bold text-editor-text leading-tight">Create New Room</div>
@@ -148,7 +148,7 @@ function realPlayerCount(room) {
             </div>
 
             <!-- Language segmented control -->
-            <div class="flex flex-col gap-2 mb-5">
+            <div class="flex flex-col gap-2" style="margin-bottom: 1.25rem;">
               <label class="arena-label">Language</label>
               <div class="arena-segment">
                 <button
@@ -165,7 +165,7 @@ function realPlayerCount(room) {
             </div>
 
             <!-- Word count tile grid -->
-            <div class="flex flex-col gap-2 mb-4">
+            <div class="flex flex-col gap-2" style="margin-bottom: 1.75rem;">
               <label class="arena-label">Word Count</label>
               <div class="arena-wc-grid">
                 <button
@@ -185,7 +185,7 @@ function realPlayerCount(room) {
             <button
               @click="createRoom(lobbyLanguage, lobbyWordCount)"
               :disabled="loading || !nickname.trim()"
-              class="arena-create-btn mt-1"
+              class="arena-create-btn"
             >
               <svg v-if="!loading" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
               <svg v-else xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="animate-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
