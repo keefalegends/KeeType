@@ -125,4 +125,4 @@ Open `http://localhost:5173` in your browser and start typing!
 
 ## 📄 License
 
-This project is open-source and licensed under the [MIT License](LICENSE). Built for speed. ⚡
+This project is open-source and licensed under the [MIT License](LICENSE). Built for speed.
