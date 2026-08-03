@@ -1,6 +1,6 @@
 # 🚀 VPS Deployment & GitHub Actions Guide
 
-Panduan cara memasang KeeType di VPS (`202.10.47.200`) menggunakan Docker & Docker Compose, serta mengaktifkan Auto-Deploy otomatis via GitHub Actions.
+Panduan cara memasang KeeType di VPS menggunakan Docker & Docker Compose, serta mengaktifkan Auto-Deploy otomatis via GitHub Actions.
 
 ---
 
@@ -9,7 +9,7 @@ Panduan cara memasang KeeType di VPS (`202.10.47.200`) menggunakan Docker & Dock
 Buka terminal laptop dan masuk ke VPS:
 
 ```bash
-ssh root@202.10.47.200
+ssh root@<YOUR_VPS_IP>
 ```
 
 Install Docker & Git jika belum ada:
@@ -45,7 +45,7 @@ Jalankan command ini di folder `/var/www/keetype`:
 docker compose up -d --build
 ```
 
-Aplikasi KeeType langsung jalan di `http://202.10.47.200` 🎉
+Aplikasi KeeType langsung jalan di `http://<YOUR_VPS_IP>` 🎉
 
 > ℹ️ **Catatan Database**: File database SQLite tersimpan di `/var/www/keetype/backend/database/database.sqlite`. Rebuild container Docker **tidak akan pernah menghapus data leaderboard**.
 
@@ -55,13 +55,13 @@ Aplikasi KeeType langsung jalan di `http://202.10.47.200` 🎉
 
 Buka Repo GitHub lu ➔ **Settings** ➔ **Secrets and variables** ➔ **Actions** ➔ **New repository secret**.
 
-Masukkan **4 Secrets** berikut persis seperti di bawah ini:
+Masukkan **4 Secrets** berikut:
 
 | Secret Name | Value |
 |-------------|-------|
-| `VPS_HOST` | `202.10.47.200` |
+| `VPS_HOST` | `<YOUR_VPS_IP>` |
 | `VPS_USERNAME` | `root` |
-| `VPS_PASSWORD` | `q$6G%CF9eZbR66` |
+| `VPS_PASSWORD` | `<YOUR_VPS_PASSWORD>` |
 | `VPS_PROJECT_PATH` | `/var/www/keetype` |
 
 Selesai! Sekarang setiap kali lu `git push origin main` dari laptop, GitHub Actions akan otomatis login ke VPS, nge-pull update terbaru, dan rebuild container tanpa mematikan database! ⚡
