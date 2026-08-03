@@ -25,7 +25,7 @@ const lobbyWordCount     = ref(25)
 const lobbyTimeLimit     = ref(60)        // seconds for timer mode
 const lobbyBotDifficulty = ref('medium')
 const wordCountOptions   = [25, 50, 75, 100]
-const timeLimitOptions   = [30, 60, 90]
+const timeLimitOptions   = [15, 30, 60, 90]
 
 const difficultyOptions = [
   { key: 'easy',        label: 'Easy',        icon: '🟢', wpm: '30-50 WPM' },

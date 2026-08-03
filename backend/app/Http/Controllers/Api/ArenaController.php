@@ -206,7 +206,7 @@ class ArenaController extends Controller
             'language'       => 'required|in:english,indonesian',
             'race_mode'      => 'nullable|in:words,timer',
             'word_count'     => 'nullable|integer|in:25,50,75,100',
-            'time_limit'     => 'nullable|integer|in:30,60,90',
+            'time_limit'     => 'nullable|integer|in:15,30,60,90',
             'bot_difficulty' => 'nullable|in:easy,medium,hard,player_only',
         ], [
             'nickname.regex' => 'Nickname only allows letters, numbers, and underscores.',
