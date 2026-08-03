@@ -8,8 +8,8 @@ export function useTypingGame() {
   const timeOption = ref(30)         // seconds: 15, 30, 60, 120
   const wordOption = ref(25)         // word count: 10, 25, 50, 100
   const language = ref('english')    // 'english' or 'indonesian'
-  const theme = ref('theme-default') // Current theme
-  const keyboardSound = ref('cherry-mx-brown') // 'off', 'cherry-mx-brown', 'bubble', 'tactile', 'typewriter'
+  const theme = ref('theme-paper')   // Current theme (default: Paper Ink)
+  const keyboardSound = ref('tactile') // Default sound (Tactile Switch)
   const keyboardVolume = ref(0.5)    // Volume slider: 0.0 to 1.0
   const isMuted = computed(() => keyboardSound.value === 'off')
 
@@ -283,18 +283,15 @@ export function useTypingGame() {
   // ============ LIFECYCLE ============
   onMounted(() => {
     initGame()
-    // Restore theme from storage
-    const savedTheme = localStorage.getItem('keetype_theme')
-    if (savedTheme) {
-      theme.value = savedTheme
-    }
+    // Restore theme from storage (default: theme-paper)
+    const savedTheme = localStorage.getItem('keetype_theme') || 'theme-paper'
+    theme.value = savedTheme
     applyTheme(theme.value)
 
-    // Restore sound preference from storage
-    const savedSound = localStorage.getItem('keetype_sound')
-    if (savedSound) {
-      keyboardSound.value = savedSound
-    }
+    // Restore sound preference from storage (default: tactile)
+    const savedSound = localStorage.getItem('keetype_sound') || 'tactile'
+    keyboardSound.value = savedSound
+    applyKeyboardSound(savedSound)
 
     // Restore volume preference from storage
     const savedVolume = localStorage.getItem('keetype_volume')

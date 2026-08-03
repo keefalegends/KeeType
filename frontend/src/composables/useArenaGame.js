@@ -217,7 +217,7 @@ export function useArenaGame() {
 
   // ── Audio preference helper ──
   function playRaceSound(type = 'default') {
-    const sound = localStorage.getItem('keetype_sound') || 'cherry-mx-brown'
+    const sound = localStorage.getItem('keetype_sound') || 'tactile'
     if (sound === 'off') return
     const volStr = localStorage.getItem('keetype_volume')
     const vol = volStr !== null ? parseFloat(volStr) : 0.5
