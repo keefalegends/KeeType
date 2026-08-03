@@ -17,7 +17,7 @@ const selectedMode = ref('time-15')
 const selectedPeriod = ref('all') // 'daily', 'weekly', 'all'
 const leaderboards = ref([])
 const isLoading = ref(false)
-const apiBaseUrl = 'http://localhost:8000/api'
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '/api'
 
 async function fetchLeaderboard() {
   isLoading.value = true

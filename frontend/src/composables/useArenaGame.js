@@ -1,7 +1,7 @@
 import { ref, computed, onUnmounted } from 'vue'
 import { playKeyboardClick, preloadMp3Sounds } from '../utils/sound.js'
 
-const API_BASE = 'http://localhost:8000/api'
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api'
 
 // ──────────────────────────────────────────────
 // Bot simulation: compute progress given elapsed seconds and bot WPM

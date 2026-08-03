@@ -33,7 +33,7 @@ const isSubmitted = ref(false)
 const errorMessage = ref('')
 const leaderboards = ref([])
 const isLoadingLeaderboard = ref(false)
-const apiBaseUrl = 'http://localhost:8000/api'
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '/api'
 
 async function fetchLeaderboard() {
   if (isCustom.value) return
