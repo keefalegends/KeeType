@@ -346,11 +346,13 @@ function realPlayerCount(room) {
           class="arena-btn arena-btn--primary w-full text-base py-3"
         >
           <span v-if="loading">Starting...</span>
+          <template v-else-if="room?.bot_difficulty === 'player_only' && realPlayerCount(room) < 2">
+            <span class="opacity-70">🚀 Start Race! &nbsp;·&nbsp; Need at least 2 players</span>
+          </template>
           <span v-else>🚀 Start Race!</span>
         </button>
-        <p class="text-xs text-editor-sub text-center">
-          <span v-if="room?.bot_difficulty === 'player_only'">Need at least 2 real players to start the race</span>
-          <span v-else>Bots fill empty slots and race too</span>
+        <p v-if="room?.bot_difficulty !== 'player_only'" class="text-xs text-editor-sub text-center">
+          Bots fill empty slots and race too
         </p>
       </div>
       <div v-else class="text-center text-sm text-editor-sub py-2">
@@ -359,8 +361,8 @@ function realPlayerCount(room) {
 
       <p v-if="error" class="text-center text-editor-error text-sm">⚠ {{ error }}</p>
 
-      <button @click="leaveRoom" class="text-xs text-editor-sub hover:text-editor-text transition-colors text-center underline underline-offset-2 cursor-pointer">
-        Leave room
+      <button @click="leaveRoom" class="arena-btn arena-btn--leave w-full">
+        🚪 Leave Room
       </button>
     </div>
 
@@ -494,21 +496,21 @@ function realPlayerCount(room) {
 
       <!-- Actions -->
       <div class="flex flex-col gap-3 w-full">
-        <div class="flex items-center gap-3 w-full">
-          <button @click="leaveRoom" class="arena-btn flex-1">Leave Room</button>
-          <button
-            v-if="isHost"
-            @click="startRace"
-            :disabled="loading"
-            class="arena-btn arena-btn--primary flex-1"
-          >
-            <span v-if="loading">Starting...</span>
-            <span v-else>🔁 Rematch / Play Again</span>
-          </button>
-        </div>
+        <button
+          v-if="isHost"
+          @click="startRace"
+          :disabled="loading"
+          class="arena-btn arena-btn--primary w-full"
+        >
+          <span v-if="loading">Starting...</span>
+          <span v-else>🔁 Rematch / Play Again</span>
+        </button>
         <p v-if="!isHost" class="text-xs text-editor-sub text-center">
           Waiting for host to restart the race...
         </p>
+        <button @click="leaveRoom" class="arena-btn arena-btn--leave w-full">
+          🚪 Leave Room
+        </button>
       </div>
     </div>
 
@@ -877,6 +879,16 @@ function realPlayerCount(room) {
 .arena-btn--sm {
   padding: 0.3rem 0.85rem;
   font-size: 0.78rem;
+}
+.arena-btn--leave {
+  border-color: color-mix(in srgb, #ef4444 35%, transparent);
+  color: color-mix(in srgb, #ef4444 75%, var(--color-editor-sub));
+  background: color-mix(in srgb, #ef4444 6%, transparent);
+}
+.arena-btn--leave:hover:not(:disabled) {
+  background: color-mix(in srgb, #ef4444 14%, transparent);
+  border-color: color-mix(in srgb, #ef4444 60%, transparent);
+  color: #ef4444;
 }
 
 /* ── Public Rooms ── */
