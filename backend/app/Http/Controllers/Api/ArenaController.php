@@ -162,9 +162,12 @@ class ArenaController extends Controller
     // ──────────────────────────────────────────────
     public function publicRooms()
     {
-        // Clean up stale rooms older than 30 minutes with no activity
+        // Clean up stale rooms: waiting/finished after 30 min, countdown/racing after 15 min
         ArenaRoom::where('last_activity_at', '<', now()->subMinutes(30))
             ->whereIn('status', ['waiting', 'finished'])
+            ->delete();
+        ArenaRoom::where('last_activity_at', '<', now()->subMinutes(15))
+            ->whereIn('status', ['countdown', 'racing'])
             ->delete();
 
         $rooms = ArenaRoom::where('status', 'waiting')
@@ -180,6 +183,8 @@ class ArenaController extends Controller
                     'host_nickname'   => $room->host_nickname,
                     'language'        => $room->language,
                     'word_count'      => $room->word_count,
+                    'race_mode'       => $room->race_mode ?? 'words',
+                    'time_limit'      => $room->time_limit,
                     'bot_difficulty'  => $room->bot_difficulty ?? 'medium',
                     'player_count'    => $realCount,
                     'total_slots'     => $totalSlots,
@@ -199,13 +204,23 @@ class ArenaController extends Controller
         $validated = $request->validate([
             'nickname'       => 'required|string|max:20|regex:/^[a-zA-Z0-9_]+$/',
             'language'       => 'required|in:english,indonesian',
-            'word_count'     => 'required|integer|in:25,50,75,100',
+            'race_mode'      => 'nullable|in:words,timer',
+            'word_count'     => 'nullable|integer|in:25,50,75,100',
+            'time_limit'     => 'nullable|integer|in:30,60,90',
             'bot_difficulty' => 'nullable|in:easy,medium,hard,player_only',
         ], [
             'nickname.regex' => 'Nickname only allows letters, numbers, and underscores.',
         ]);
 
         $difficulty = $validated['bot_difficulty'] ?? 'medium';
+        $raceMode   = $validated['race_mode'] ?? 'words';
+        $wordCount  = $validated['word_count'] ?? 25;
+        $timeLimit  = $validated['time_limit'] ?? null;
+
+        // For timer mode, generate enough words to last the full duration at max bot speed
+        $generatedWordCount = $raceMode === 'timer'
+            ? max(200, (int)(($timeLimit ?? 60) * 2.5))
+            : $wordCount;
 
         // Generate unique 6-char room code
         do {
@@ -224,14 +239,16 @@ class ArenaController extends Controller
             }
         }
 
-        $words = $this->generateWords($validated['word_count'], $validated['language']);
+        $words = $this->generateWords($generatedWordCount, $validated['language']);
 
         $room = ArenaRoom::create([
             'room_code'        => $code,
             'host_nickname'    => $validated['nickname'],
             'status'           => 'waiting',
             'language'         => $validated['language'],
-            'word_count'       => $validated['word_count'],
+            'race_mode'        => $raceMode,
+            'word_count'       => $wordCount,
+            'time_limit'       => $timeLimit,
             'bot_difficulty'   => $difficulty,
             'words_json'       => $words,
             'players_json'     => $players,
@@ -367,7 +384,12 @@ class ArenaController extends Controller
         })->toArray();
 
         // Generate fresh words for the new race
-        $words = $this->generateWords($room->word_count ?? 25, $room->language ?? 'english');
+        $raceMode  = $room->race_mode ?? 'words';
+        $timeLimit = $room->time_limit;
+        $genCount  = $raceMode === 'timer'
+            ? max(200, (int)(($timeLimit ?? 60) * 2.5))
+            : ($room->word_count ?? 25);
+        $words = $this->generateWords($genCount, $room->language ?? 'english');
 
         // Set countdown: race_started_at = 5 seconds from now
         $room->status           = 'countdown';
@@ -444,7 +466,9 @@ class ArenaController extends Controller
             'host_nickname'  => $room->host_nickname,
             'status'         => $room->status,
             'language'       => $room->language,
+            'race_mode'      => $room->race_mode ?? 'words',
             'word_count'     => $room->word_count,
+            'time_limit'     => $room->time_limit,
             'bot_difficulty' => $room->bot_difficulty ?? 'medium',
             'words'          => $room->words_json,
             'players'        => $room->players_json,

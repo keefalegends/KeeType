@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useArenaGame } from '../composables/useArenaGame.js'
 
 import TypingArea from './TypingArea.vue'
@@ -10,6 +10,7 @@ const {
   room, racers, sortedRacers, myRacer,
   publicRooms, error, loading,
   countdownSeconds,
+  raceMode, timeLimit,
   words, currentWordIndex, currentCharIndex, typedChars,
   isTypingActive, localFinished,
   fetchPublicRooms, createRoom, joinRoom, startRace, leaveRoom,
@@ -19,9 +20,12 @@ const {
 
 // ── Lobby settings ──
 const lobbyLanguage      = ref('english')
+const lobbyRaceMode      = ref('words')   // 'words' | 'timer'
 const lobbyWordCount     = ref(25)
+const lobbyTimeLimit     = ref(60)        // seconds for timer mode
 const lobbyBotDifficulty = ref('medium')
 const wordCountOptions   = [25, 50, 75, 100]
+const timeLimitOptions   = [30, 60, 90]
 
 const difficultyOptions = [
   { key: 'easy',        label: 'Easy',        icon: '🟢', wpm: '30-50 WPM' },
@@ -97,6 +101,19 @@ function realPlayerCount(room) {
   if (!room) return 0
   return (room.players || []).filter(p => !p.is_bot).length
 }
+
+// Live timer countdown display (reactive via a tick ref)
+const _tick = ref(0)
+let _tickInterval = null
+onMounted(() => { _tickInterval = setInterval(() => _tick.value++, 200) })
+onUnmounted(() => clearInterval(_tickInterval))
+
+const raceTimeLeft = computed(() => {
+  void _tick.value // reactivity trigger
+  if (!room.value?.race_starts_at || raceMode.value !== 'timer') return timeLimit.value
+  const elapsed = (Date.now() - new Date(room.value.race_starts_at).getTime()) / 1000
+  return Math.max(0, Math.ceil(timeLimit.value - elapsed))
+})
 </script>
 
 <template>
@@ -170,8 +187,31 @@ function realPlayerCount(room) {
             </div>
           </div>
 
-          <!-- Word count tile grid -->
+          <!-- Race Mode toggle -->
           <div class="flex flex-col gap-1.5" style="margin-bottom: 1.25rem;">
+            <label class="arena-label">Race Mode</label>
+            <div class="flex gap-2">
+              <button
+                @click="lobbyRaceMode = 'words'"
+                class="arena-wc-btn flex-1 py-2"
+                :class="lobbyRaceMode === 'words' ? 'arena-wc-btn--active' : ''"
+              >
+                <span class="text-base">📝</span>
+                <span class="arena-wc-btn__label font-semibold">Words</span>
+              </button>
+              <button
+                @click="lobbyRaceMode = 'timer'"
+                class="arena-wc-btn flex-1 py-2"
+                :class="lobbyRaceMode === 'timer' ? 'arena-wc-btn--active' : ''"
+              >
+                <span class="text-base">⏱️</span>
+                <span class="arena-wc-btn__label font-semibold">Timer</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Word count tile grid (only for words mode) -->
+          <div v-if="lobbyRaceMode === 'words'" class="flex flex-col gap-1.5" style="margin-bottom: 1.25rem;">
             <label class="arena-label">Word Count</label>
             <div class="arena-wc-grid">
               <button
@@ -183,6 +223,23 @@ function realPlayerCount(room) {
               >
                 <span class="arena-wc-btn__num">{{ wc }}</span>
                 <span class="arena-wc-btn__label">words</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Timer options (only for timer mode) -->
+          <div v-if="lobbyRaceMode === 'timer'" class="flex flex-col gap-1.5" style="margin-bottom: 1.25rem;">
+            <label class="arena-label">Time Limit</label>
+            <div class="arena-wc-grid">
+              <button
+                v-for="t in timeLimitOptions"
+                :key="t"
+                @click="lobbyTimeLimit = t"
+                class="arena-wc-btn"
+                :class="lobbyTimeLimit === t ? 'arena-wc-btn--active' : ''"
+              >
+                <span class="arena-wc-btn__num">{{ t }}</span>
+                <span class="arena-wc-btn__label">sec</span>
               </button>
             </div>
           </div>
@@ -207,7 +264,7 @@ function realPlayerCount(room) {
 
           <!-- Create button -->
           <button
-            @click="createRoom(lobbyLanguage, lobbyWordCount, lobbyBotDifficulty)"
+            @click="createRoom(lobbyLanguage, lobbyWordCount, lobbyBotDifficulty, lobbyRaceMode, lobbyTimeLimit)"
             :disabled="loading || !nickname.trim()"
             class="arena-create-btn"
           >
@@ -249,7 +306,7 @@ function realPlayerCount(room) {
                   {{ getDifficultyBadge(r.bot_difficulty).icon }} {{ getDifficultyBadge(r.bot_difficulty).label }}
                 </span>
               </div>
-              <div class="text-xs text-editor-sub">{{ r.language }} · {{ r.word_count }} words</div>
+              <div class="text-xs text-editor-sub">{{ r.language }} · {{ r.race_mode === 'timer' ? `${r.time_limit}s timer` : `${r.word_count} words` }}</div>
             </div>
           </div>
           <div class="flex items-center gap-3 flex-shrink-0">
@@ -278,7 +335,7 @@ function realPlayerCount(room) {
           <div class="text-3xl font-bold text-editor-accent font-mono tracking-widest">{{ room?.room_code }}</div>
         </div>
         <div class="flex flex-col items-end gap-1 text-xs text-editor-sub">
-          <span>{{ room?.language }} · {{ room?.word_count }} words</span>
+          <span>{{ room?.language }} · {{ room?.race_mode === 'timer' ? `${room?.time_limit}s timer` : `${room?.word_count} words` }}</span>
           <span class="arena-diff-badge" :class="'arena-diff-badge--' + (room?.bot_difficulty || 'medium')">
             {{ getDifficultyBadge(room?.bot_difficulty).icon }} {{ getDifficultyBadge(room?.bot_difficulty).label }}
           </span>
@@ -384,7 +441,18 @@ function realPlayerCount(room) {
 
       <!-- Race Track -->
       <div class="flex flex-col gap-3">
-        <div class="text-[10px] uppercase tracking-[0.25em] text-editor-sub mb-1">Live Race</div>
+        <div class="flex items-center justify-between mb-1">
+          <div class="text-[10px] uppercase tracking-[0.25em] text-editor-sub">Live Race</div>
+          <!-- Timer display for timer mode -->
+          <div v-if="raceMode === 'timer'" class="flex items-center gap-1.5">
+            <span class="text-sm">⏱</span>
+            <span class="text-sm font-bold tabular-nums text-editor-accent">{{ raceTimeLeft }}s</span>
+          </div>
+          <!-- Word count progress for words mode -->
+          <div v-else class="text-[10px] text-editor-sub tabular-nums">
+            {{ currentWordIndex }} / {{ words.length }} words
+          </div>
+        </div>
 
         <div
           v-for="(racer, idx) in racers"

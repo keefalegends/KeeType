@@ -52,6 +52,9 @@ export function useArenaGame() {
   const raceStartedAt    = ref(null)   // JS Date when actual race begins
   const isTypingActive   = ref(false)
   const localFinished    = ref(false)
+  const raceMode         = ref('words')  // 'words' | 'timer'
+  const timeLimit        = ref(60)       // seconds for timer mode
+  let   raceTimer        = null          // countdown timer for timer mode
 
   // For synced racers display (real + bots)
   const racers = computed(() => {
@@ -87,7 +90,8 @@ export function useArenaGame() {
     clearInterval(botInterval)
     clearInterval(countdownTimer)
     clearInterval(progressSyncTimer)
-    pollInterval = botInterval = countdownTimer = progressSyncTimer = null
+    clearInterval(raceTimer)
+    pollInterval = botInterval = countdownTimer = progressSyncTimer = raceTimer = null
   }
 
   // ── API helpers ──
@@ -138,7 +142,7 @@ export function useArenaGame() {
       }
     }
 
-    // If server says finished → move everyone to finished podium screen
+    // If server says finished → move to podium (stop all intervals)
     if (newRoom.status === 'finished' && screen.value !== 'finished') {
       screen.value = 'finished'
       stopAll()
@@ -175,26 +179,60 @@ export function useArenaGame() {
     isTypingActive.value   = false
     localFinished.value    = false
     raceStartedAt.value    = new Date(roomData.race_starts_at)
+    raceMode.value         = roomData.race_mode || 'words'
+    timeLimit.value        = roomData.time_limit || 60
 
     // Simulate bots locally (smooth animation)
     startBotSimulation(roomData)
 
-    // Sync my progress to server every 600ms
+    // Sync my progress to server every 600ms (keep syncing even after local finish so others see final stats)
     progressSyncTimer = setInterval(() => {
       syncProgress()
     }, 600)
+
+    // Timer mode: auto-finish when time runs out
+    if (raceMode.value === 'timer') {
+      const endTime = raceStartedAt.value.getTime() + (timeLimit.value * 1000)
+      raceTimer = setInterval(() => {
+        const remaining = endTime - Date.now()
+        if (remaining <= 0) {
+          clearInterval(raceTimer)
+          raceTimer = null
+          if (!localFinished.value) finishRace()
+        }
+      }, 200)
+    }
   }
 
   // ── Bot simulation (client-side smooth movement) ──
   function startBotSimulation(roomData) {
+    // For timer mode bots, use time-based progress (words typed / total words in time)
+    const totalWords = raceMode.value === 'timer'
+      ? Math.ceil(((roomData.time_limit || 60) / 60) * 150) // estimate max words at top speed
+      : (roomData.word_count || 25)
+
     botInterval = setInterval(() => {
       if (!room.value) return
       const elapsed = Date.now() - raceStartedAt.value.getTime()
-      const totalWords = roomData.word_count
+
+      // Timer mode: check if time is up
+      if (raceMode.value === 'timer') {
+        const timeLimitMs = (roomData.time_limit || 60) * 1000
+        if (elapsed >= timeLimitMs) {
+          const updatedPlayers = room.value.players.map(p => {
+            if (!p.is_bot || p.finished) return p
+            return { ...p, progress: 100, finished: true, finish_time: new Date().toISOString() }
+          })
+          room.value = { ...room.value, players: updatedPlayers }
+          return
+        }
+      }
 
       const updatedPlayers = room.value.players.map(p => {
         if (!p.is_bot || p.finished) return p
-        const newProgress = computeBotProgress(p.bot_wpm, totalWords, elapsed, p.id)
+        const newProgress = raceMode.value === 'timer'
+          ? Math.min(100, (elapsed / ((roomData.time_limit || 60) * 1000)) * 100)
+          : computeBotProgress(p.bot_wpm, totalWords, elapsed, p.id)
         const updatedP = { ...p, progress: newProgress, wpm: p.bot_wpm }
         if (newProgress >= 100 && !updatedP.finished) {
           updatedP.finished    = true
@@ -203,16 +241,6 @@ export function useArenaGame() {
         return updatedP
       })
       room.value = { ...room.value, players: updatedPlayers }
-
-      // Check if all real players done → show finish
-      const myPlayer = updatedPlayers.find(p => p.id === playerId.value)
-      if (myPlayer?.finished) {
-        const allRealDone = updatedPlayers.filter(p => !p.is_bot).every(p => p.finished)
-        if (allRealDone) {
-          screen.value = 'finished'
-          stopAll()
-        }
-      }
     }, 100)
   }
 
@@ -297,12 +325,15 @@ export function useArenaGame() {
     localFinished.value = true
     // Final sync to backend
     syncProgress(true)
+    // NOTE: Do NOT stopAll() here — keep polling so we see other players finish live
+    // The finished screen transition is handled by applyRoomState when server says 'finished'
+    // Fallback: show finished screen after 8s if server never says finished (e.g. others AFK)
     setTimeout(() => {
       if (screen.value !== 'finished') {
         screen.value = 'finished'
         stopAll()
       }
-    }, 1500)
+    }, 8000)
   }
 
   // ── Calculate local stats ──
@@ -379,7 +410,7 @@ export function useArenaGame() {
   }
 
   // ── Create room ──
-  async function createRoom(language, wordCount, botDifficulty = 'medium') {
+  async function createRoom(language, wordCount, botDifficulty = 'medium', raceModeParam = 'words', timeLimitParam = 60) {
     if (!nickname.value.trim()) { error.value = 'Please enter a nickname.'; return }
     loading.value = true; error.value = ''
     try {
@@ -389,7 +420,9 @@ export function useArenaGame() {
         body: JSON.stringify({
           nickname: nickname.value,
           language,
-          word_count: wordCount,
+          race_mode:      raceModeParam,
+          word_count:     raceModeParam === 'words' ? wordCount : undefined,
+          time_limit:     raceModeParam === 'timer' ? timeLimitParam : undefined,
           bot_difficulty: botDifficulty,
         }),
       })
@@ -479,6 +512,7 @@ export function useArenaGame() {
     room, racers, sortedRacers, myRacer,
     publicRooms, error, loading,
     countdownSeconds,
+    raceMode, timeLimit,
     // Typing
     words, currentWordIndex, currentCharIndex, typedChars,
     isTypingActive, localFinished,
