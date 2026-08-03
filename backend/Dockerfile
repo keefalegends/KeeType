@@ -1,4 +1,4 @@
-FROM php:8.2-cli-alpine
+FROM php:8.3-cli-alpine
 
 # Install PHP extensions required for Laravel & SQLite
 RUN apk add --no-cache \
