@@ -162,11 +162,11 @@ class ArenaController extends Controller
     // ──────────────────────────────────────────────
     public function publicRooms()
     {
-        // Clean up stale rooms: waiting/finished after 30 min, countdown/racing after 15 min
-        ArenaRoom::where('last_activity_at', '<', now()->subMinutes(30))
+        // Clean up stale rooms: waiting/finished after 5 min of inactivity, countdown/racing after 10 min
+        ArenaRoom::where('last_activity_at', '<', now()->subMinutes(5))
             ->whereIn('status', ['waiting', 'finished'])
             ->delete();
-        ArenaRoom::where('last_activity_at', '<', now()->subMinutes(15))
+        ArenaRoom::where('last_activity_at', '<', now()->subMinutes(10))
             ->whereIn('status', ['countdown', 'racing'])
             ->delete();
 

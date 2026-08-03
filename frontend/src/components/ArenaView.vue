@@ -45,17 +45,27 @@ function getDifficultyBadge(diff) {
 // ── Public room auto-refresh ──
 let publicRoomRefresh = null
 
+// Live timer countdown display (reactive via a tick ref)
+const _tick = ref(0)
+let _tickInterval = null
+
 onMounted(() => {
   preloadMp3Sounds()
   fetchPublicRooms()
   publicRoomRefresh = setInterval(fetchPublicRooms, 4000)
+  _tickInterval = setInterval(() => _tick.value++, 200)
   window.addEventListener('keydown', handleRaceKeyDown)
 })
 
-
 onUnmounted(() => {
   clearInterval(publicRoomRefresh)
+  clearInterval(_tickInterval)
   window.removeEventListener('keydown', handleRaceKeyDown)
+  // Auto-leave room when user navigates away (e.g. switches to Settings, About, etc.)
+  // This triggers server cleanup: host leave = delete room, player leave = replace with bot
+  if (screen.value !== 'home') {
+    leaveRoom()
+  }
 })
 
 // Stop public room refresh once inside a room
@@ -102,11 +112,7 @@ function realPlayerCount(room) {
   return (room.players || []).filter(p => !p.is_bot).length
 }
 
-// Live timer countdown display (reactive via a tick ref)
-const _tick = ref(0)
-let _tickInterval = null
-onMounted(() => { _tickInterval = setInterval(() => _tick.value++, 200) })
-onUnmounted(() => clearInterval(_tickInterval))
+// (tick declared above, interval started in onMounted)
 
 const raceTimeLeft = computed(() => {
   void _tick.value // reactivity trigger
