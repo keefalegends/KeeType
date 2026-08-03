@@ -1,4 +1,4 @@
-FROM php:8.3-cli-alpine
+FROM php:8.4-cli-alpine
 
 # Install PHP extensions required for Laravel & SQLite
 RUN apk add --no-cache \
@@ -17,7 +17,7 @@ WORKDIR /var/www/html
 COPY . .
 
 # Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+RUN composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs
 
 # Copy entrypoint script and set permissions
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
