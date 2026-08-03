@@ -343,8 +343,9 @@ class ArenaController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Only the host can start the race.'], 403);
         }
 
-        if ($room->status !== 'waiting') {
-            return response()->json(['status' => 'error', 'message' => 'Race already started.'], 422);
+        // Allow start if status is 'waiting' OR 'finished' (restarting/rematch)
+        if ($room->status !== 'waiting' && $room->status !== 'finished') {
+            return response()->json(['status' => 'error', 'message' => 'Race already in progress.'], 422);
         }
 
         // Require at least 2 real players for player_only mode
@@ -355,9 +356,24 @@ class ArenaController extends Controller
             }
         }
 
-        // Set countdown: race_started_at = 5 seconds from now (countdown period)
+        // Reset all player stats for the new race
+        $players = collect($room->players_json)->map(function ($p) {
+            $p['progress']    = 0.0;
+            $p['wpm']         = 0;
+            $p['accuracy']    = 100;
+            $p['finished']    = false;
+            $p['finish_time'] = null;
+            return $p;
+        })->toArray();
+
+        // Generate fresh words for the new race
+        $words = $this->generateWords($room->word_count ?? 25, $room->language ?? 'english');
+
+        // Set countdown: race_started_at = 5 seconds from now
         $room->status           = 'countdown';
-        $room->race_started_at  = now()->addSeconds(5); // actual race start timestamp
+        $room->words_json       = $words;
+        $room->players_json     = $players;
+        $room->race_started_at  = now()->addSeconds(5);
         $room->last_activity_at = now();
         $room->save();
 

@@ -493,11 +493,22 @@ function realPlayerCount(room) {
       </div>
 
       <!-- Actions -->
-      <div class="flex items-center gap-3 w-full">
-        <button @click="leaveRoom" class="arena-btn flex-1">Back to Lobby</button>
-        <button @click="createRoom(room?.language || 'english', room?.word_count || 25, room?.bot_difficulty || 'medium')" class="arena-btn arena-btn--primary flex-1">
-          Play Again
-        </button>
+      <div class="flex flex-col gap-3 w-full">
+        <div class="flex items-center gap-3 w-full">
+          <button @click="leaveRoom" class="arena-btn flex-1">Leave Room</button>
+          <button
+            v-if="isHost"
+            @click="startRace"
+            :disabled="loading"
+            class="arena-btn arena-btn--primary flex-1"
+          >
+            <span v-if="loading">Starting...</span>
+            <span v-else>🔁 Rematch / Play Again</span>
+          </button>
+        </div>
+        <p v-if="!isHost" class="text-xs text-editor-sub text-center">
+          Waiting for host to restart the race...
+        </p>
       </div>
     </div>
 

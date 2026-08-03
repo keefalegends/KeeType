@@ -118,8 +118,8 @@ export function useArenaGame() {
   function applyRoomState(newRoom) {
     room.value = newRoom
 
-    // Only start countdown if not already in countdown/racing/finished
-    if (newRoom.status === 'countdown' && screen.value === 'lobby') {
+    // Start countdown if server status is countdown (works from lobby or finished/rematch screen)
+    if (newRoom.status === 'countdown' && (screen.value === 'lobby' || screen.value === 'finished')) {
       startCountdown(newRoom.race_starts_at, newRoom)
     }
 
@@ -138,7 +138,8 @@ export function useArenaGame() {
       }
     }
 
-    if (newRoom.status === 'finished' && localFinished.value) {
+    // If server says finished → move everyone to finished podium screen
+    if (newRoom.status === 'finished' && screen.value !== 'finished') {
       screen.value = 'finished'
       stopAll()
     }
@@ -282,18 +283,26 @@ export function useArenaGame() {
         typedChars.value[wi][ci] = { char: e.key, status: 'extra' }
       }
       currentCharIndex.value++
+
+      // Auto-finish if the user completes typing the last character of the last word
+      if (wi === words.value.length - 1 && currentCharIndex.value >= currentWord.length) {
+        finishRace()
+      }
     }
   }
 
 
   function finishRace() {
+    if (localFinished.value) return
     localFinished.value = true
-    // Final sync
+    // Final sync to backend
     syncProgress(true)
-    // Poll result
     setTimeout(() => {
-      if (screen.value !== 'finished') screen.value = 'finished'
-    }, 2000)
+      if (screen.value !== 'finished') {
+        screen.value = 'finished'
+        stopAll()
+      }
+    }, 1500)
   }
 
   // ── Calculate local stats ──
