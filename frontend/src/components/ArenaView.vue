@@ -573,10 +573,13 @@ const raceTimeLeft = computed(() => {
         <button
           v-if="isHost"
           @click="startRace"
-          :disabled="loading"
+          :disabled="loading || (room?.bot_difficulty === 'player_only' && realPlayerCount(room) < 2)"
           class="arena-btn arena-btn--primary w-full"
         >
           <span v-if="loading">Starting...</span>
+          <template v-else-if="room?.bot_difficulty === 'player_only' && realPlayerCount(room) < 2">
+            <span class="opacity-70">🔁 Rematch &nbsp;·&nbsp; Need at least 2 players</span>
+          </template>
           <span v-else>🔁 Rematch / Play Again</span>
         </button>
         <p v-if="!isHost" class="text-xs text-editor-sub text-center">

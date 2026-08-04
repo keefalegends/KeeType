@@ -64,8 +64,15 @@ export function useArenaGame() {
 
   // Sorted for podium
   const sortedRacers = computed(() => {
+    const mode = raceMode.value || (room.value?.race_mode ?? 'words')
     return [...racers.value].sort((a, b) => {
-      // finished first, then by finish_time, then by progress
+      if (mode === 'timer') {
+        // Timer mode: rank by WPM descending (most words typed wins)
+        const wpmA = a.is_bot ? (a.bot_wpm || 0) : (a.wpm || 0)
+        const wpmB = b.is_bot ? (b.bot_wpm || 0) : (b.wpm || 0)
+        return wpmB - wpmA
+      }
+      // Words mode: rank by who finished first, then by progress
       if (a.finished && !b.finished) return -1
       if (!a.finished && b.finished) return 1
       if (a.finished && b.finished) {
@@ -338,23 +345,40 @@ export function useArenaGame() {
 
   // ── Calculate local stats ──
   function getLocalStats() {
-    let correct = 0, incorrect = 0, extra = 0, missed = 0, total = 0
-    for (let wi = 0; wi <= Math.min(currentWordIndex.value, words.value.length - 1); wi++) {
+    let correctChars = 0, totalTyped = 0
+    const completedWords = currentWordIndex.value
+
+    // Count chars in completed words (not current word)
+    for (let wi = 0; wi < Math.min(completedWords, words.value.length); wi++) {
+      const word = words.value[wi] || ''
       const chars = typedChars.value[wi] || []
-      for (const c of chars) {
-        if (!c) continue
-        if (c.status === 'correct')   { correct++; total++ }
-        if (c.status === 'incorrect') { incorrect++; total++ }
-        if (c.status === 'extra')     { extra++; total++ }
-        if (c.status === 'missed')    { missed++ }
+      // Count each char typed in this word
+      for (let ci = 0; ci < word.length; ci++) {
+        const c = chars[ci]
+        totalTyped++
+        if (c && c.status === 'correct') correctChars++
       }
-      if (wi < currentWordIndex.value) { correct++; total++ }
+      // Add 1 for the space between words (counted as correct if word was completed)
+      correctChars++ // space
+      totalTyped++
     }
-    const elapsed = (Date.now() - raceStartedAt.value?.getTime()) / 60000 || 0.001
-    const wpm = Math.round((correct / 5) / elapsed)
-    const accuracy = total > 0 ? Math.round((correct / total) * 100) : 100
+
+    // Count chars in current (partially typed) word
+    const currentWord = words.value[completedWords] || ''
+    const currentChars = typedChars.value[completedWords] || []
+    for (let ci = 0; ci < currentWord.length && ci < currentChars.length; ci++) {
+      const c = currentChars[ci]
+      if (!c) continue
+      totalTyped++
+      if (c.status === 'correct') correctChars++
+    }
+
+    const elapsed = Math.max(0.001, (Date.now() - (raceStartedAt.value?.getTime() || Date.now())) / 60000)
+    // Standard WPM: every 5 chars = 1 word
+    const wpm = Math.round((correctChars / 5) / elapsed)
+    const accuracy = totalTyped > 0 ? Math.round((correctChars / totalTyped) * 100) : 100
     const progress = words.value.length > 0
-      ? Math.min(100, (currentWordIndex.value / words.value.length) * 100)
+      ? Math.min(100, (completedWords / words.value.length) * 100)
       : 0
     return { wpm, accuracy, progress }
   }
