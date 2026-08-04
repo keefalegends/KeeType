@@ -36,17 +36,17 @@
   --gold: #dfb15b;        /* Gold color for headers, logos, and settings indicators */
 }
 
-/* 2. Retro Terminal CRT (Pure Black & Phosphor Green) - Hacker terminal vibe */
+/* 2. Retro Terminal CRT - Phosphor amber-green, readable contrast, scanline atmosphere */
 .theme-retro-crt {
-  --bg: #000000;
-  --sub: #005a00;
-  --text: #00ff00;
-  --error: #ff0000;
-  --error-extra: #8b0000;
-  --correct: #00ff00;
-  --accent: #00ff00;
-  --accent-dim: #00aa00;
-  --caret: #00ff00;
+  --bg:          #0a0f0a;   /* deep dark green-black, not pure black */
+  --sub:         #3a6b3a;   /* mid phosphor green for dim text */
+  --text:        #a8e63d;   /* warm phosphor amber-green, easy on eyes */
+  --error:       #ff5555;   /* soft red, not pure */
+  --error-extra: #5a1a1a;   /* dark red for extra-wrong chars */
+  --correct:     #a8e63d;   /* same as text */
+  --accent:      #c8f060;   /* brighter green for accent/caret */
+  --accent-dim:  #6dbf67;   /* dimmed accent */
+  --caret:       #c8f060;
 }
 
 /* 3. Paper (Off-White & Ink) - Elegant editorial light mode */
@@ -101,7 +101,8 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 .theme-retro-crt .modal-content {
-  border: 2px solid var(--accent);
+  border: 1px solid var(--accent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 20%, transparent), inset 0 0 40px rgba(0,0,0,0.4);
 }
 .theme-paper .modal-content {
   border: 1px solid rgba(0, 0, 0, 0.08);
@@ -146,12 +147,37 @@ body {
   opacity: 1;
 }
 
-/* Specific styling for Retro CRT caret (block instead of line) */
+/* Retro CRT: block cursor + subtle glow */
 .theme-retro-crt .caret-blink,
 .theme-retro-crt .caret-no-blink {
-  width: 0.6em !important;
-  opacity: 0.8;
-  margin-left: 0.05em;
+  width: 0.55em !important;
+  opacity: 0.9;
+  margin-left: 0.04em;
+  box-shadow: 0 0 6px var(--caret);
+}
+
+/* CRT scanline overlay on the whole page */
+.theme-retro-crt body::after {
+  content: '';
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.13) 2px,
+    rgba(0, 0, 0, 0.13) 4px
+  );
+}
+
+/* Subtle text glow for CRT feel */
+.theme-retro-crt .word-char,
+.theme-retro-crt .stat-value,
+.theme-retro-crt h1,
+.theme-retro-crt h2 {
+  text-shadow: 0 0 8px color-mix(in srgb, var(--text) 45%, transparent);
 }
 
 /* Smooth fade transitions */
@@ -271,9 +297,9 @@ body {
 }
 
 .theme-retro-crt .sidebar-panel {
-  border: 2px solid var(--accent);
-  box-shadow: none;
-  background: #000;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 8%, transparent);
+  background: #060c06;
 }
 
 .sidebar-open {
