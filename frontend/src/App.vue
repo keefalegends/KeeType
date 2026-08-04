@@ -385,7 +385,7 @@ onUnmounted(() => {
                   <div class="setting-card">
                     <div class="setting-header">
                       <span class="setting-icon">⌨️</span>
-                      <span>Mechanical Sound (ASMR)</span>
+                      <span>Typing Sound</span>
                     </div>
                     
                     <div class="flex flex-col gap-2.5">
@@ -517,7 +517,7 @@ onUnmounted(() => {
 
       <!-- Footer (Centered at Bottom) -->
       <footer 
-        class="w-full flex flex-col items-center justify-center gap-3 text-xs pb-8 transition-opacity duration-300 animate-pulse-slow"
+        class="w-full flex flex-col items-center justify-center gap-3 text-xs pt-6 pb-10 transition-opacity duration-300 animate-pulse-slow"
         :class="[
           isActive ? 'opacity-0 pointer-events-none' : 'opacity-100',
           theme === 'theme-default' ? 'text-editor-gold' : 'text-editor-sub'
