@@ -88,6 +88,19 @@
   --caret: #ffffff;
 }
 
+/* 6. Lavender Haze (Dark purple - elegant & feminine) */
+.theme-lavender {
+  --bg:          #181320;  /* deep aubergine-black */
+  --sub:         #6b5a8c;  /* muted violet for dim text */
+  --text:        #e8dff5;  /* soft lilac white */
+  --error:       #f28b82;  /* soft coral */
+  --error-extra: #4a1a2a;  /* dark berry */
+  --correct:     #e8dff5;
+  --accent:      #c084fc;  /* purple-400 */
+  --accent-dim:  #9333ea;  /* purple-600 */
+  --caret:       #e879f9;  /* fuchsia-500 */
+}
+
 /* Modal styles for custom prompt */
 .modal-overlay {
   background-color: rgba(0, 0, 0, 0.4);
