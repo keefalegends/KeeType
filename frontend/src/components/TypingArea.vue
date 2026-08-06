@@ -51,23 +51,23 @@ function getExtraChars(wordIndex) {
 }
 
 function getWordClass(wordIndex) {
-  // Check if current word has errors (misspelled letters)
+  // Current word: highlight background
   if (wordIndex === props.currentWordIndex) {
     const typed = props.typedChars[wordIndex] || []
-    const hasError = typed.some(c => c && c.status === 'incorrect' || c && c.status === 'extra')
-    if (hasError) return 'underline decoration-editor-error/60 decoration-2 underline-offset-4'
+    const hasError = typed.some(c => c && (c.status === 'incorrect' || c.status === 'extra'))
+    return hasError ? 'word-active word-active--error' : 'word-active'
   }
-  
-  // If this word is already completed (before current word)
+
+  // Completed words (before current)
   if (wordIndex < props.currentWordIndex) {
     const word = props.words[wordIndex]
     const typed = props.typedChars[wordIndex] || []
-    // Check if any char was wrong or missed or extra
-    const hasError = typed.some(c => c && c.status !== 'correct') ||
-                     typed.length < word.length
-    if (hasError) return 'underline decoration-editor-error/30 decoration-2 underline-offset-4'
+    const hasError = typed.some(c => c && c.status !== 'correct') || typed.length < word.length
+    return hasError ? 'word-done word-done--error' : 'word-done word-done--correct'
   }
-  return ''
+
+  // Untyped words
+  return 'word-untyped'
 }
 
 // Update caret and scroll position
@@ -145,7 +145,7 @@ onMounted(updateCaret)
     <!-- Words Display -->
     <div
       ref="wordsContainer"
-      class="relative text-3xl leading-loose overflow-hidden select-none pb-2"
+      class="relative text-3xl leading-loose overflow-hidden select-none pb-2 pt-[4px] pl-[4px]"
       style="max-height: 6.6em;"
     >
       <!-- Moving Wrapper -->
@@ -181,7 +181,7 @@ onMounted(updateCaret)
             :key="ci"
             :data-char="ci"
             class="inline-block transition-colors duration-75"
-            :class="getCharClass(wi, ci)"
+            :class="wi === currentWordIndex ? getCharClass(wi, ci) : ''"
           >{{ char }}</span>
 
           <!-- Extra characters (overtyped) -->
@@ -199,20 +199,43 @@ onMounted(updateCaret)
 
 <style scoped>
 .word {
-  margin-right: 0.65em;
-  transition: opacity 0.2s ease, filter 0.2s ease;
+  margin-right: 0.55em;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  border-radius: 5px;
+  padding: 1px 3px;
+  border: 1.5px solid transparent; /* reserve space for border, won't clip */
+}
+
+/* Current active word: highlighted background */
+.word-active {
+  background: color-mix(in srgb, var(--accent) 13%, transparent);
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+.word-active--error {
+  background: color-mix(in srgb, var(--error) 11%, transparent);
+  border-color: color-mix(in srgb, var(--error) 30%, transparent);
+}
+
+/* Completed words */
+.word-done--correct {
+  color: var(--accent);
+  opacity: 0.7;
+}
+.word-done--error {
+  color: var(--error);
+  opacity: 0.6;
+}
+
+/* Untyped words */
+.word-untyped {
+  color: var(--sub);
 }
 
 @keyframes char-pop {
-  0% {
-    transform: scale(0.85);
-  }
-  60% {
-    transform: scale(1.08);
-  }
-  100% {
-    transform: scale(1);
-  }
+  0%   { transform: scale(0.85); }
+  60%  { transform: scale(1.08); }
+  100% { transform: scale(1); }
 }
 
 @keyframes char-shake {

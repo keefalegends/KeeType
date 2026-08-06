@@ -282,9 +282,16 @@ export function useArenaGame() {
           typedChars.value[wi][newCi] = undefined
         }
       } else if (ci === 0 && wi > 0) {
-        currentWordIndex.value--
-        const prev = typedChars.value[currentWordIndex.value] || []
-        currentCharIndex.value = prev.length
+        // Only go back if previous word had an error
+        const prevTyped = typedChars.value[wi - 1] || []
+        const prevWord = words.value[wi - 1]
+        const prevHasError = prevTyped.some(c => c && c.status !== 'correct') ||
+                             prevTyped.length < prevWord.length
+        if (prevHasError) {
+          currentWordIndex.value--
+          const prev = typedChars.value[currentWordIndex.value] || []
+          currentCharIndex.value = prev.length
+        }
       }
       return
     }
