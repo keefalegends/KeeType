@@ -556,6 +556,34 @@ body {
   background: color-mix(in srgb, var(--accent) 8%, transparent) !important;
 }
 
+/* ── Font selector buttons (horizontal pills) ── */
+.font-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 0.5rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--sub) 4%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sub) 12%, transparent);
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+.font-btn:hover {
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+  background: color-mix(in srgb, var(--sub) 8%, transparent);
+}
+.font-btn--active {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
+}
+
+
 .sound-radio {
   width: 14px;
   height: 14px;

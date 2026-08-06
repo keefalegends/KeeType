@@ -9,6 +9,7 @@ export function useTypingGame() {
   const wordOption = ref(25)         // word count: 10, 25, 50, 100
   const language = ref('english')    // 'english' or 'indonesian'
   const theme = ref('theme-paper')   // Current theme (default: Paper Ink)
+  const font = ref('jetbrains')       // Current font: 'jetbrains' | 'nunito' | 'outfit'
   const keyboardSound = ref('tactile') // Default sound (Tactile Switch)
   const keyboardVolume = ref(0.5)    // Volume slider: 0.0 to 1.0
   const isMuted = computed(() => keyboardSound.value === 'off')
@@ -265,6 +266,18 @@ export function useTypingGame() {
   // ============ STATS DISPLAY ============
   // The first duplicate displayTime block was added above. Removing this duplicate lower one.
 
+  // ============ FONT HANDLING ============
+  const fontMap = {
+    jetbrains: "'JetBrains Mono', monospace",
+    nunito:    "'Nunito', sans-serif",
+    outfit:    "'Outfit', sans-serif",
+  }
+  function applyFont(newFont) {
+    const family = fontMap[newFont] || fontMap.jetbrains
+    document.documentElement.style.setProperty('--font-mono', family)
+    localStorage.setItem('keetype_font', newFont)
+  }
+
   // ============ THEME HANDLING ============
   function applyTheme(newTheme) {
     document.documentElement.className = newTheme
@@ -283,6 +296,11 @@ export function useTypingGame() {
   // ============ LIFECYCLE ============
   onMounted(() => {
     initGame()
+    // Restore font from storage (default: jetbrains)
+    const savedFont = localStorage.getItem('keetype_font') || 'jetbrains'
+    font.value = savedFont
+    applyFont(savedFont)
+
     // Restore theme from storage (default: theme-paper)
     const savedTheme = localStorage.getItem('keetype_theme') || 'theme-paper'
     theme.value = savedTheme
@@ -312,6 +330,11 @@ export function useTypingGame() {
     initGame()
   })
 
+  // Watch font changes
+  watch(font, (newFont) => {
+    applyFont(newFont)
+  })
+
   // Watch theme changes
   watch(theme, (newTheme) => {
     applyTheme(newTheme)
@@ -333,6 +356,7 @@ export function useTypingGame() {
     wordOption,
     language,
     theme,
+    font,
     keyboardSound,
     keyboardVolume,
     isMuted,

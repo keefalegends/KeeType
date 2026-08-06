@@ -8,7 +8,7 @@ import LeaderboardView from './components/LeaderboardView.vue'
 import ArenaView from './components/ArenaView.vue'
 
 const {
-  mode, timeOption, wordOption, language, theme, keyboardSound, keyboardVolume,
+  mode, timeOption, wordOption, language, theme, font, keyboardSound, keyboardVolume,
   words, currentWordIndex, currentCharIndex, typedChars,
   isActive, isFinished, displayTime, wpmHistory, stats,
   initGame, handleKeyDown,
@@ -317,141 +317,115 @@ onUnmounted(() => {
               
               <!-- Two column settings layout -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                
-                <!-- Column 1: Theme list -->
-                <div class="setting-card">
-                  <div class="setting-header">
-                    <span class="setting-icon">✨</span>
-                    <span>Theme Selection</span>
+
+                <!-- Column 1: Theme + Font -->
+                <div class="flex flex-col gap-6">
+
+                  <!-- Theme Selection -->
+                  <div class="setting-card">
+                    <div class="setting-header">
+                      <span class="setting-icon">✨</span>
+                      <span>Theme Selection</span>
+                    </div>
+                    <div class="flex flex-col gap-2.5">
+
+                      <button @click="theme = 'theme-default'" class="theme-btn" :class="theme === 'theme-default' ? 'theme-btn--active' : ''">
+                        <div class="theme-preview" style="background: #202940; border-color: #dfb15b;"></div>
+                        <span class="theme-name">Navy Gold</span>
+                        <span v-if="theme === 'theme-default'" class="theme-check">✓</span>
+                      </button>
+
+                      <button @click="theme = 'theme-retro-crt'" class="theme-btn" :class="theme === 'theme-retro-crt' ? 'theme-btn--active' : ''">
+                        <div class="theme-preview" style="background: #000000; border-color: #00ff00; border-radius: 0;"></div>
+                        <span class="theme-name">Terminal CRT</span>
+                        <span v-if="theme === 'theme-retro-crt'" class="theme-check">✓</span>
+                      </button>
+
+                      <button @click="theme = 'theme-paper'" class="theme-btn" :class="theme === 'theme-paper' ? 'theme-btn--active' : ''">
+                        <div class="theme-preview" style="background: #f4f4f0; border-color: #225ccb; border-radius: 2px;"></div>
+                        <span class="theme-name">Paper Ink</span>
+                        <span v-if="theme === 'theme-paper'" class="theme-check">✓</span>
+                      </button>
+
+                      <button @click="theme = 'theme-serika-dark'" class="theme-btn" :class="theme === 'theme-serika-dark' ? 'theme-btn--active' : ''">
+                        <div class="theme-preview" style="background: #323437; border-color: #e2b714;"></div>
+                        <span class="theme-name">Serika Dark</span>
+                        <span v-if="theme === 'theme-serika-dark'" class="theme-check">✓</span>
+                      </button>
+
+                      <button @click="theme = 'theme-darling'" class="theme-btn" :class="theme === 'theme-darling' ? 'theme-btn--active' : ''">
+                        <div class="theme-preview" style="background: #fec8cd; border-color: #a30000; border-radius: 2px;"></div>
+                        <span class="theme-name">Darling</span>
+                        <span v-if="theme === 'theme-darling'" class="theme-check">✓</span>
+                      </button>
+
+                      <button @click="theme = 'theme-lavender'" class="theme-btn" :class="theme === 'theme-lavender' ? 'theme-btn--active' : ''">
+                        <div class="theme-preview" style="background: #181320; border-color: #c084fc;"></div>
+                        <span class="theme-name">Lavender Haze</span>
+                        <span v-if="theme === 'theme-lavender'" class="theme-check">✓</span>
+                      </button>
+
+                    </div>
                   </div>
-                  <div class="flex flex-col gap-2.5">
-                    
-                    <button 
-                      @click="theme = 'theme-default'"
-                      class="theme-btn"
-                      :class="theme === 'theme-default' ? 'theme-btn--active' : ''"
-                    >
-                      <div class="theme-preview" style="background: #202940; border-color: #dfb15b;"></div>
-                      <span class="theme-name">Navy Gold</span>
-                      <span v-if="theme === 'theme-default'" class="theme-check">✓</span>
-                    </button>
-                    
-                    <button 
-                      @click="theme = 'theme-retro-crt'"
-                      class="theme-btn"
-                      :class="theme === 'theme-retro-crt' ? 'theme-btn--active' : ''"
-                    >
-                      <div class="theme-preview" style="background: #000000; border-color: #00ff00; border-radius: 0;"></div>
-                      <span class="theme-name">Terminal CRT</span>
-                      <span v-if="theme === 'theme-retro-crt'" class="theme-check">✓</span>
-                    </button>
 
-                    <button 
-                      @click="theme = 'theme-paper'"
-                      class="theme-btn"
-                      :class="theme === 'theme-paper' ? 'theme-btn--active' : ''"
-                    >
-                      <div class="theme-preview" style="background: #f4f4f0; border-color: #225ccb; border-radius: 2px;"></div>
-                      <span class="theme-name">Paper Ink</span>
-                      <span v-if="theme === 'theme-paper'" class="theme-check">✓</span>
-                    </button>
+                  <!-- Font Selection -->
+                  <div class="setting-card">
+                    <div class="setting-header">
+                      <span class="setting-icon">Aa</span>
+                      <span>Font</span>
+                    </div>
+                    <div class="flex flex-row gap-2">
 
-                    <button 
-                      @click="theme = 'theme-serika-dark'"
-                      class="theme-btn"
-                      :class="theme === 'theme-serika-dark' ? 'theme-btn--active' : ''"
-                    >
-                      <div class="theme-preview" style="background: #323437; border-color: #e2b714;"></div>
-                      <span class="theme-name">Serika Dark</span>
-                      <span v-if="theme === 'theme-serika-dark'" class="theme-check">✓</span>
-                    </button>
+                      <button @click="font = 'jetbrains'" class="font-btn" :class="font === 'jetbrains' ? 'font-btn--active' : ''">
+                        <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">JB Mono</span>
+                      </button>
 
-                    <button 
-                      @click="theme = 'theme-darling'"
-                      class="theme-btn"
-                      :class="theme === 'theme-darling' ? 'theme-btn--active' : ''"
-                    >
-                      <div class="theme-preview" style="background: #fec8cd; border-color: #a30000; border-radius: 2px;"></div>
-                      <span class="theme-name">Darling</span>
-                      <span v-if="theme === 'theme-darling'" class="theme-check">✓</span>
-                    </button>
+                      <button @click="font = 'nunito'" class="font-btn" :class="font === 'nunito' ? 'font-btn--active' : ''">
+                        <span style="font-family: 'Nunito', sans-serif;">Nunito</span>
+                      </button>
 
-                    <button 
-                      @click="theme = 'theme-lavender'"
-                      class="theme-btn"
-                      :class="theme === 'theme-lavender' ? 'theme-btn--active' : ''"
-                    >
-                      <div class="theme-preview" style="background: #181320; border-color: #c084fc;"></div>
-                      <span class="theme-name">Lavender Haze</span>
-                      <span v-if="theme === 'theme-lavender'" class="theme-check">✓</span>
-                    </button>
+                      <button @click="font = 'outfit'" class="font-btn" :class="font === 'outfit' ? 'font-btn--active' : ''">
+                        <span style="font-family: 'Outfit', sans-serif;">Outfit</span>
+                      </button>
 
+                    </div>
                   </div>
+
                 </div>
 
-                <!-- Column 2: Keyboard Sound Options -->
+                <!-- Column 2: Typing Sound + Volume -->
                 <div class="flex flex-col gap-6">
-                  
+
                   <div class="setting-card">
                     <div class="setting-header">
                       <span class="setting-icon">⌨️</span>
                       <span>Typing Sound</span>
                     </div>
-                    
                     <div class="flex flex-col gap-2.5">
-                      <!-- Option OFF -->
-                      <button 
-                        @click="keyboardSound = 'off'"
-                        class="sound-btn"
-                        :class="keyboardSound === 'off' ? 'sound-btn--active' : ''"
-                      >
+                      <button @click="keyboardSound = 'off'" class="sound-btn" :class="keyboardSound === 'off' ? 'sound-btn--active' : ''">
                         <span class="sound-name">Muted</span>
                         <div class="sound-radio" :class="keyboardSound === 'off' ? 'radio-on radio-red' : ''"></div>
                       </button>
-
-                      <!-- Option Retro Cherry -->
-                      <button 
-                        @click="keyboardSound = 'cherry-mx-brown'"
-                        class="sound-btn"
-                        :class="keyboardSound === 'cherry-mx-brown' ? 'sound-btn--active' : ''"
-                      >
+                      <button @click="keyboardSound = 'cherry-mx-brown'" class="sound-btn" :class="keyboardSound === 'cherry-mx-brown' ? 'sound-btn--active' : ''">
                         <span class="sound-name">Retro Cherry</span>
                         <div class="sound-radio" :class="keyboardSound === 'cherry-mx-brown' ? 'radio-on' : ''"></div>
                       </button>
-
-                      <!-- Option BUBBLE -->
-                      <button 
-                        @click="keyboardSound = 'bubble'"
-                        class="sound-btn"
-                        :class="keyboardSound === 'bubble' ? 'sound-btn--active' : ''"
-                      >
+                      <button @click="keyboardSound = 'bubble'" class="sound-btn" :class="keyboardSound === 'bubble' ? 'sound-btn--active' : ''">
                         <span class="sound-name">Bubble Pop</span>
                         <div class="sound-radio" :class="keyboardSound === 'bubble' ? 'radio-on' : ''"></div>
                       </button>
-
-                      <!-- Option TACTILE KEYBOARD -->
-                      <button 
-                        @click="keyboardSound = 'tactile'"
-                        class="sound-btn"
-                        :class="keyboardSound === 'tactile' ? 'sound-btn--active' : ''"
-                      >
+                      <button @click="keyboardSound = 'tactile'" class="sound-btn" :class="keyboardSound === 'tactile' ? 'sound-btn--active' : ''">
                         <span class="sound-name">Tactile Switch</span>
                         <div class="sound-radio" :class="keyboardSound === 'tactile' ? 'radio-on' : ''"></div>
                       </button>
-
-                      <!-- Option TYPEWRITER -->
-                      <button 
-                        @click="keyboardSound = 'typewriter'"
-                        class="sound-btn"
-                        :class="keyboardSound === 'typewriter' ? 'sound-btn--active' : ''"
-                      >
+                      <button @click="keyboardSound = 'typewriter'" class="sound-btn" :class="keyboardSound === 'typewriter' ? 'sound-btn--active' : ''">
                         <span class="sound-name">Vintage Typewriter</span>
                         <div class="sound-radio" :class="keyboardSound === 'typewriter' ? 'radio-on' : ''"></div>
                       </button>
                     </div>
                   </div>
 
-                  <!-- Volume Control Slider (Only visible when sound is not OFF) -->
+                  <!-- Volume -->
                   <div v-if="keyboardSound !== 'off'" class="setting-card">
                     <div class="flex items-center justify-between mb-4">
                       <div class="setting-header" style="margin-bottom: 0;">
@@ -460,17 +434,11 @@ onUnmounted(() => {
                       </div>
                       <span class="text-xs font-bold text-editor-accent tabular-nums">{{ Math.round(keyboardVolume * 100) }}%</span>
                     </div>
-                    
                     <div class="vol-slider-wrap">
-                      <input 
-                        type="range" 
-                        min="0" max="1" step="0.05"
-                        v-model.number="keyboardVolume"
-                        class="vol-slider"
-                      />
+                      <input type="range" min="0" max="1" step="0.05" v-model.number="keyboardVolume" class="vol-slider" />
                     </div>
                   </div>
-                  
+
                 </div>
               </div>
             </div>
