@@ -20,7 +20,7 @@ const {
 
 // ── Lobby settings ──
 const lobbyLanguage      = ref('english')
-const lobbyRaceMode      = ref('words')   // 'words' | 'timer'
+const lobbyRaceMode      = ref('timer')   // 'words' | 'timer'
 const lobbyWordCount     = ref(25)
 const lobbyTimeLimit     = ref(60)        // seconds for timer mode
 const lobbyBotDifficulty = ref('medium')
@@ -123,12 +123,12 @@ const raceTimeLeft = computed(() => {
 </script>
 
 <template>
-  <div class="w-full max-w-3xl mx-auto animate-slide-up">
+  <div class="w-full mx-auto animate-slide-up">
 
     <!-- ════════════════════════════════════════════ -->
     <!-- SCREEN: HOME (Lobby + public rooms list)    -->
     <!-- ════════════════════════════════════════════ -->
-    <div v-if="screen === 'home'" class="flex flex-col gap-7">
+    <div v-if="screen === 'home'" class="flex flex-col gap-6">
 
       <!-- Hero Header -->
       <div class="arena-hero">
@@ -140,8 +140,11 @@ const raceTimeLeft = computed(() => {
         <p class="arena-hero__sub">Compete against real players & bots in real-time.</p>
       </div>
 
-      <!-- Single Unified Create Room Card (Wide Landscape Rectangle) -->
-      <div class="arena-create-card w-full max-w-3xl mx-auto">
+      <!-- 2-col: Create Room LEFT + Open Rooms RIGHT -->
+      <div class="arena-home-grid">
+
+      <!-- Create Room Card -->
+      <div class="arena-create-card">
         <div class="arena-create-card__accent"></div>
         <div class="arena-create-card__body">
 
@@ -183,8 +186,7 @@ const raceTimeLeft = computed(() => {
                   class="arena-segment__btn"
                   :class="lobbyLanguage === lang ? 'arena-segment__btn--active' : ''"
                 >
-                  <span>{{ lang === 'english' ? '🇬🇧' : '🇮🇩' }}</span>
-                  <span>{{ lang }}</span>
+                  <span>{{ lang === 'english' ? 'EN' : 'ID' }}</span>
                 </button>
               </div>
             </div>
@@ -276,21 +278,14 @@ const raceTimeLeft = computed(() => {
             <span>{{ loading ? 'Creating...' : 'Create Room' }}</span>
           </button>
 
-        </div>
-      </div>
+        </div><!-- end card__body -->
+      </div><!-- end arena-create-card -->
 
-      <!-- Error -->
-      <p v-if="error" class="text-center text-sm font-medium text-editor-error">⚠ {{ error }}</p>
-
-      <!-- Public Rooms List -->
-      <div class="flex flex-col gap-3">
-        <div class="flex items-center gap-3">
-          <div class="h-px bg-editor-sub/20 flex-1"></div>
-          <span class="text-[10px] uppercase tracking-[0.25em] text-editor-sub flex items-center gap-1.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-editor-accent inline-block animate-pulse"></span>
-            Open Rooms
-          </span>
-          <div class="h-px bg-editor-sub/20 flex-1"></div>
+      <!-- Open Rooms -->
+      <div class="arena-rooms-panel">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="w-1.5 h-1.5 rounded-full bg-editor-accent inline-block animate-pulse"></span>
+          <span class="text-[10px] uppercase tracking-[0.25em] text-editor-sub">Open Rooms</span>
         </div>
 
         <div v-if="publicRooms.length === 0" class="arena-empty-state">
@@ -323,8 +318,14 @@ const raceTimeLeft = computed(() => {
             >Join</button>
           </div>
         </div>
-      </div>
-    </div>
+      </div><!-- end Open Rooms -->
+
+      </div><!-- end arena-home-grid -->
+
+      <!-- Error -->
+      <p v-if="error" class="text-center text-sm font-medium text-editor-error">⚠ {{ error }}</p>
+
+    </div><!-- end screen home -->
 
     <!-- ════════════════════════════════════════════ -->
     <!-- SCREEN: LOBBY (waiting room)               -->
@@ -592,27 +593,33 @@ const raceTimeLeft = computed(() => {
 </template>
 
 <style scoped>
-/* ── Hero ── */
-.arena-hero {
-  text-align: center;
-  padding: 0.5rem 0 0.25rem;
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ARENA — Design System (Theme-Adaptive)
+   Font: Sora | Colors: CSS custom properties
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* Sora font on all arena elements */
+.arena-hero, .arena-home-grid, .arena-create-card,
+.arena-rooms-panel, .arena-label, .arena-input,
+.arena-segment, .arena-segment__btn, .arena-mode-btn,
+.arena-wc-btn, .arena-diff-btn, .arena-create-btn,
+.arena-btn, .arena-room-row, .arena-player-slot,
+.arena-result-row, .arena-pill, .arena-info-pill,
+.arena-tag, .arena-empty-state, .arena-hero-badge {
+  font-family: 'Sora', sans-serif;
 }
+
+/* ── Hero ── */
+.arena-hero { text-align: center; padding: 0.25rem 0 1rem; }
 .arena-hero__eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--color-editor-accent);
-  margin-bottom: 0.75rem;
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-size: 0.65rem; font-weight: 600; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 0.6rem; font-family: 'Sora', sans-serif;
 }
 .arena-hero__dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--color-editor-accent);
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent);
   animation: pulse-dot 2s ease-in-out infinite;
 }
 @keyframes pulse-dot {
@@ -620,614 +627,383 @@ const raceTimeLeft = computed(() => {
   50%       { opacity: 0.4; transform: scale(0.75); }
 }
 .arena-hero__title {
-  font-size: 2.5rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  color: var(--color-editor-text);
-  line-height: 1.05;
-  margin-bottom: 0.4rem;
+  font-size: 2.6rem; font-weight: 800; letter-spacing: -0.04em;
+  color: var(--text); line-height: 1.05;
+  margin-bottom: 0.45rem; font-family: 'Sora', sans-serif;
 }
 .arena-hero__sub {
-  font-size: 0.82rem;
-  color: var(--color-editor-sub);
-  opacity: 0.8;
+  font-size: 0.85rem; color: var(--sub);
+  font-weight: 400; font-family: 'Sora', sans-serif;
+}
+
+/* ── Home 2-col grid (65/35) ── */
+.arena-home-grid {
+  display: grid; grid-template-columns: 1fr 260px;
+  gap: 1.25rem; align-items: start;
+}
+@media (max-width: 640px) { .arena-home-grid { grid-template-columns: 1fr; } }
+
+/* ── Create Room Card ── */
+.arena-create-card {
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--sub) 18%, transparent);
+  overflow: hidden; position: relative;
+  box-shadow: 0 2px 16px color-mix(in srgb, var(--sub) 10%, transparent);
+}
+.arena-create-card__accent {
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 55%, transparent) 70%, transparent 100%);
+}
+.arena-create-card__body {
+  padding: 1.75rem 1.75rem 2rem;
+  background: color-mix(in srgb, var(--bg) 97%, var(--sub));
+}
+.arena-create-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--accent); flex-shrink: 0;
+}
+
+/* ── Labels ── */
+.arena-label {
+  display: flex; align-items: center; gap: 0.35rem;
+  font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.16em;
+  color: var(--sub); font-weight: 600; font-family: 'Sora', sans-serif;
 }
 
 /* ── Inputs ── */
 .arena-input {
   width: 100%;
-  background: color-mix(in srgb, var(--color-editor-bg) 70%, transparent);
-  border: 1.5px solid color-mix(in srgb, var(--color-editor-sub) 22%, transparent);
-  border-radius: 8px;
-  padding: 0.65rem 0.9rem;
-  color: var(--color-editor-text);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.92rem;
-  font-weight: 700;
-  transition: border-color 0.18s, box-shadow 0.18s;
-  outline: none;
+  background: color-mix(in srgb, var(--bg) 85%, var(--sub));
+  border: 1.5px solid color-mix(in srgb, var(--sub) 22%, transparent);
+  border-radius: 10px; padding: 0.7rem 1rem;
+  color: var(--text); font-family: 'Sora', sans-serif;
+  font-size: 0.9rem; font-weight: 600;
+  transition: border-color 0.15s, box-shadow 0.15s; outline: none;
 }
 .arena-input:focus {
-  border-color: var(--color-editor-accent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-editor-accent) 14%, transparent);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
+  background: color-mix(in srgb, var(--bg) 98%, var(--sub));
 }
-.arena-input::placeholder {
-  color: color-mix(in srgb, var(--color-editor-sub) 50%, transparent);
-  font-weight: 400;
-}
+.arena-input::placeholder { color: color-mix(in srgb, var(--sub) 50%, transparent); font-weight: 400; }
 
-/* ── Labels ── */
-.arena-label {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.63rem;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  color: var(--color-editor-sub);
-  font-weight: 600;
-  opacity: 0.75;
-}
-
-/* ── Hero badge (kept for backwards compat) ── */
-.arena-hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.3rem 0.85rem;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--color-editor-accent) 35%, transparent);
-  background: color-mix(in srgb, var(--color-editor-accent) 10%, transparent);
-  color: var(--color-editor-accent);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-/* ── Create Room Card ── */
-.arena-create-card {
-  border-radius: 12px;
-  border: 1px solid color-mix(in srgb, var(--color-editor-sub) 16%, transparent);
-  overflow: hidden;
-  position: relative;
-}
-.arena-create-card__accent {
-  height: 3px;
-  background: linear-gradient(
-    90deg,
-    var(--color-editor-accent) 0%,
-    color-mix(in srgb, var(--color-editor-accent) 55%, transparent) 70%,
-    transparent 100%
-  );
-  box-shadow: 0 0 12px color-mix(in srgb, var(--color-editor-accent) 30%, transparent);
-}
-.arena-create-card__body {
-  padding: 1.4rem 1.4rem 1.8rem;
-  background: color-mix(in srgb, var(--color-editor-bg) 92%, var(--color-editor-sub));
-}
-.arena-create-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 7px;
-  background: color-mix(in srgb, var(--color-editor-accent) 10%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-editor-accent) 22%, transparent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-editor-accent);
-  flex-shrink: 0;
-}
-
-/* ── Segmented language control ── */
+/* ── Language segment ── */
 .arena-segment {
   display: flex;
-  background: color-mix(in srgb, var(--color-editor-sub) 8%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-editor-sub) 15%, transparent);
-  border-radius: 7px;
-  padding: 3px;
-  gap: 2px;
+  background: color-mix(in srgb, var(--sub) 10%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--sub) 18%, transparent);
+  border-radius: 10px; padding: 3px; gap: 3px;
 }
 .arena-segment__btn {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  padding: 0.38rem 0.5rem;
-  border-radius: 5px;
-  font-size: 0.74rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  border: none;
-  background: transparent;
-  color: var(--color-editor-sub);
-  transition: all 0.12s;
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  gap: 0.35rem; padding: 0.45rem 0.75rem; border-radius: 7px;
+  font-size: 0.8rem; font-weight: 700; font-family: 'Sora', sans-serif;
+  cursor: pointer; border: none; background: transparent;
+  color: var(--sub); transition: all 0.12s; letter-spacing: 0.05em;
 }
 .arena-segment__btn:hover:not(.arena-segment__btn--active) {
-  color: var(--color-editor-text);
+  color: var(--text);
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
 }
 .arena-segment__btn--active {
-  background: var(--color-editor-accent);
-  color: var(--color-editor-bg);
-  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  background: var(--accent); color: var(--bg);
+  box-shadow: 0 1px 6px color-mix(in srgb, var(--accent) 30%, transparent);
+  font-weight: 800;
 }
 
-/* ── Race Mode toggle ── */
-.arena-mode-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-}
+/* ── Race Mode ── */
+.arena-mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
 .arena-mode-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.65rem 1rem;
-  border-radius: 8px;
-  border: 1.5px solid color-mix(in srgb, var(--color-editor-sub) 18%, transparent);
-  background: color-mix(in srgb, var(--color-editor-bg) 50%, transparent);
-  color: var(--color-editor-sub);
-  font-size: 0.8rem;
-  font-weight: 700;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.14s;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
+  display: flex; align-items: center; justify-content: center;
+  gap: 0.5rem; padding: 0.7rem 1rem; border-radius: 10px;
+  border: 1.5px solid color-mix(in srgb, var(--sub) 18%, transparent);
+  background: color-mix(in srgb, var(--bg) 80%, var(--sub));
+  color: var(--sub); font-size: 0.78rem; font-weight: 700;
+  font-family: 'Sora', sans-serif; cursor: pointer; transition: all 0.14s;
+  letter-spacing: 0.04em; text-transform: uppercase;
 }
 .arena-mode-btn:hover:not(.arena-mode-btn--active) {
-  border-color: color-mix(in srgb, var(--color-editor-sub) 40%, transparent);
-  color: var(--color-editor-text);
+  border-color: color-mix(in srgb, var(--sub) 35%, transparent);
+  color: var(--text);
+  background: color-mix(in srgb, var(--bg) 95%, var(--sub));
 }
 .arena-mode-btn--active {
-  border-color: var(--color-editor-accent);
-  color: var(--color-editor-accent);
-  background: color-mix(in srgb, var(--color-editor-accent) 8%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-editor-accent) 20%, transparent);
+  border-color: var(--accent); border-width: 2px;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
 
-/* ── Word count grid ── */
-.arena-wc-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.4rem;
-}
+/* ── Word Count ── */
+.arena-wc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
 .arena-wc-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 0.65rem 0.2rem;
-  border-radius: 7px;
-  border: 1.5px solid color-mix(in srgb, var(--color-editor-sub) 18%, transparent);
-  background: color-mix(in srgb, var(--color-editor-bg) 55%, transparent);
-  cursor: pointer;
-  transition: all 0.12s;
-  gap: 0.1rem;
-  font-family: inherit;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 0.9rem 0.2rem; border-radius: 10px;
+  border: 1.5px solid color-mix(in srgb, var(--sub) 18%, transparent);
+  background: color-mix(in srgb, var(--bg) 80%, var(--sub));
+  cursor: pointer; transition: all 0.12s; gap: 0.2rem; font-family: 'Sora', sans-serif;
 }
 .arena-wc-btn:hover:not(.arena-wc-btn--active) {
-  border-color: color-mix(in srgb, var(--color-editor-sub) 38%, transparent);
-  background: color-mix(in srgb, var(--color-editor-sub) 7%, transparent);
+  border-color: color-mix(in srgb, var(--sub) 35%, transparent);
+  background: color-mix(in srgb, var(--bg) 95%, var(--sub));
 }
 .arena-wc-btn--active {
-  border-color: var(--color-editor-accent);
-  background: color-mix(in srgb, var(--color-editor-accent) 9%, transparent);
+  border-color: var(--accent); border-width: 2px;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
 .arena-wc-btn__num {
-  font-size: 1rem;
-  font-weight: 800;
-  color: var(--color-editor-text);
-  line-height: 1;
-  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.25rem; font-weight: 800; color: var(--text);
+  line-height: 1; font-family: 'Sora', sans-serif;
 }
-.arena-wc-btn--active .arena-wc-btn__num {
-  color: var(--color-editor-accent);
-}
+.arena-wc-btn--active .arena-wc-btn__num { color: var(--accent); }
 .arena-wc-btn__label {
-  font-size: 0.58rem;
-  color: var(--color-editor-sub);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  opacity: 0.7;
+  font-size: 0.57rem; color: var(--sub);
+  text-transform: uppercase; letter-spacing: 0.07em; font-weight: 500;
 }
+.arena-wc-btn--active .arena-wc-btn__label { color: color-mix(in srgb, var(--accent) 70%, transparent); }
 
-/* ── Bot Difficulty Grid ── */
-.arena-diff-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.4rem;
-}
+/* ── Bot Difficulty ── */
+.arena-diff-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
 .arena-diff-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 0.6rem 0.2rem;
-  border-radius: 7px;
-  border: 1.5px solid color-mix(in srgb, var(--color-editor-sub) 18%, transparent);
-  border-left-width: 3px;
-  background: color-mix(in srgb, var(--color-editor-bg) 55%, transparent);
-  cursor: pointer;
-  transition: all 0.12s;
-  gap: 0.25rem;
-  font-family: inherit;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 0.85rem 0.25rem; border-radius: 10px;
+  border: 1.5px solid color-mix(in srgb, var(--sub) 18%, transparent);
+  background: color-mix(in srgb, var(--bg) 80%, var(--sub));
+  cursor: pointer; transition: all 0.12s; gap: 0.28rem; font-family: 'Sora', sans-serif;
 }
 .arena-diff-btn:hover:not(.arena-diff-btn--active) {
-  border-color: color-mix(in srgb, var(--color-editor-sub) 38%, transparent);
-  border-left-color: inherit;
-  background: color-mix(in srgb, var(--color-editor-sub) 7%, transparent);
+  border-color: color-mix(in srgb, var(--sub) 35%, transparent);
+  background: color-mix(in srgb, var(--bg) 95%, var(--sub));
 }
 .arena-diff-btn--active {
-  background: color-mix(in srgb, var(--color-editor-accent) 8%, transparent);
-  border-color: color-mix(in srgb, var(--color-editor-accent) 40%, transparent);
+  border-color: var(--accent); border-width: 2px;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
-/* Colored left border + dot per difficulty */
 .arena-diff-btn__dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--color-editor-sub);
-  opacity: 0.4;
-  transition: opacity 0.12s;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: color-mix(in srgb, var(--sub) 30%, transparent);
+  transition: background 0.12s;
 }
-.arena-diff-btn--active .arena-diff-btn__dot,
-.arena-diff-btn:hover .arena-diff-btn__dot { opacity: 1; }
-.arena-diff-btn--easy   .arena-diff-btn__dot { background: #4ade80; }
-.arena-diff-btn--medium .arena-diff-btn__dot { background: #facc15; }
-.arena-diff-btn--hard   .arena-diff-btn__dot { background: #f87171; }
-.arena-diff-btn--player_only .arena-diff-btn__dot { background: var(--color-editor-accent); }
-/* active left border color */
-.arena-diff-btn--active.arena-diff-btn--easy   { border-left-color: #4ade80; }
-.arena-diff-btn--active.arena-diff-btn--medium { border-left-color: #facc15; }
-.arena-diff-btn--active.arena-diff-btn--hard   { border-left-color: #f87171; }
-.arena-diff-btn--active.arena-diff-btn--player_only { border-left-color: var(--color-editor-accent); }
+.arena-diff-btn--easy        .arena-diff-btn__dot { background: #4ade80; }
+.arena-diff-btn--medium      .arena-diff-btn__dot { background: #facc15; }
+.arena-diff-btn--hard        .arena-diff-btn__dot { background: #f87171; }
+.arena-diff-btn--player_only .arena-diff-btn__dot { background: var(--accent); }
 .arena-diff-btn__label {
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: var(--color-editor-text);
-  line-height: 1;
+  font-size: 0.7rem; font-weight: 700; color: var(--text);
+  line-height: 1; font-family: 'Sora', sans-serif;
 }
-.arena-diff-btn--active .arena-diff-btn__label {
-  color: var(--color-editor-accent);
-}
+.arena-diff-btn--active .arena-diff-btn__label { color: var(--accent); }
 .arena-diff-btn__sub {
-  font-size: 0.56rem;
-  color: var(--color-editor-sub);
-  font-family: 'JetBrains Mono', monospace;
-  opacity: 0.7;
+  font-size: 0.56rem; color: var(--sub);
+  font-family: 'JetBrains Mono', monospace; font-weight: 500;
+}
+
+/* ── Create CTA button ── */
+.arena-create-btn {
+  width: 100%; display: flex; align-items: center; justify-content: center;
+  gap: 0.5rem; padding: 0.85rem 1rem; border-radius: 12px;
+  font-size: 0.82rem; font-weight: 700; font-family: 'Sora', sans-serif;
+  cursor: pointer; border: none;
+  background: var(--accent); color: var(--bg);
+  transition: all 0.15s; letter-spacing: 0.06em; text-transform: uppercase;
+  box-shadow: 0 2px 12px color-mix(in srgb, var(--accent) 28%, transparent);
+}
+.arena-create-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  box-shadow: 0 4px 18px color-mix(in srgb, var(--accent) 38%, transparent);
+  transform: translateY(-1px);
+}
+.arena-create-btn:active:not(:disabled) { transform: translateY(0); }
+.arena-create-btn:disabled { opacity: 0.35; cursor: not-allowed; box-shadow: none; }
+
+/* ── Open Rooms panel ── */
+.arena-rooms-panel {
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--sub) 16%, transparent);
+  padding: 1.4rem 1.2rem;
+  background: color-mix(in srgb, var(--bg) 97%, var(--sub));
+  display: flex; flex-direction: column; gap: 0.5rem;
+  min-height: 220px; max-height: 520px; overflow-y: auto;
+  box-shadow: 0 2px 12px color-mix(in srgb, var(--sub) 8%, transparent);
 }
 
 /* ── Difficulty Badges ── */
 .arena-diff-badge {
-  font-size: 0.62rem;
-  padding: 0.1rem 0.4rem;
-  border-radius: 4px;
-  font-weight: 700;
-  border: 1px solid color-mix(in srgb, var(--color-editor-sub) 20%, transparent);
-  color: var(--color-editor-sub);
-  background: color-mix(in srgb, var(--color-editor-sub) 7%, transparent);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  font-size: 0.6rem; padding: 0.1rem 0.4rem; border-radius: 4px;
+  font-weight: 700; font-family: 'Sora', sans-serif;
+  border: 1px solid color-mix(in srgb, var(--sub) 20%, transparent);
+  color: var(--sub);
+  background: color-mix(in srgb, var(--sub) 7%, transparent);
+  display: inline-flex; align-items: center;
+  text-transform: uppercase; letter-spacing: 0.05em;
 }
-.arena-diff-badge--easy        { color: #4ade80; border-color: color-mix(in srgb, #4ade80 30%, transparent); background: color-mix(in srgb, #4ade80 8%, transparent); }
-.arena-diff-badge--medium      { color: #facc15; border-color: color-mix(in srgb, #facc15 30%, transparent); background: color-mix(in srgb, #facc15 8%, transparent); }
-.arena-diff-badge--hard        { color: #f87171; border-color: color-mix(in srgb, #f87171 30%, transparent); background: color-mix(in srgb, #f87171 8%, transparent); }
-.arena-diff-badge--player_only { color: var(--color-editor-accent); border-color: color-mix(in srgb, var(--color-editor-accent) 30%, transparent); background: color-mix(in srgb, var(--color-editor-accent) 8%, transparent); }
-
-/* ── Create CTA button ── */
-.arena-create-btn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.72rem 1rem;
-  border-radius: 8px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  font-family: inherit;
-  cursor: pointer;
-  border: none;
-  background: var(--color-editor-accent);
-  color: var(--color-editor-bg);
-  transition: opacity 0.14s, transform 0.1s;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-.arena-create-btn:hover:not(:disabled) {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}
-.arena-create-btn:active:not(:disabled) {
-  transform: translateY(0);
-}
-.arena-create-btn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
+.arena-diff-badge--easy        { color: #4ade80; border-color: color-mix(in srgb, #4ade80 35%, transparent); background: color-mix(in srgb, #4ade80 10%, transparent); }
+.arena-diff-badge--medium      { color: #facc15; border-color: color-mix(in srgb, #facc15 35%, transparent); background: color-mix(in srgb, #facc15 10%, transparent); }
+.arena-diff-badge--hard        { color: #f87171; border-color: color-mix(in srgb, #f87171 35%, transparent); background: color-mix(in srgb, #f87171 10%, transparent); }
+.arena-diff-badge--player_only { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 30%, transparent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
 
 /* ── Tags ── */
 .arena-tag {
-  font-size: 0.58rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  padding: 0.1rem 0.35rem;
-  border-radius: 3px;
-  background: color-mix(in srgb, var(--color-editor-sub) 10%, transparent);
-  color: var(--color-editor-sub);
-  border: 1px solid color-mix(in srgb, var(--color-editor-sub) 20%, transparent);
+  font-size: 0.56rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.1em; padding: 0.1rem 0.35rem; border-radius: 4px;
+  background: color-mix(in srgb, var(--sub) 10%, transparent);
+  color: var(--sub);
+  border: 1px solid color-mix(in srgb, var(--sub) 20%, transparent);
+  font-family: 'Sora', sans-serif;
 }
 .arena-tag--you {
-  background: color-mix(in srgb, var(--color-editor-accent) 12%, transparent);
-  color: var(--color-editor-accent);
-  border-color: color-mix(in srgb, var(--color-editor-accent) 25%, transparent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 28%, transparent);
 }
 
 /* ── Empty state ── */
 .arena-empty-state {
-  text-align: center;
-  padding: 2rem 1rem;
-  border: 1px dashed color-mix(in srgb, var(--color-editor-sub) 18%, transparent);
-  border-radius: 10px;
-  color: var(--color-editor-sub);
-  font-size: 0.82rem;
-}
-
-/* ── Two-column home grid (kept) ── */
-.arena-home-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.25rem;
-  align-items: start;
-}
-@media (max-width: 640px) {
-  .arena-home-grid { grid-template-columns: 1fr; }
+  text-align: center; padding: 2.5rem 1rem;
+  color: var(--sub); font-size: 0.82rem; font-family: 'Sora', sans-serif;
 }
 
 /* ── Buttons ── */
 .arena-btn {
-  padding: 0.55rem 1.2rem;
-  border-radius: 7px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
-  border: 1.5px solid color-mix(in srgb, var(--color-editor-sub) 25%, transparent);
-  color: var(--color-editor-sub);
-  background: transparent;
-  transition: all 0.14s;
-  font-family: inherit;
-  letter-spacing: 0.02em;
+  padding: 0.5rem 1.1rem; border-radius: 8px; font-size: 0.78rem;
+  font-weight: 700; font-family: 'Sora', sans-serif; cursor: pointer;
+  border: 1.5px solid color-mix(in srgb, var(--sub) 25%, transparent);
+  color: var(--sub);
+  background: color-mix(in srgb, var(--bg) 80%, var(--sub));
+  transition: all 0.14s; letter-spacing: 0.02em;
 }
 .arena-btn:hover:not(:disabled) {
-  color: var(--color-editor-text);
-  border-color: color-mix(in srgb, var(--color-editor-sub) 55%, transparent);
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--sub) 45%, transparent);
+  background: color-mix(in srgb, var(--bg) 95%, var(--sub));
 }
-.arena-btn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
+.arena-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 .arena-btn--primary {
-  background: var(--color-editor-accent);
-  border-color: var(--color-editor-accent);
-  color: var(--color-editor-bg);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  background: var(--accent); border-color: var(--accent);
+  color: var(--bg); letter-spacing: 0.05em; text-transform: uppercase;
 }
-.arena-btn--primary:hover:not(:disabled) {
-  opacity: 0.88;
-  color: var(--color-editor-bg);
-}
-.arena-btn--sm {
-  padding: 0.3rem 0.8rem;
-  font-size: 0.76rem;
-}
+.arena-btn--primary:hover:not(:disabled) { opacity: 0.88; color: var(--bg); }
+.arena-btn--sm { padding: 0.3rem 0.75rem; font-size: 0.72rem; }
 .arena-btn--leave {
-  border-color: color-mix(in srgb, #ef4444 30%, transparent);
-  color: color-mix(in srgb, #ef4444 70%, var(--color-editor-sub));
-  background: color-mix(in srgb, #ef4444 5%, transparent);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  border-color: color-mix(in srgb, #f87171 30%, transparent);
+  color: #f87171;
+  background: color-mix(in srgb, #f87171 6%, transparent);
 }
 .arena-btn--leave:hover:not(:disabled) {
-  background: color-mix(in srgb, #ef4444 12%, transparent);
-  border-color: color-mix(in srgb, #ef4444 55%, transparent);
-  color: #ef4444;
+  background: color-mix(in srgb, #f87171 14%, transparent);
+  border-color: color-mix(in srgb, #f87171 55%, transparent);
 }
 
 /* ── Public Rooms ── */
 .arena-room-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.8rem 1rem;
-  border-radius: 9px;
-  border: 1px solid color-mix(in srgb, var(--color-editor-sub) 14%, transparent);
-  background: color-mix(in srgb, var(--color-editor-bg) 75%, transparent);
-  transition: border-color 0.14s, background 0.14s;
-  cursor: default;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.75rem; padding: 0.75rem 0.85rem; border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--sub) 16%, transparent);
+  background: color-mix(in srgb, var(--bg) 80%, var(--sub));
+  transition: all 0.14s;
 }
 .arena-room-row:hover {
-  border-color: color-mix(in srgb, var(--color-editor-accent) 35%, transparent);
-  background: color-mix(in srgb, var(--color-editor-accent) 3%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
 }
 .arena-room-badge {
-  background: color-mix(in srgb, var(--color-editor-accent) 10%, transparent);
-  color: var(--color-editor-accent);
-  border: 1px solid color-mix(in srgb, var(--color-editor-accent) 25%, transparent);
-  border-radius: 5px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.7rem;
-  font-weight: 800;
-  padding: 0.2rem 0.5rem;
-  letter-spacing: 0.14em;
-  flex-shrink: 0;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+  border-radius: 6px; font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem; font-weight: 800; padding: 0.2rem 0.45rem;
+  letter-spacing: 0.14em; flex-shrink: 0;
+}
+
+/* ── Hero badge ── */
+.arena-hero-badge {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.3rem 0.85rem; border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent); font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase; font-family: 'Sora', sans-serif;
 }
 
 /* ── Lobby player slots ── */
 .arena-player-slot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.8rem 1rem;
-  border-radius: 9px;
-  border: 1px solid color-mix(in srgb, var(--color-editor-sub) 14%, transparent);
-  background: color-mix(in srgb, var(--color-editor-bg) 75%, transparent);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.8rem 1rem; border-radius: 10px;
+  border: 1.5px solid color-mix(in srgb, var(--sub) 16%, transparent);
+  background: color-mix(in srgb, var(--bg) 80%, var(--sub));
   transition: all 0.14s;
 }
 .arena-player-slot--me {
-  border-color: color-mix(in srgb, var(--color-editor-accent) 45%, transparent);
-  background: color-mix(in srgb, var(--color-editor-accent) 5%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
 }
 .arena-player-avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  border: 2px solid var(--lane-color, var(--color-editor-sub));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  font-family: 'JetBrains Mono', monospace;
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 2px solid var(--lane-color, color-mix(in srgb, var(--sub) 35%, transparent));
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-family: 'Sora', sans-serif; font-size: 0.65rem; font-weight: 700;
 }
-.arena-player-avatar--me    { border-color: var(--color-editor-accent); background: color-mix(in srgb, var(--color-editor-accent) 10%, transparent); color: var(--color-editor-accent); }
-.arena-player-avatar--other { border-color: color-mix(in srgb, var(--color-editor-sub) 35%, transparent); color: var(--color-editor-sub); }
-.arena-player-avatar--bot   { border-color: color-mix(in srgb, var(--color-editor-sub) 22%, transparent); color: color-mix(in srgb, var(--color-editor-sub) 60%, transparent); border-style: dashed; }
-.arena-player-avatar--empty { border-color: color-mix(in srgb, var(--color-editor-sub) 18%, transparent); color: color-mix(in srgb, var(--color-editor-sub) 40%, transparent); border-style: dashed; }
-.arena-player-status {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
+.arena-player-avatar--me    { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--accent); }
+.arena-player-avatar--other { border-color: color-mix(in srgb, var(--sub) 35%, transparent); color: var(--sub); }
+.arena-player-avatar--bot   { border-color: color-mix(in srgb, var(--sub) 22%, transparent); color: color-mix(in srgb, var(--sub) 50%, transparent); border-style: dashed; }
+.arena-player-avatar--empty { border-color: color-mix(in srgb, var(--sub) 18%, transparent); color: color-mix(in srgb, var(--sub) 35%, transparent); border-style: dashed; }
+.arena-player-status { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 .arena-player-status--online { background: #4ade80; box-shadow: 0 0 5px #4ade8060; }
-.arena-player-status--bot    { background: color-mix(in srgb, var(--color-editor-sub) 35%, transparent); }
+.arena-player-status--bot    { background: color-mix(in srgb, var(--sub) 30%, transparent); }
 
-/* ── Racer initials bubble (race track + podium) ── */
+/* ── Racer bubbles ── */
 .arena-racer-init {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  font-size: 0.6rem;
-  font-weight: 800;
-  font-family: 'JetBrains Mono', monospace;
-  flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 50%; font-size: 0.6rem;
+  font-weight: 800; font-family: 'Sora', sans-serif; flex-shrink: 0;
 }
-.arena-racer-init--me    { background: color-mix(in srgb, var(--color-editor-accent) 15%, transparent); color: var(--color-editor-accent); border: 1.5px solid color-mix(in srgb, var(--color-editor-accent) 40%, transparent); }
-.arena-racer-init--other { background: color-mix(in srgb, var(--color-editor-sub) 10%, transparent); color: var(--color-editor-text); border: 1.5px solid color-mix(in srgb, var(--color-editor-sub) 25%, transparent); }
-.arena-racer-init--bot   { background: color-mix(in srgb, var(--color-editor-sub) 7%, transparent); color: color-mix(in srgb, var(--color-editor-sub) 60%, transparent); border: 1.5px dashed color-mix(in srgb, var(--color-editor-sub) 20%, transparent); }
+.arena-racer-init--me    { background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent); border: 1.5px solid color-mix(in srgb, var(--accent) 35%, transparent); }
+.arena-racer-init--other { background: color-mix(in srgb, var(--sub) 8%, transparent); color: var(--text); border: 1.5px solid color-mix(in srgb, var(--sub) 22%, transparent); }
+.arena-racer-init--bot   { background: color-mix(in srgb, var(--sub) 5%, transparent); color: color-mix(in srgb, var(--sub) 50%, transparent); border: 1.5px dashed color-mix(in srgb, var(--sub) 18%, transparent); }
 
 /* ── Race Track ── */
-.arena-track-lane {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-.arena-track-bg {
-  position: absolute;
-  inset: 0;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--color-editor-sub) 10%, transparent);
-}
-.arena-track-fill {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  border-radius: 999px;
-  transition: width 0.1s ease-out;
-  opacity: 0.9;
-}
-.arena-track-lane > .flex-1 {
-  position: relative;
-  height: 8px;
-  border-radius: 999px;
-}
-.arena-car {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 0.95rem;
-  line-height: 1;
-  transition: left 0.1s ease-out;
-  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.25));
-}
+.arena-track-lane { display: flex; align-items: center; gap: 0.75rem; }
+.arena-track-bg { position: absolute; inset: 0; border-radius: 999px; background: color-mix(in srgb, var(--sub) 12%, transparent); }
+.arena-track-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 999px; transition: width 0.1s ease-out; opacity: 0.9; }
+.arena-track-lane > .flex-1 { position: relative; height: 8px; border-radius: 999px; }
+.arena-car { position: absolute; top: 50%; transform: translateY(-50%); font-size: 0.95rem; line-height: 1; transition: left 0.1s ease-out; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.2)); }
 
-/* ── Result rows (podium) ── */
+/* ── Podium / Result rows ── */
 .arena-result-row {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.9rem 1rem;
-  border-radius: 9px;
-  border: 1px solid color-mix(in srgb, var(--color-editor-sub) 14%, transparent);
+  display: flex; align-items: center; gap: 0.75rem; padding: 0.9rem 1rem;
+  border-radius: 10px;
+  border: 1.5px solid color-mix(in srgb, var(--sub) 16%, transparent);
   border-left-width: 3px;
-  background: color-mix(in srgb, var(--color-editor-bg) 75%, transparent);
+  background: color-mix(in srgb, var(--bg) 80%, var(--sub));
   transition: all 0.14s;
 }
-.arena-result-row--winner {
-  border-color: color-mix(in srgb, #dfb15b 40%, transparent);
-  border-left-color: #dfb15b;
-  background: color-mix(in srgb, #dfb15b 6%, transparent);
-}
-.arena-result-row--me {
-  border-left-color: var(--color-editor-accent);
-}
+.arena-result-row--winner { border-color: color-mix(in srgb, #dfb15b 40%, transparent); border-left-color: #dfb15b; background: color-mix(in srgb, #dfb15b 6%, transparent); }
+.arena-result-row--me     { border-left-color: var(--accent); }
 
-/* ── Legacy / misc (kept) ── */
+/* ── Legacy misc ── */
 .arena-card {
-  background: color-mix(in srgb, var(--color-editor-bg) 85%, var(--color-editor-sub));
-  border: 1px solid color-mix(in srgb, var(--color-editor-sub) 18%, transparent);
-  border-radius: 12px;
-  padding: 1.4rem;
+  background: color-mix(in srgb, var(--bg) 92%, var(--sub));
+  border: 1px solid color-mix(in srgb, var(--sub) 16%, transparent);
+  border-radius: 14px; padding: 1.4rem;
+  box-shadow: 0 1px 6px color-mix(in srgb, var(--sub) 8%, transparent);
 }
-.arena-card-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1.25rem;
-  font-size: 0.9rem;
-}
+.arena-card-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.25rem; font-size: 0.9rem; }
 .arena-pill {
-  padding: 0.25rem 0.85rem;
-  border-radius: 999px;
-  border: 1.5px solid color-mix(in srgb, var(--color-editor-sub) 28%, transparent);
-  color: var(--color-editor-sub);
-  font-size: 0.76rem;
-  cursor: pointer;
-  transition: all 0.14s;
-  background: transparent;
+  padding: 0.25rem 0.85rem; border-radius: 999px;
+  border: 1.5px solid color-mix(in srgb, var(--sub) 25%, transparent);
+  color: var(--sub); font-size: 0.76rem; cursor: pointer;
+  transition: all 0.14s; background: transparent; font-family: 'Sora', sans-serif;
 }
-.arena-pill:hover {
-  color: var(--color-editor-text);
-  border-color: color-mix(in srgb, var(--color-editor-sub) 48%, transparent);
-}
-.arena-pill--active {
-  border-color: var(--color-editor-accent);
-  color: var(--color-editor-accent);
-  background: color-mix(in srgb, var(--color-editor-accent) 10%, transparent);
-}
+.arena-pill:hover { color: var(--text); border-color: color-mix(in srgb, var(--sub) 45%, transparent); }
+.arena-pill--active { border-color: var(--accent); color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
 .arena-info-pill {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.5rem 0.85rem;
-  border-radius: 7px;
-  background: color-mix(in srgb, var(--color-editor-sub) 6%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-editor-sub) 12%, transparent);
-  font-size: 0.74rem;
-  color: var(--color-editor-sub);
-  line-height: 1.3;
+  display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 0.85rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--sub) 7%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sub) 14%, transparent);
+  font-size: 0.74rem; color: var(--sub); line-height: 1.3;
+  font-family: 'Sora', sans-serif;
 }
 </style>
