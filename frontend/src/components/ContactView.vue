@@ -252,9 +252,9 @@ async function handleSubmit() {
             </div>
 
             <!-- Email -->
-            <a 
-              href="mailto:keefastudys@gmail.com" 
-              class="social-card group"
+            <div 
+              @click="copyToClipboard('keefastudys@gmail.com', 'email')"
+              class="social-card cursor-pointer group"
             >
               <div class="social-icon bg-rose-600 text-white">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -265,10 +265,20 @@ async function handleSubmit() {
                 <div class="text-xs font-semibold text-editor-text group-hover:text-editor-accent transition-colors">Email</div>
                 <div class="text-[11px] text-editor-sub truncate">keefastudys@gmail.com</div>
               </div>
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-editor-sub group-hover:text-editor-accent transition-colors">
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/>
-              </svg>
-            </a>
+              <a 
+                href="mailto:keefastudys@gmail.com" 
+                @click.stop 
+                class="text-editor-sub hover:text-editor-accent p-1"
+                title="Send email directly"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/>
+                </svg>
+              </a>
+              <span class="text-[10px] font-semibold text-editor-accent bg-editor-accent/10 px-2 py-0.5 rounded transition-all">
+                {{ copiedItem === 'email' ? 'Copied!' : 'Copy' }}
+              </span>
+            </div>
 
           </div>
         </div>
