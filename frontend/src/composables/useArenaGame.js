@@ -87,10 +87,11 @@ export function useArenaGame() {
   )
 
   // ── Polling & Bot simulation ──
-  let pollInterval    = null
-  let botInterval     = null
-  let countdownTimer  = null
-  let progressSyncTimer = null
+  let pollInterval        = null
+  let botInterval         = null
+  let countdownTimer      = null
+  let progressSyncTimer   = null
+  let finishFallbackTimer = null
 
   function stopAll() {
     clearInterval(pollInterval)
@@ -98,7 +99,8 @@ export function useArenaGame() {
     clearInterval(countdownTimer)
     clearInterval(progressSyncTimer)
     clearInterval(raceTimer)
-    pollInterval = botInterval = countdownTimer = progressSyncTimer = raceTimer = null
+    clearTimeout(finishFallbackTimer)
+    pollInterval = botInterval = countdownTimer = progressSyncTimer = raceTimer = finishFallbackTimer = null
   }
 
   // ── API helpers ──
@@ -152,11 +154,12 @@ export function useArenaGame() {
     // If server says finished → move to podium (keep polling alive for rematch!)
     if (newRoom.status === 'finished' && screen.value !== 'finished') {
       screen.value = 'finished'
+      clearTimeout(finishFallbackTimer)
       clearInterval(botInterval)
       clearInterval(countdownTimer)
       clearInterval(progressSyncTimer)
       clearInterval(raceTimer)
-      botInterval = countdownTimer = progressSyncTimer = raceTimer = null
+      finishFallbackTimer = botInterval = countdownTimer = progressSyncTimer = raceTimer = null
     }
   }
 
@@ -164,8 +167,14 @@ export function useArenaGame() {
   function startCountdown(raceStartsAtISO, roomData) {
     screen.value = 'countdown'
     raceStartedAt.value = new Date(raceStartsAtISO)
+    localFinished.value = false
+    isTypingActive.value = false
 
-    clearInterval(countdownTimer) // Ensure no duplicate timers
+    // Clear any leftover fallback or countdown timers from previous race
+    clearTimeout(finishFallbackTimer)
+    clearInterval(countdownTimer)
+    finishFallbackTimer = null
+
     countdownTimer = setInterval(() => {
       const diff = Math.ceil((raceStartedAt.value - Date.now()) / 1000)
       countdownSeconds.value = Math.max(0, diff)
@@ -182,6 +191,9 @@ export function useArenaGame() {
 
   // ── Enter racing screen ──
   function enterRacing(roomData) {
+    clearTimeout(finishFallbackTimer)
+    finishFallbackTimer = null
+
     screen.value       = 'racing'
     words.value        = roomData.words || []
     typedChars.value   = words.value.map(() => [])
@@ -192,6 +204,10 @@ export function useArenaGame() {
     raceStartedAt.value    = new Date(roomData.race_starts_at)
     raceMode.value         = roomData.race_mode || 'words'
     timeLimit.value        = roomData.time_limit || 60
+
+    clearInterval(botInterval)
+    clearInterval(progressSyncTimer)
+    clearInterval(raceTimer)
 
     // Simulate bots locally (smooth animation)
     startBotSimulation(roomData)
@@ -343,15 +359,18 @@ export function useArenaGame() {
     localFinished.value = true
     // Final sync to backend
     syncProgress(true)
-    // NOTE: Do NOT stopAll() here — keep polling so we see other players finish live
-    // The finished screen transition is handled by applyRoomState when server says 'finished'
-    // Fallback: show finished screen after 8s if server never says finished (e.g. others AFK)
-    setTimeout(() => {
-      if (screen.value !== 'finished') {
+
+    // Fallback: show finished screen after 20s ONLY if room status never changes on server and still in racing
+    clearTimeout(finishFallbackTimer)
+    finishFallbackTimer = setTimeout(() => {
+      if (screen.value === 'racing') {
         screen.value = 'finished'
-        stopAll()
+        clearInterval(botInterval)
+        clearInterval(progressSyncTimer)
+        clearInterval(raceTimer)
+        botInterval = progressSyncTimer = raceTimer = null
       }
-    }, 8000)
+    }, 20000)
   }
 
   // ── Calculate local stats ──
