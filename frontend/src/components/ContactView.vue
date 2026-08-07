@@ -15,12 +15,10 @@ const copiedItem = ref('')
 function handleFileSelect(event) {
   const file = event.target.files[0]
   if (!file) return
-
   if (file.size > 5 * 1024 * 1024) {
-    submitError.value = 'Image size must be less than 5MB.'
+    submitError.value = 'Image too large — keep it under 5MB please.'
     return
   }
-
   selectedFile.value = file
   submitError.value = ''
   previewUrl.value = URL.createObjectURL(file)
@@ -35,14 +33,12 @@ function removeFile() {
 function copyToClipboard(text, label) {
   navigator.clipboard.writeText(text)
   copiedItem.value = label
-  setTimeout(() => {
-    copiedItem.value = ''
-  }, 2000)
+  setTimeout(() => { copiedItem.value = '' }, 2000)
 }
 
 async function handleSubmit() {
-  if (!name.value || !message.value) {
-    submitError.value = 'Please enter your name and message.'
+  if (!name.value.trim() || !message.value.trim()) {
+    submitError.value = 'Name and message are both required.'
     return
   }
 
@@ -59,9 +55,7 @@ async function handleSubmit() {
 
     const res = await fetch('/api/contact', {
       method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-      },
+      headers: { 'Accept': 'application/json' },
       body: formData,
     })
 
@@ -73,9 +67,9 @@ async function handleSubmit() {
       removeFile()
     } else {
       const data = await res.json()
-      submitError.value = data.message || 'Failed to send message.'
+      submitError.value = data.message || 'Something went wrong. Try again.'
     }
-  } catch (err) {
+  } catch {
     submitSuccess.value = true
     name.value = ''
     email.value = ''
@@ -88,288 +82,522 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <div class="w-full max-w-2xl py-4 animate-slide-up mx-auto">
-    
-    <!-- Title Header -->
-    <div class="flex items-center gap-4 mb-8">
-      <div class="h-px bg-editor-sub/20 flex-1"></div>
-      <h2 class="text-[10px] uppercase tracking-[0.3em] text-editor-sub font-semibold">Get In Touch</h2>
-      <div class="h-px bg-editor-sub/20 flex-1"></div>
+  <div class="contact-root animate-slide-up">
+
+    <!-- Hero section -->
+    <div class="contact-hero">
+      <p class="contact-hero__label">say hello</p>
+      <h1 class="contact-hero__title">Get in touch.</h1>
+      <p class="contact-hero__desc">
+        Found a bug? Got a feature idea? Or just wanna say hi — drop me a message below.
+        I read everything, even if I'm slow to reply.
+      </p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+    <!-- Main grid -->
+    <div class="contact-grid">
 
-      <!-- Column 1: Send Message Form -->
-      <div class="setting-card">
-        <div class="setting-header">
-          <span class="setting-icon">✉️</span>
-          <span>Send Feedback / Message</span>
+      <!-- Left: Form -->
+      <div class="contact-form-wrap">
+
+        <!-- Hints -->
+        <div class="contact-hints">
+          <div class="hint-chip">
+            <span class="hint-dot hint-dot--bug"></span>
+            found a bug?
+          </div>
+          <div class="hint-chip">
+            <span class="hint-dot hint-dot--idea"></span>
+            have a suggestion?
+          </div>
+          <div class="hint-chip">
+            <span class="hint-dot hint-dot--hi"></span>
+            just saying hi?
+          </div>
         </div>
 
-        <form @submit.prevent="handleSubmit" class="flex flex-col gap-3 mt-2">
-          <div>
-            <label class="block text-[11px] font-semibold text-editor-sub uppercase tracking-wider mb-1">Name</label>
-            <input 
-              v-model="name"
-              type="text" 
-              placeholder="Your name"
-              required
-              class="contact-input"
-            />
+        <form @submit.prevent="handleSubmit" class="contact-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Name</label>
+              <input
+                v-model="name"
+                type="text"
+                placeholder="what should i call you"
+                required
+                class="form-input"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email <span class="form-label--optional">optional</span></label>
+              <input
+                v-model="email"
+                type="email"
+                placeholder="if you want a reply"
+                class="form-input"
+              />
+            </div>
           </div>
 
-          <div>
-            <label class="block text-[11px] font-semibold text-editor-sub uppercase tracking-wider mb-1">Email <span class="text-editor-sub/50 font-normal">(Optional)</span></label>
-            <input 
-              v-model="email"
-              type="email" 
-              placeholder="your.email@example.com"
-              class="contact-input"
-            />
-          </div>
-
-          <div>
-            <label class="block text-[11px] font-semibold text-editor-sub uppercase tracking-wider mb-1">Message</label>
-            <textarea 
+          <div class="form-group">
+            <label class="form-label">Message</label>
+            <textarea
               v-model="message"
-              rows="4" 
-              placeholder="Suggest a feature, report a bug, or just say hi..."
+              rows="5"
+              placeholder="type anything — bug reports, feature requests, random thoughts. it all counts."
               required
-              class="contact-input resize-none"
+              class="form-input form-textarea"
             ></textarea>
           </div>
 
-          <!-- Image Attachment Input -->
-          <div>
-            <label class="block text-[11px] font-semibold text-editor-sub uppercase tracking-wider mb-1">
-              Attachment Image <span class="text-editor-sub/50 font-normal">(Optional, Max 5MB)</span>
-            </label>
-            
-            <div v-if="!previewUrl" class="relative">
-              <input 
+          <!-- Attachment -->
+          <div class="form-group">
+            <label class="form-label">Screenshot <span class="form-label--optional">optional · max 5mb</span></label>
+            <div v-if="!previewUrl">
+              <input
                 ref="fileInputRef"
-                type="file" 
+                type="file"
                 accept="image/*"
                 @change="handleFileSelect"
                 class="hidden"
-                id="contact-image-input"
+                id="contact-img"
               />
-              <label 
-                for="contact-image-input"
-                class="flex items-center justify-center gap-2 p-3 border border-dashed border-editor-sub/30 hover:border-editor-accent/50 rounded-lg bg-editor-sub/5 hover:bg-editor-sub/10 cursor-pointer text-xs text-editor-sub hover:text-editor-text transition-all"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+              <label for="contact-img" class="attach-zone">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
                 </svg>
-                <span>Attach Screenshot / Image</span>
+                <span>attach a file</span>
               </label>
             </div>
-
-            <!-- Image Preview Thumbnail -->
-            <div v-else class="relative inline-block mt-1">
-              <img :src="previewUrl" class="h-20 w-auto max-w-full object-cover rounded-lg border border-editor-accent/40 shadow-sm" />
-              <button 
-                type="button" 
-                @click="removeFile"
-                class="absolute -top-2 -right-2 bg-editor-error text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-md hover:scale-110 transition-transform"
-                title="Remove image"
-              >
-                ✕
-              </button>
+            <div v-else class="attach-preview">
+              <img :src="previewUrl" class="attach-preview__img" />
+              <div class="attach-preview__info">
+                <span class="text-[11px] text-editor-text font-medium">{{ selectedFile?.name }}</span>
+                <button type="button" @click="removeFile" class="attach-preview__remove">remove</button>
+              </div>
             </div>
           </div>
 
-          <!-- Error Alert -->
-          <div v-if="submitError" class="text-xs text-editor-error bg-editor-error/10 border border-editor-error/30 rounded-lg p-2.5">
-            {{ submitError }}
+          <!-- Alerts -->
+          <div v-if="submitError" class="form-alert form-alert--error">{{ submitError }}</div>
+          <div v-if="submitSuccess" class="form-alert form-alert--success">
+            sent — thanks for reaching out. i'll get back to you if you left an email.
           </div>
 
-          <!-- Success Alert -->
-          <div v-if="submitSuccess" class="text-xs text-editor-accent bg-editor-accent/10 border border-editor-accent/30 rounded-lg p-2.5 flex items-center gap-2">
-            <span>✓</span> Message sent successfully! Thank you for your feedback.
-          </div>
-
-          <button 
-            type="submit" 
-            :disabled="isSubmitting"
-            class="contact-btn flex items-center justify-center gap-2 mt-1"
-          >
-            <span v-if="isSubmitting" class="animate-spin text-sm">⏳</span>
-            <span>{{ isSubmitting ? 'Sending...' : 'Send Message' }}</span>
+          <button type="submit" :disabled="isSubmitting" class="form-submit">
+            <svg v-if="!isSubmitting" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>
+            </svg>
+            <span class="submit-spinner" v-else></span>
+            {{ isSubmitting ? 'sending...' : 'send message' }}
           </button>
         </form>
       </div>
 
-      <!-- Column 2: Social Media & Contacts -->
-      <div class="flex flex-col gap-4">
-        
-        <div class="setting-card">
-          <div class="setting-header">
-            <span class="setting-icon">🌐</span>
-            <span>Social & Links</span>
-          </div>
+      <!-- Right: Social links -->
+      <div class="contact-social-wrap">
+        <p class="social-heading">or find me here</p>
 
-          <div class="flex flex-col gap-3 mt-1">
+        <div class="social-list">
 
-            <!-- Instagram -->
-            <a 
-              href="https://www.instagram.com/keef4_y" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              class="social-card group"
-            >
-              <div class="social-icon bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
-                </svg>
-              </div>
-              <div class="flex-1">
-                <div class="text-xs font-semibold text-editor-text group-hover:text-editor-accent transition-colors">Instagram</div>
-                <div class="text-[11px] text-editor-sub">@keef4_y</div>
-              </div>
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-editor-sub group-hover:text-editor-accent transition-colors">
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/>
+          <!-- Instagram -->
+          <a href="https://www.instagram.com/keef4_y" target="_blank" rel="noopener noreferrer" class="social-row group">
+            <div class="social-row__icon" style="background: linear-gradient(135deg, #f59e0b, #ef4444, #a855f7);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
               </svg>
-            </a>
-
-            <!-- Discord -->
-            <div 
-              @click="copyToClipboard('_keefa', 'discord')"
-              class="social-card cursor-pointer group"
-            >
-              <div class="social-icon bg-[#5865F2] text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.093.252-.19.372-.287a.075.075 0 0 1 .078-.01c3.927 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .079.009c.12.098.245.195.372.288a.077.077 0 0 1-.006.127c-.598.349-1.22.647-1.873.894a.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
-                </svg>
-              </div>
-              <div class="flex-1">
-                <div class="text-xs font-semibold text-editor-text group-hover:text-editor-accent transition-colors">Discord</div>
-                <div class="text-[11px] text-editor-sub">_keefa</div>
-              </div>
-              <span class="text-[10px] font-semibold text-editor-accent bg-editor-accent/10 px-2 py-0.5 rounded transition-all">
-                {{ copiedItem === 'discord' ? 'Copied!' : 'Copy' }}
-              </span>
             </div>
+            <div class="social-row__text">
+              <span class="social-row__name">instagram</span>
+              <span class="social-row__handle">@keef4_y</span>
+            </div>
+            <svg class="social-row__arrow" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 7h10v10"/><path d="M7 17 17 7"/>
+            </svg>
+          </a>
 
-            <!-- Email -->
-            <a 
-              href="https://mail.google.com/mail/?view=cm&fs=1&to=keefastudys@gmail.com" 
-              target="_blank"
-              rel="noopener noreferrer"
-              class="social-card group"
-            >
-              <div class="social-icon bg-rose-600 text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-                </svg>
-              </div>
-              <div class="flex-1 overflow-hidden">
-                <div class="text-xs font-semibold text-editor-text group-hover:text-editor-accent transition-colors">Email</div>
-                <div class="text-[11px] text-editor-sub truncate">keefastudys@gmail.com</div>
-              </div>
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-editor-sub group-hover:text-editor-accent transition-colors">
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/>
+          <!-- Discord -->
+          <div @click="copyToClipboard('_keefa', 'discord')" class="social-row group cursor-pointer">
+            <div class="social-row__icon" style="background: #5865F2;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.093.252-.19.372-.287a.075.075 0 0 1 .078-.01c3.927 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .079.009c.12.098.245.195.372.288a.077.077 0 0 1-.006.127c-.598.349-1.22.647-1.873.894a.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
               </svg>
-            </a>
-
-            <!-- GitHub -->
-            <a 
-              href="https://github.com/keefalegends" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              class="social-card group"
-            >
-              <div class="social-icon bg-[#24292e] text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
-                </svg>
-              </div>
-              <div class="flex-1">
-                <div class="text-xs font-semibold text-editor-text group-hover:text-editor-accent transition-colors">GitHub</div>
-                <div class="text-[11px] text-editor-sub">@keefalegends</div>
-              </div>
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-editor-sub group-hover:text-editor-accent transition-colors">
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/>
-              </svg>
-            </a>
-
+            </div>
+            <div class="social-row__text">
+              <span class="social-row__name">discord</span>
+              <span class="social-row__handle">_keefa</span>
+            </div>
+            <span class="social-copy-badge">{{ copiedItem === 'discord' ? 'copied!' : 'copy' }}</span>
           </div>
+
+          <!-- Email -->
+          <a href="https://mail.google.com/mail/?view=cm&fs=1&to=keefastudys@gmail.com" target="_blank" rel="noopener noreferrer" class="social-row group">
+            <div class="social-row__icon" style="background: #dc2626;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+              </svg>
+            </div>
+            <div class="social-row__text">
+              <span class="social-row__name">email</span>
+              <span class="social-row__handle">keefastudys@gmail.com</span>
+            </div>
+            <svg class="social-row__arrow" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 7h10v10"/><path d="M7 17 17 7"/>
+            </svg>
+          </a>
+
+          <!-- GitHub -->
+          <a href="https://github.com/keefalegends" target="_blank" rel="noopener noreferrer" class="social-row group">
+            <div class="social-row__icon" style="background: #1a1a2e;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+              </svg>
+            </div>
+            <div class="social-row__text">
+              <span class="social-row__name">github</span>
+              <span class="social-row__handle">@keefalegends</span>
+            </div>
+            <svg class="social-row__arrow" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 7h10v10"/><path d="M7 17 17 7"/>
+            </svg>
+          </a>
+
         </div>
 
-      </div>
+        <!-- Footnote -->
+        <p class="contact-footnote">
+          response time varies, but your message always lands.
+        </p>
 
+      </div>
     </div>
 
   </div>
 </template>
 
 <style scoped>
-.contact-input {
+.contact-root {
   width: 100%;
-  padding: 0.5rem 0.75rem;
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--sub) 5%, transparent);
-  border: 1px solid color-mix(in srgb, var(--sub) 15%, transparent);
-  color: var(--text);
-  font-family: inherit;
-  font-size: 0.8rem;
-  transition: all 0.2s ease;
-  outline: none;
-}
-.contact-input:focus {
-  border-color: var(--accent);
-  background: color-mix(in srgb, var(--sub) 8%, transparent);
-}
-.contact-input::placeholder {
-  color: color-mix(in srgb, var(--sub) 40%, transparent);
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 1.5rem 0 3rem;
 }
 
-.contact-btn {
+/* ── Hero ── */
+.contact-hero {
+  margin-bottom: 2.5rem;
+}
+.contact-hero__label {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+.contact-hero__title {
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.03em;
+  margin-bottom: 0.6rem;
+  line-height: 1.1;
+}
+.contact-hero__desc {
+  font-size: 0.82rem;
+  color: var(--sub);
+  line-height: 1.65;
+  max-width: 460px;
+}
+
+/* ── Grid ── */
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+@media (max-width: 600px) {
+  .contact-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Hints ── */
+.contact-hints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1.1rem;
+}
+.hint-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.68rem;
+  color: var(--sub);
+  background: color-mix(in srgb, var(--sub) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sub) 12%, transparent);
+  padding: 0.25rem 0.65rem;
+  border-radius: 99px;
+  font-weight: 500;
+}
+.hint-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.hint-dot--bug   { background: #f87171; }
+.hint-dot--idea  { background: #fbbf24; }
+.hint-dot--hi    { background: #34d399; }
+
+/* ── Form ── */
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.form-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--sub);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.form-label--optional {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.65rem;
+  opacity: 0.6;
+}
+.form-input {
   width: 100%;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--sub) 5%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sub) 13%, transparent);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.78rem;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  outline: none;
+}
+.form-input:focus {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 4%, transparent);
+}
+.form-input::placeholder {
+  color: color-mix(in srgb, var(--sub) 35%, transparent);
+  font-style: italic;
+}
+.form-textarea { resize: none; }
+
+/* ── Attach zone ── */
+.attach-zone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   padding: 0.6rem;
+  border: 1.5px dashed color-mix(in srgb, var(--sub) 20%, transparent);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.72rem;
+  color: var(--sub);
+  transition: all 0.15s ease;
+}
+.attach-zone:hover {
+  border-color: var(--accent);
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent) 4%, transparent);
+}
+.attach-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+}
+.attach-preview__img {
+  height: 44px;
+  width: 44px;
+  object-fit: cover;
+  border-radius: 5px;
+  flex-shrink: 0;
+}
+.attach-preview__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  overflow: hidden;
+}
+.attach-preview__remove {
+  font-size: 0.65rem;
+  color: var(--error, #f87171);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+  font-family: inherit;
+}
+.attach-preview__remove:hover { text-decoration: underline; }
+
+/* ── Alerts ── */
+.form-alert {
+  font-size: 0.75rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 7px;
+  line-height: 1.5;
+}
+.form-alert--error {
+  color: var(--error, #f87171);
+  background: color-mix(in srgb, var(--error, #f87171) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--error, #f87171) 20%, transparent);
+}
+.form-alert--success {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+/* ── Submit ── */
+.form-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.65rem;
   border-radius: 8px;
   background: var(--accent);
   color: var(--bg);
   font-weight: 700;
-  font-size: 0.8rem;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
   border: none;
   cursor: pointer;
-  transition: opacity 0.2s ease, transform 0.1s ease;
+  transition: opacity 0.15s ease, transform 0.1s ease;
 }
-.contact-btn:hover:not(:disabled) {
-  opacity: 0.9;
+.form-submit:hover:not(:disabled) {
+  opacity: 0.88;
   transform: translateY(-1px);
 }
-.contact-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+.form-submit:disabled { opacity: 0.45; cursor: not-allowed; }
 
-.social-card {
+.submit-spinner {
+  width: 13px;
+  height: 13px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Social column ── */
+.contact-social-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.social-heading {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--sub);
+  margin-bottom: 0.85rem;
+}
+.social-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid color-mix(in srgb, var(--sub) 10%, transparent);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.social-row {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.65rem 0.85rem;
-  border-radius: 9px;
-  background: color-mix(in srgb, var(--sub) 4%, transparent);
-  border: 1px solid color-mix(in srgb, var(--sub) 10%, transparent);
+  gap: 0.8rem;
+  padding: 0.75rem 1rem;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: background 0.15s ease;
+  border-bottom: 1px solid color-mix(in srgb, var(--sub) 8%, transparent);
+  background: transparent;
 }
-.social-card:hover {
-  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
-  background: color-mix(in srgb, var(--accent) 6%, transparent);
+.social-row:last-child { border-bottom: none; }
+.social-row:hover {
+  background: color-mix(in srgb, var(--sub) 5%, transparent);
 }
-
-.social-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+.social-row__icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  color: #fff;
+}
+.social-row__text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+}
+.social-row__name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.social-row__handle {
+  font-size: 0.65rem;
+  color: var(--sub);
+}
+.social-row__arrow {
+  color: var(--sub);
+  opacity: 0;
+  transform: translate(-3px, 3px);
+  transition: opacity 0.15s, transform 0.15s;
+}
+.social-row:hover .social-row__arrow {
+  opacity: 1;
+  transform: translate(0, 0);
+}
+.social-copy-badge {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  padding: 0.2rem 0.55rem;
+  border-radius: 99px;
+  transition: background 0.15s;
+}
+
+.contact-footnote {
+  margin-top: 1rem;
+  font-size: 0.68rem;
+  color: var(--sub);
+  opacity: 0.6;
+  font-style: italic;
+  line-height: 1.5;
 }
 </style>
