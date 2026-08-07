@@ -27,6 +27,29 @@ const lobbyBotDifficulty = ref('medium')
 const wordCountOptions   = [25, 50, 75, 100]
 const timeLimitOptions   = [15, 30, 60, 90]
 
+// ── Nickname warning popup ──
+const nicknameWarning = ref(false)
+let warningTimer = null
+function checkNickname() {
+  if (!nickname.value.trim()) {
+    nicknameWarning.value = true
+    clearTimeout(warningTimer)
+    warningTimer = setTimeout(() => { nicknameWarning.value = false }, 3000)
+    return false
+  }
+  return true
+}
+
+function tryJoinRoom(roomCode) {
+  if (!checkNickname()) return
+  joinRoom(roomCode)
+}
+
+function tryCreateRoom(lang, wc, diff, mode, time) {
+  if (!checkNickname()) return
+  createRoom(lang, wc, diff, mode, time)
+}
+
 const difficultyOptions = [
   { key: 'easy',        label: 'Easy',        sub: '30–50 wpm' },
   { key: 'medium',      label: 'Medium',      sub: '55–85 wpm' },
@@ -269,8 +292,8 @@ const raceTimeLeft = computed(() => {
 
           <!-- Create button -->
           <button
-            @click="createRoom(lobbyLanguage, lobbyWordCount, lobbyBotDifficulty, lobbyRaceMode, lobbyTimeLimit)"
-            :disabled="loading || !nickname.trim()"
+            @click="tryCreateRoom(lobbyLanguage, lobbyWordCount, lobbyBotDifficulty, lobbyRaceMode, lobbyTimeLimit)"
+            :disabled="loading"
             class="arena-create-btn"
           >
             <svg v-if="!loading" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
@@ -283,47 +306,57 @@ const raceTimeLeft = computed(() => {
 
       <!-- Open Rooms -->
       <div class="arena-rooms-panel">
-        <div class="flex items-center gap-2 mb-3">
-          <span class="w-1.5 h-1.5 rounded-full bg-editor-accent inline-block animate-pulse"></span>
-          <span class="text-[10px] uppercase tracking-[0.25em] text-editor-sub">Open Rooms</span>
+        <!-- Header -->
+        <div class="arena-rooms-header">
+          <div class="flex items-center gap-2">
+            <span class="arena-rooms-live-dot"></span>
+            <span class="arena-rooms-title">Open Rooms</span>
+          </div>
+          <span class="arena-rooms-count" v-if="publicRooms.length > 0">{{ publicRooms.length }}</span>
         </div>
 
+        <!-- Empty -->
         <div v-if="publicRooms.length === 0" class="arena-empty-state">
           <div class="text-2xl mb-2">🏁</div>
-          <div class="text-sm text-editor-sub">No open rooms yet.</div>
-          <div class="text-xs text-editor-sub/50 mt-0.5">Create one and start the race!</div>
+          <div style="font-size:0.82rem; color:var(--sub); margin-bottom:0.25rem;">No open rooms yet.</div>
+          <div style="font-size:0.72rem; color:var(--sub); opacity:0.6;">Create one and start the race!</div>
         </div>
 
-        <div v-for="r in publicRooms" :key="r.room_code" class="arena-room-row">
-          <div class="flex items-center gap-3 flex-1 min-w-0">
-            <div class="arena-room-badge">{{ r.room_code }}</div>
-            <div class="min-w-0">
-              <div class="text-sm font-semibold text-editor-text truncate flex items-center gap-2">
-                <span>{{ r.host_nickname }}'s room</span>
-                <span class="arena-diff-badge" :class="'arena-diff-badge--' + (r.bot_difficulty || 'medium')">
-                  {{ getDifficultyBadge(r.bot_difficulty).label }}
-                </span>
-              </div>
-              <div class="text-xs text-editor-sub">{{ r.language }} · {{ r.race_mode === 'timer' ? `${r.time_limit}s timer` : `${r.word_count} words` }}</div>
-            </div>
+        <!-- Room cards -->
+        <div v-for="r in publicRooms" :key="r.room_code" class="arena-room-card">
+          <!-- Top: code + difficulty badge -->
+          <div class="arena-room-card__top">
+            <span class="arena-room-badge">{{ r.room_code }}</span>
+            <span class="arena-diff-badge" :class="'arena-diff-badge--' + (r.bot_difficulty || 'medium')">
+              {{ getDifficultyBadge(r.bot_difficulty).label }}
+            </span>
           </div>
-          <div class="flex items-center gap-3 flex-shrink-0">
-            <div class="text-xs text-editor-sub">
-              <span class="text-editor-accent font-bold">{{ r.player_count }}</span>/{{ r.total_slots }} players
-            </div>
-            <button
-              @click="joinRoom(r.room_code)"
-              :disabled="loading || !nickname.trim()"
-              class="arena-btn arena-btn--sm"
-            >Join</button>
+          <!-- Middle: host + mode info -->
+          <div class="arena-room-card__host">{{ r.host_nickname }}'s room</div>
+          <div class="arena-room-card__meta">
+            <span>{{ r.language === 'english' ? 'EN' : 'ID' }}</span>
+            <span class="arena-room-card__dot">·</span>
+            <span>{{ r.race_mode === 'timer' ? `${r.time_limit}s timer` : `${r.word_count} words` }}</span>
+            <span class="arena-room-card__dot">·</span>
+            <span><span style="color:var(--accent); font-weight:700;">{{ r.player_count }}</span>/{{ r.total_slots }} players</span>
           </div>
+          <!-- Join button -->
+          <button
+            @click="tryJoinRoom(r.room_code)"
+            :disabled="loading"
+            class="arena-room-card__join"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Join Race
+          </button>
         </div>
+
       </div><!-- end Open Rooms -->
 
       </div><!-- end arena-home-grid -->
 
       <!-- Error -->
-      <p v-if="error" class="text-center text-sm font-medium text-editor-error">⚠ {{ error }}</p>
+      <p v-if="error" class="text-center text-sm font-medium" style="color:var(--error);">⚠ {{ error }}</p>
 
     </div><!-- end screen home -->
 
@@ -589,6 +622,14 @@ const raceTimeLeft = computed(() => {
       </div>
     </div>
 
+    <!-- ── Nickname warning toast ── -->
+    <Transition name="toast">
+      <div v-if="nicknameWarning" class="arena-nickname-toast">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span>Enter your nickname first!</span>
+      </div>
+    </Transition>
+
   </div>
 </template>
 
@@ -605,9 +646,88 @@ const raceTimeLeft = computed(() => {
 .arena-wc-btn, .arena-diff-btn, .arena-create-btn,
 .arena-btn, .arena-room-row, .arena-player-slot,
 .arena-result-row, .arena-pill, .arena-info-pill,
-.arena-tag, .arena-empty-state, .arena-hero-badge {
-  font-family: 'Sora', sans-serif;
+.arena-tag, .arena-empty-state, .arena-hero-badge,
+.arena-room-card, .arena-room-card__join { font-family: 'Sora', sans-serif; }
+
+/* ── Rooms panel header ── */
+.arena-rooms-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 0.75rem;
 }
+.arena-rooms-live-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent);
+  animation: pulse-dot 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+.arena-rooms-title {
+  font-size: 0.62rem; font-weight: 700; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--sub); font-family: 'Sora', sans-serif;
+}
+.arena-rooms-count {
+  font-size: 0.62rem; font-weight: 800; font-family: 'Sora', sans-serif;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  border-radius: 999px; padding: 0.05rem 0.45rem; letter-spacing: 0;
+}
+
+/* ── Room card (vertical layout) ── */
+.arena-room-card {
+  background: color-mix(in srgb, var(--bg) 80%, var(--sub));
+  border: 1px solid color-mix(in srgb, var(--sub) 16%, transparent);
+  border-radius: 10px; padding: 0.85rem 0.9rem;
+  display: flex; flex-direction: column; gap: 0.35rem;
+  transition: border-color 0.14s, background 0.14s;
+  cursor: default;
+}
+.arena-room-card:hover {
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+  background: color-mix(in srgb, var(--accent) 4%, transparent);
+}
+.arena-room-card__top {
+  display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+}
+.arena-room-card__host {
+  font-size: 0.8rem; font-weight: 700; color: var(--text);
+  font-family: 'Sora', sans-serif; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.arena-room-card__meta {
+  display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;
+  font-size: 0.68rem; color: var(--sub); font-family: 'Sora', sans-serif;
+}
+.arena-room-card__dot { opacity: 0.4; }
+.arena-room-card__join {
+  margin-top: 0.35rem; width: 100%;
+  display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+  padding: 0.48rem 0.75rem; border-radius: 7px; border: none;
+  background: var(--accent); color: var(--bg);
+  font-size: 0.72rem; font-weight: 700; cursor: pointer;
+  transition: all 0.14s; letter-spacing: 0.04em;
+  box-shadow: 0 1px 6px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.arena-room-card__join:hover:not(:disabled) {
+  opacity: 0.88; transform: translateY(-1px);
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--accent) 32%, transparent);
+}
+.arena-room-card__join:disabled { opacity: 0.35; cursor: not-allowed; box-shadow: none; }
+
+/* ── Nickname warning toast ── */
+.arena-nickname-toast {
+  position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 0.6rem;
+  background: #1c1c1e; color: #fff;
+  padding: 0.7rem 1.2rem; border-radius: 12px;
+  font-size: 0.82rem; font-weight: 600; font-family: 'Sora', sans-serif;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  z-index: 999; white-space: nowrap;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.toast-enter-active { transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.toast-leave-active { transition: all 0.2s ease-in; }
+.toast-enter-from  { opacity: 0; transform: translateX(-50%) translateY(12px); }
+.toast-leave-to    { opacity: 0; transform: translateX(-50%) translateY(6px); }
 
 /* ── Hero ── */
 .arena-hero { text-align: center; padding: 0.25rem 0 1rem; }
