@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ContactFeedbackMail;
 use App\Models\Contact;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class ContactController extends Controller
 {
@@ -16,7 +19,15 @@ class ContactController extends Controller
             'message' => 'required|string|max:2000',
         ]);
 
+        // 1. Save to SQLite database
         $contact = Contact::create($validated);
+
+        // 2. Try sending email notification to owner
+        try {
+            Mail::to('keefastudys@gmail.com')->send(new ContactFeedbackMail($contact));
+        } catch (\Exception $e) {
+            Log::error('Failed to send contact notification email: ' . $e->getMessage());
+        }
 
         return response()->json([
             'status' => 'success',
@@ -25,3 +36,4 @@ class ContactController extends Controller
         ], 201);
     }
 }
+

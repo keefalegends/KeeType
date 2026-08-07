@@ -14,6 +14,14 @@ services:
       - APP_URL=http://keetype.my.id
       - DB_CONNECTION=sqlite
       - DB_DATABASE=/var/www/html/database/database.sqlite
+      - MAIL_MAILER=smtp
+      - MAIL_HOST=smtp.gmail.com
+      - MAIL_PORT=587
+      - MAIL_USERNAME=keefastudys@gmail.com
+      - MAIL_PASSWORD=ocxlpqxukhglldpc
+      - MAIL_ENCRYPTION=tls
+      - MAIL_FROM_ADDRESS=keefastudys@gmail.com
+      - MAIL_FROM_NAME=KeeType
     volumes:
       # Persistent SQLite volume - Database data is preserved across container rebuilds
       - ./backend/database:/var/www/html/database
