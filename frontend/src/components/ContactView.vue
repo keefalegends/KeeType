@@ -7,14 +7,17 @@ const message = ref('')
 const selectedFile = ref(null)
 const previewUrl = ref('')
 const fileInputRef = ref(null)
+const isDragging = ref(false)
 const isSubmitting = ref(false)
 const submitSuccess = ref(false)
 const submitError = ref('')
 const copiedItem = ref('')
 
-function handleFileSelect(event) {
-  const file = event.target.files[0]
-  if (!file) return
+function applyFile(file) {
+  if (!file || !file.type.startsWith('image/')) {
+    submitError.value = 'Only image files are supported.'
+    return
+  }
   if (file.size > 5 * 1024 * 1024) {
     submitError.value = 'Image too large — keep it under 5MB please.'
     return
@@ -22,6 +25,27 @@ function handleFileSelect(event) {
   selectedFile.value = file
   submitError.value = ''
   previewUrl.value = URL.createObjectURL(file)
+}
+
+function handleFileSelect(event) {
+  const file = event.target.files[0]
+  if (file) applyFile(file)
+}
+
+function handleDrop(event) {
+  event.preventDefault()
+  isDragging.value = false
+  const file = event.dataTransfer.files[0]
+  if (file) applyFile(file)
+}
+
+function handleDragOver(event) {
+  event.preventDefault()
+  isDragging.value = true
+}
+
+function handleDragLeave() {
+  isDragging.value = false
 }
 
 function removeFile() {
@@ -100,22 +124,6 @@ async function handleSubmit() {
       <!-- Left: Form -->
       <div class="contact-form-wrap">
 
-        <!-- Hints -->
-        <div class="contact-hints">
-          <div class="hint-chip">
-            <span class="hint-dot hint-dot--bug"></span>
-            found a bug?
-          </div>
-          <div class="hint-chip">
-            <span class="hint-dot hint-dot--idea"></span>
-            have a suggestion?
-          </div>
-          <div class="hint-chip">
-            <span class="hint-dot hint-dot--hi"></span>
-            just saying hi?
-          </div>
-        </div>
-
         <form @submit.prevent="handleSubmit" class="contact-form">
           <div class="form-row">
             <div class="form-group">
@@ -153,7 +161,14 @@ async function handleSubmit() {
           <!-- Attachment -->
           <div class="form-group">
             <label class="form-label">Screenshot <span class="form-label--optional">optional · max 5mb</span></label>
-            <div v-if="!previewUrl">
+            <div
+              v-if="!previewUrl"
+              class="attach-dropzone"
+              :class="{ 'attach-dropzone--active': isDragging }"
+              @dragover="handleDragOver"
+              @dragleave="handleDragLeave"
+              @drop="handleDrop"
+            >
               <input
                 ref="fileInputRef"
                 type="file"
@@ -164,9 +179,10 @@ async function handleSubmit() {
               />
               <label for="contact-img" class="attach-zone">
                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/>
                 </svg>
-                <span>attach a file</span>
+                <span v-if="!isDragging">drag & drop or <u>click to browse</u></span>
+                <span v-else>drop it here!</span>
               </label>
             </div>
             <div v-else class="attach-preview">
@@ -321,35 +337,6 @@ async function handleSubmit() {
   .contact-grid { grid-template-columns: 1fr; }
 }
 
-/* ── Hints ── */
-.contact-hints {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-bottom: 1.1rem;
-}
-.hint-chip {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.68rem;
-  color: var(--sub);
-  background: color-mix(in srgb, var(--sub) 6%, transparent);
-  border: 1px solid color-mix(in srgb, var(--sub) 12%, transparent);
-  padding: 0.25rem 0.65rem;
-  border-radius: 99px;
-  font-weight: 500;
-}
-.hint-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.hint-dot--bug   { background: #f87171; }
-.hint-dot--idea  { background: #fbbf24; }
-.hint-dot--hi    { background: #34d399; }
-
 /* ── Form ── */
 .contact-form {
   display: flex;
@@ -406,19 +393,31 @@ async function handleSubmit() {
 .form-textarea { resize: none; }
 
 /* ── Attach zone ── */
+.attach-dropzone {
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+.attach-dropzone--active .attach-zone {
+  border-color: var(--accent);
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+  transform: scale(1.01);
+}
 .attach-zone {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.6rem;
+  padding: 0.7rem;
   border: 1.5px dashed color-mix(in srgb, var(--sub) 20%, transparent);
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.72rem;
   color: var(--sub);
   transition: all 0.15s ease;
+  user-select: none;
 }
+.attach-zone u { text-underline-offset: 2px; }
 .attach-zone:hover {
   border-color: var(--accent);
   color: var(--text);
