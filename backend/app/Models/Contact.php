@@ -13,5 +13,6 @@ class Contact extends Model
         'name',
         'email',
         'message',
+        'image_path',
     ];
 }

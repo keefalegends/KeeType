@@ -44,12 +44,28 @@ class ContactFeedbackMail extends Mailable
                     <div style='margin-top: 15px;'>
                         <strong style='color: #1f2937;'>Message:</strong>
                         <div style='background-color: #f3f4f6; padding: 15px; border-left: 4px solid #2563eb; border-radius: 4px; margin-top: 8px; font-size: 14px; color: #374151; white-space: pre-wrap;'>{$this->contact->message}</div>
-                    </div>
+                    </div>" . ($this->contact->image_path ? "
+                    <div style='margin-top: 15px; background-color: #eff6ff; padding: 10px 15px; border-radius: 6px; font-size: 13px; color: #1d4ed8;'>
+                        📎 <strong>Attachment:</strong> Image file is attached to this email.
+                    </div>" : "") . "
 
                     <hr style='border: none; border-top: 1px solid #eee; margin: 25px 0 15px 0;' />
                     <p style='font-size: 12px; color: #9ca3af; text-align: center; margin: 0;'>KeeType Automated Notification • <a href='https://keetype.my.id' style='color: #2563eb; text-decoration: none;'>keetype.my.id</a></p>
                 </div>
             ",
         );
+    }
+
+    public function attachments(): array
+    {
+        if ($this->contact->image_path && storage_path('app/public/' . $this->contact->image_path)) {
+            $fullPath = storage_path('app/public/' . $this->contact->image_path);
+            if (file_exists($fullPath)) {
+                return [
+                    \Illuminate\Mail\Mailables\Attachment::fromPath($fullPath),
+                ];
+            }
+        }
+        return [];
     }
 }

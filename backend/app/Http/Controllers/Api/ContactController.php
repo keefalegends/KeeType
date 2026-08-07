@@ -17,10 +17,21 @@ class ContactController extends Controller
             'name' => 'required|string|max:100',
             'email' => 'nullable|email|max:150',
             'message' => 'required|string|max:2000',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // Max 5MB
         ]);
 
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('contacts', 'public');
+        }
+
         // 1. Save to SQLite database
-        $contact = Contact::create($validated);
+        $contact = Contact::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'] ?? null,
+            'message' => $validated['message'],
+            'image_path' => $imagePath,
+        ]);
 
         // 2. Try sending email notification to owner
         try {

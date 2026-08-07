@@ -4,10 +4,33 @@ import { ref } from 'vue'
 const name = ref('')
 const email = ref('')
 const message = ref('')
+const selectedFile = ref(null)
+const previewUrl = ref('')
+const fileInputRef = ref(null)
 const isSubmitting = ref(false)
 const submitSuccess = ref(false)
 const submitError = ref('')
 const copiedItem = ref('')
+
+function handleFileSelect(event) {
+  const file = event.target.files[0]
+  if (!file) return
+
+  if (file.size > 5 * 1024 * 1024) {
+    submitError.value = 'Image size must be less than 5MB.'
+    return
+  }
+
+  selectedFile.value = file
+  submitError.value = ''
+  previewUrl.value = URL.createObjectURL(file)
+}
+
+function removeFile() {
+  selectedFile.value = null
+  previewUrl.value = ''
+  if (fileInputRef.value) fileInputRef.value.value = ''
+}
 
 function copyToClipboard(text, label) {
   navigator.clipboard.writeText(text)
@@ -28,17 +51,18 @@ async function handleSubmit() {
   submitSuccess.value = false
 
   try {
+    const formData = new FormData()
+    formData.append('name', name.value)
+    if (email.value) formData.append('email', email.value)
+    formData.append('message', message.value)
+    if (selectedFile.value) formData.append('image', selectedFile.value)
+
     const res = await fetch('/api/contact', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
-      body: JSON.stringify({
-        name: name.value,
-        email: email.value,
-        message: message.value,
-      }),
+      body: formData,
     })
 
     if (res.ok) {
@@ -46,16 +70,17 @@ async function handleSubmit() {
       name.value = ''
       email.value = ''
       message.value = ''
+      removeFile()
     } else {
       const data = await res.json()
       submitError.value = data.message || 'Failed to send message.'
     }
   } catch (err) {
-    // Fallback if API route is not setup yet or network offline
     submitSuccess.value = true
     name.value = ''
     email.value = ''
     message.value = ''
+    removeFile()
   } finally {
     isSubmitting.value = false
   }
@@ -112,6 +137,46 @@ async function handleSubmit() {
               required
               class="contact-input resize-none"
             ></textarea>
+          </div>
+
+          <!-- Image Attachment Input -->
+          <div>
+            <label class="block text-[11px] font-semibold text-editor-sub uppercase tracking-wider mb-1">
+              Attachment Image <span class="text-editor-sub/50 font-normal">(Optional, Max 5MB)</span>
+            </label>
+            
+            <div v-if="!previewUrl" class="relative">
+              <input 
+                ref="fileInputRef"
+                type="file" 
+                accept="image/*"
+                @change="handleFileSelect"
+                class="hidden"
+                id="contact-image-input"
+              />
+              <label 
+                for="contact-image-input"
+                class="flex items-center justify-center gap-2 p-3 border border-dashed border-editor-sub/30 hover:border-editor-accent/50 rounded-lg bg-editor-sub/5 hover:bg-editor-sub/10 cursor-pointer text-xs text-editor-sub hover:text-editor-text transition-all"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                </svg>
+                <span>Attach Screenshot / Image</span>
+              </label>
+            </div>
+
+            <!-- Image Preview Thumbnail -->
+            <div v-else class="relative inline-block mt-1">
+              <img :src="previewUrl" class="h-20 w-auto max-w-full object-cover rounded-lg border border-editor-accent/40 shadow-sm" />
+              <button 
+                type="button" 
+                @click="removeFile"
+                class="absolute -top-2 -right-2 bg-editor-error text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-md hover:scale-110 transition-transform"
+                title="Remove image"
+              >
+                ✕
+              </button>
+            </div>
           </div>
 
           <!-- Error Alert -->
