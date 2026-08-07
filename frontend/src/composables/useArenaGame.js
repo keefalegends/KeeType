@@ -149,10 +149,14 @@ export function useArenaGame() {
       }
     }
 
-    // If server says finished → move to podium (stop all intervals)
+    // If server says finished → move to podium (keep polling alive for rematch!)
     if (newRoom.status === 'finished' && screen.value !== 'finished') {
       screen.value = 'finished'
-      stopAll()
+      clearInterval(botInterval)
+      clearInterval(countdownTimer)
+      clearInterval(progressSyncTimer)
+      clearInterval(raceTimer)
+      botInterval = countdownTimer = progressSyncTimer = raceTimer = null
     }
   }
 
@@ -493,7 +497,7 @@ export function useArenaGame() {
     }
   }
 
-  // ── Start race (host only) ──
+  // ── Start race / Rematch vote ──
   async function startRace() {
     if (!isHost.value) return
     loading.value = true; error.value = ''
@@ -509,6 +513,29 @@ export function useArenaGame() {
       loading.value = false
     }
   }
+
+  async function voteRematch() {
+    if (!roomCode.value || !playerId.value) return
+    loading.value = true; error.value = ''
+    try {
+      const data = await apiFetch(`/arena/${roomCode.value}/rematch`, {
+        method: 'POST',
+        body: JSON.stringify({ player_id: playerId.value }),
+      })
+      if (data.room) applyRoomState(data.room)
+    } catch (e) {
+      error.value = e.message
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const rematchVotes = computed(() => room.value?.rematch_votes || 0)
+  const totalRealPlayers = computed(() => room.value?.total_real_players || 1)
+  const hasVotedRematch = computed(() => {
+    if (!myRacer.value) return false
+    return !!myRacer.value.voted_rematch
+  })
 
   // ── Leave / reset ──
   function leaveRoom() {
@@ -544,11 +571,12 @@ export function useArenaGame() {
     publicRooms, error, loading,
     countdownSeconds,
     raceMode, timeLimit,
+    rematchVotes, totalRealPlayers, hasVotedRematch,
     // Typing
     words, currentWordIndex, currentCharIndex, typedChars,
     isTypingActive, localFinished,
     // Actions
-    fetchPublicRooms, createRoom, joinRoom, startRace, leaveRoom,
+    fetchPublicRooms, createRoom, joinRoom, startRace, voteRematch, leaveRoom,
     handleRaceKeyDown,
     getLocalStats,
   }

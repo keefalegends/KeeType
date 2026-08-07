@@ -150,9 +150,10 @@ class ArenaController extends Controller
             'progress'    => 0.0,
             'wpm'         => 0,
             'accuracy'    => 100,
-            'finished'    => false,
-            'finish_time' => null,
-            'joined_at'   => now()->toISOString(),
+            'finished'      => false,
+            'finish_time'   => null,
+            'voted_rematch' => false,
+            'joined_at'     => now()->toISOString(),
         ];
     }
 
@@ -375,11 +376,12 @@ class ArenaController extends Controller
 
         // Reset all player stats for the new race
         $players = collect($room->players_json)->map(function ($p) {
-            $p['progress']    = 0.0;
-            $p['wpm']         = 0;
-            $p['accuracy']    = 100;
-            $p['finished']    = false;
-            $p['finish_time'] = null;
+            $p['progress']      = 0.0;
+            $p['wpm']           = 0;
+            $p['accuracy']      = 100;
+            $p['finished']      = false;
+            $p['finish_time']   = null;
+            $p['voted_rematch'] = false;
             return $p;
         })->toArray();
 
@@ -461,20 +463,90 @@ class ArenaController extends Controller
     // ──────────────────────────────────────────────
     private function formatRoom(ArenaRoom $room): array
     {
+        $players = $room->players_json;
+        $realPlayers = collect($players)->where('is_bot', false);
         return [
-            'room_code'      => $room->room_code,
-            'host_nickname'  => $room->host_nickname,
-            'status'         => $room->status,
-            'language'       => $room->language,
-            'race_mode'      => $room->race_mode ?? 'words',
-            'word_count'     => $room->word_count,
-            'time_limit'     => $room->time_limit,
-            'bot_difficulty' => $room->bot_difficulty ?? 'medium',
-            'words'          => $room->words_json,
-            'players'        => $room->players_json,
-            'race_starts_at' => $room->race_started_at?->toISOString(),
-            'created_at'     => $room->created_at->toISOString(),
+            'room_code'          => $room->room_code,
+            'host_nickname'      => $room->host_nickname,
+            'status'             => $room->status,
+            'language'           => $room->language,
+            'race_mode'          => $room->race_mode ?? 'words',
+            'word_count'         => $room->word_count,
+            'time_limit'         => $room->time_limit,
+            'bot_difficulty'     => $room->bot_difficulty ?? 'medium',
+            'words'              => $room->words_json,
+            'players'            => $room->players_json,
+            'race_starts_at'     => $room->race_started_at?->toISOString(),
+            'created_at'         => $room->created_at->toISOString(),
+            'rematch_votes'      => $realPlayers->where('voted_rematch', true)->count(),
+            'total_real_players' => $realPlayers->count(),
         ];
+    }
+
+    // ──────────────────────────────────────────────
+    // POST /api/arena/{code}/rematch
+    // Body: { player_id }
+    // Vote for rematch. When ALL real players vote, reset & start countdown!
+    // ──────────────────────────────────────────────
+    public function rematch(Request $request, string $code)
+    {
+        $validated = $request->validate([
+            'player_id' => 'required|string',
+        ]);
+
+        $room = ArenaRoom::where('room_code', strtoupper($code))->first();
+        if (!$room) {
+            return response()->json(['status' => 'error', 'message' => 'Room not found.'], 404);
+        }
+
+        $players = $room->players_json;
+        $playerIndex = collect($players)->search(fn($p) => $p['id'] === $validated['player_id']);
+
+        if ($playerIndex === false) {
+            return response()->json(['status' => 'error', 'message' => 'Player not found in room.'], 404);
+        }
+
+        // Toggle voted_rematch for this player
+        $currentlyVoted = $players[$playerIndex]['voted_rematch'] ?? false;
+        $players[$playerIndex]['voted_rematch'] = !$currentlyVoted;
+
+        $room->players_json = $players;
+
+        // Check total real players and voted real players
+        $realPlayers = collect($players)->where('is_bot', false);
+        $totalReal   = $realPlayers->count();
+        $votedReal   = $realPlayers->where('voted_rematch', true)->count();
+
+        // If 100% of real players voted for rematch -> restart game!
+        if ($totalReal > 0 && $votedReal >= $totalReal) {
+            // Reset player stats & clear voted_rematch
+            $resetPlayers = collect($players)->map(function ($p) {
+                $p['progress']      = 0.0;
+                $p['wpm']           = 0;
+                $p['accuracy']      = 100;
+                $p['finished']      = false;
+                $p['finish_time']   = null;
+                $p['voted_rematch'] = false;
+                return $p;
+            })->toArray();
+
+            $raceMode  = $room->race_mode ?? 'words';
+            $timeLimit = $room->time_limit;
+            $genCount  = $raceMode === 'timer'
+                ? max(200, (int)(($timeLimit ?? 60) * 2.5))
+                : ($room->word_count ?? 25);
+            $words = $this->generateWords($genCount, $room->language ?? 'english');
+
+            $room->status           = 'countdown';
+            $room->words_json       = $words;
+            $room->players_json     = $resetPlayers;
+            $room->race_started_at  = now()->addSeconds(5);
+        }
+
+        $room->last_activity_at = now();
+        $room->save();
+
+        return response()->json(['status' => 'success', 'room' => $this->formatRoom($room)]);
     }
 
     // ──────────────────────────────────────────────
