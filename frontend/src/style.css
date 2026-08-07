@@ -39,7 +39,7 @@
 /* 2. Retro Terminal CRT - Phosphor amber-green, readable contrast, scanline atmosphere */
 .theme-retro-crt {
   --bg:          #0a0f0a;   /* deep dark green-black, not pure black */
-  --sub:         #3a6b3a;   /* mid phosphor green for dim text */
+  --sub:         #5fa85f;   /* mid phosphor green for dim text — readable on dark */
   --text:        #a8e63d;   /* warm phosphor amber-green, easy on eyes */
   --error:       #ff5555;   /* soft red, not pure */
   --error-extra: #5a1a1a;   /* dark red for extra-wrong chars */
@@ -65,7 +65,7 @@
 /* 4. Serika Dark (Monkeytype default - Charcoal & Yellow) */
 .theme-serika-dark {
   --bg: #323437;
-  --sub: #646669;
+  --sub: #7f8185;
   --text: #d1d0c5;
   --error: #ca4754;
   --error-extra: #7e2a33;
@@ -78,7 +78,7 @@
 /* 5. Darling (Pink & White - Kawaii pastel) */
 .theme-darling {
   --bg: #fec8cd;
-  --sub: #a30000;
+  --sub: #cc4444;
   --text: #ffffff;
   --error: #2e7dde;
   --error-extra: #1c5aad;
@@ -91,7 +91,7 @@
 /* 6. Lavender Haze (Dark purple - elegant & feminine) */
 .theme-lavender {
   --bg:          #181320;  /* deep aubergine-black */
-  --sub:         #6b5a8c;  /* muted violet for dim text */
+  --sub:         #9b87c0;  /* muted violet for dim text — lifted for readability */
   --text:        #e8dff5;  /* soft lilac white */
   --error:       #f28b82;  /* soft coral */
   --error-extra: #4a1a2a;  /* dark berry */

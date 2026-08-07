@@ -321,7 +321,8 @@ async function handleSubmit() {
 }
 .contact-hero__desc {
   font-size: 0.82rem;
-  color: var(--sub);
+  color: var(--text);
+  opacity: 0.75;
   line-height: 1.65;
   max-width: 460px;
 }
@@ -521,7 +522,8 @@ async function handleSubmit() {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--sub);
+  color: var(--text);
+  opacity: 0.6;
   margin-bottom: 0.85rem;
 }
 .social-list {
@@ -569,7 +571,8 @@ async function handleSubmit() {
 }
 .social-row__handle {
   font-size: 0.65rem;
-  color: var(--sub);
+  color: var(--text);
+  opacity: 0.55;
 }
 .social-row__arrow {
   color: var(--sub);
@@ -594,8 +597,8 @@ async function handleSubmit() {
 .contact-footnote {
   margin-top: 1rem;
   font-size: 0.68rem;
-  color: var(--sub);
-  opacity: 0.6;
+  color: var(--text);
+  opacity: 0.45;
   font-style: italic;
   line-height: 1.5;
 }
