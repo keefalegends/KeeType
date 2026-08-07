@@ -4,9 +4,10 @@ A hyper-minimalist, distraction-free typing speed test built for focus. No login
 
 Inspired by [Monkeytype](https://monkeytype.com) · Crafted by [keefalegends](https://github.com/keefalegends)
 
-<img width="1920" height="952" alt="image" src="https://github.com/user-attachments/assets/52e053d7-6a90-497d-a468-2d6f26882774" />
+<img width="1920" height="961" alt="image" src="https://github.com/user-attachments/assets/171f1823-85b3-4e7b-9ccd-57e0d123dce5" />
 
-<img width="1896" height="953" alt="image" src="https://github.com/user-attachments/assets/81af3709-0b30-4624-827a-f2e5fb849e41" />
+<img width="1920" height="956" alt="image" src="https://github.com/user-attachments/assets/d7e6c5cf-0c8a-4190-b137-791748d9f4b7" />
+
 
 ---
 
