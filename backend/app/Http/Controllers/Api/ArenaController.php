@@ -517,6 +517,11 @@ class ArenaController extends Controller
         $totalReal   = $realPlayers->count();
         $votedReal   = $realPlayers->where('voted_rematch', true)->count();
 
+        // Require at least 2 real players for player_only mode
+        if ($room->bot_difficulty === 'player_only' && $totalReal < 2) {
+            return response()->json(['status' => 'error', 'message' => 'Player Only mode requires at least 2 players to rematch.'], 422);
+        }
+
         // If 100% of real players voted for rematch -> restart game!
         if ($totalReal > 0 && $votedReal >= $totalReal) {
             // Reset player stats & clear voted_rematch

@@ -177,7 +177,7 @@ export function useArenaGame() {
 
     countdownTimer = setInterval(() => {
       const diff = Math.ceil((raceStartedAt.value - Date.now()) / 1000)
-      countdownSeconds.value = Math.max(0, diff)
+      countdownSeconds.value = Math.min(5, Math.max(0, diff))
       if (diff <= 0) {
         clearInterval(countdownTimer)
         countdownTimer = null

@@ -617,18 +617,22 @@ const raceTimeLeft = computed(() => {
       <div class="flex flex-col gap-3 w-full">
         <button
           @click="voteRematch"
-          :disabled="loading"
+          :disabled="loading || (room?.bot_difficulty === 'player_only' && totalRealPlayers < 2)"
           class="arena-btn arena-btn--primary w-full flex items-center justify-center gap-2 py-3 text-base"
           :class="hasVotedRematch ? 'arena-btn--active' : ''"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
           <span v-if="loading">Starting...</span>
+          <template v-else-if="room?.bot_difficulty === 'player_only' && totalRealPlayers < 2">
+            <span class="opacity-70">Rematch &nbsp;·&nbsp; Need 2+ players</span>
+          </template>
           <span v-else-if="hasVotedRematch">Voted Rematch ({{ rematchVotes }}/{{ totalRealPlayers }})</span>
           <span v-else>Rematch ({{ rematchVotes }}/{{ totalRealPlayers }})</span>
         </button>
 
         <p class="text-xs text-editor-sub text-center">
-          <span v-if="rematchVotes === 0">Click Rematch to vote for a new race</span>
+          <span v-if="room?.bot_difficulty === 'player_only' && totalRealPlayers < 2">Waiting for another player to join...</span>
+          <span v-else-if="rematchVotes === 0">Click Rematch to vote for a new race</span>
           <span v-else-if="rematchVotes < totalRealPlayers">Waiting for {{ totalRealPlayers - rematchVotes }} more player(s) to vote...</span>
           <span v-else class="text-editor-accent font-semibold">Starting new race...</span>
         </p>
