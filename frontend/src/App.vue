@@ -6,6 +6,7 @@ import TypingArea from './components/TypingArea.vue'
 import ResultScreen from './components/ResultScreen.vue'
 import LeaderboardView from './components/LeaderboardView.vue'
 import ArenaView from './components/ArenaView.vue'
+import ContactView from './components/ContactView.vue'
 
 const {
   mode, timeOption, wordOption, language, theme, font, keyboardSound, keyboardVolume,
@@ -172,6 +173,20 @@ onUnmounted(() => {
         <!-- Spacer -->
         <div class="sidebar-spacer"></div>
 
+        <!-- Contact -->
+        <button
+          @click="activeView = 'contact'"
+          class="sidebar-item"
+          :class="[
+            activeView === 'contact' ? 'sidebar-item--active' : ''
+          ]"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+          </svg>
+          <span>Contact</span>
+        </button>
+
         <!-- Setting -->
         <button
           @click="activeView = 'setting'"
@@ -304,6 +319,11 @@ onUnmounted(() => {
             <!-- View: Leaderboard -->
             <div v-else-if="activeView === 'leaderboard'" key="leaderboard" class="w-full max-w-3xl">
               <LeaderboardView />
+            </div>
+
+            <!-- View: Contact -->
+            <div v-else-if="activeView === 'contact'" key="contact" class="w-full">
+              <ContactView />
             </div>
 
             <!-- View: Setting (Modern Glassmorphism) -->

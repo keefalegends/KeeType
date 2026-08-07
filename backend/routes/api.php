@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\Api\LeaderboardController;
 use App\Http\Controllers\Api\ArenaController;
+use App\Http\Controllers\Api\ContactController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/leaderboard', [LeaderboardController::class, 'index']);
 Route::post('/leaderboard', [LeaderboardController::class, 'store']);
+Route::post('/contact', [ContactController::class, 'store']);
 
 // Arena Mode routes
 Route::prefix('arena')->group(function () {
