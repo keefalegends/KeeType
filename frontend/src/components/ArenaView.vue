@@ -394,9 +394,22 @@ const raceTimeLeft = computed(() => {
           :key="racer.id"
           class="arena-player-slot"
           :class="isMe(racer) ? 'arena-player-slot--me' : ''"
+          :style="{
+            borderLeftColor: getRacerColor(racer, idx),
+            borderLeftWidth: '4px',
+            background: `color-mix(in srgb, ${getRacerColor(racer, idx)} 8%, var(--bg))`
+          }"
         >
           <div class="flex items-center gap-3">
-            <div class="arena-player-avatar" :class="racer.is_bot ? 'arena-player-avatar--bot' : isMe(racer) ? 'arena-player-avatar--me' : 'arena-player-avatar--other'" :style="{ '--lane-color': getRacerColor(racer, idx) }">
+            <div
+              class="arena-player-avatar"
+              :class="racer.is_bot ? 'arena-player-avatar--bot' : isMe(racer) ? 'arena-player-avatar--me' : 'arena-player-avatar--other'"
+              :style="{
+                borderColor: getRacerColor(racer, idx),
+                color: getRacerColor(racer, idx),
+                background: `color-mix(in srgb, ${getRacerColor(racer, idx)} 15%, transparent)`
+              }"
+            >
               <span class="text-xs font-bold">{{ racer.nickname.slice(0,2).toUpperCase() }}</span>
             </div>
             <div>
@@ -1008,7 +1021,12 @@ const raceTimeLeft = computed(() => {
   background: var(--accent); border-color: var(--accent);
   color: var(--bg); letter-spacing: 0.05em; text-transform: uppercase;
 }
-.arena-btn--primary:hover:not(:disabled) { opacity: 0.88; color: var(--bg); }
+.arena-btn--primary:hover:not(:disabled) {
+  opacity: 0.9;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
 .arena-btn--sm { padding: 0.3rem 0.75rem; font-size: 0.72rem; }
 .arena-btn--leave {
   border-color: color-mix(in srgb, #f87171 30%, transparent);
