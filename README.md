@@ -6,7 +6,7 @@ Inspired by [Monkeytype](https://monkeytype.com) · Crafted by [keefalegends](ht
 
 <img width="1919" height="987" alt="image" src="https://github.com/user-attachments/assets/97a26677-54c5-46c3-bad4-82d8b4d146f6" />
 
-<img width="1920" height="956" alt="KeeType Arena Mode" src="https://github.com/user-attachments/assets/d7e6c5cf-0c8a-4190-b137-791748d9f4b7" />
+<img width="1915" height="990" alt="image" src="https://github.com/user-attachments/assets/259e8865-dde7-444b-b4ff-c0c00cb323af" />
 
 
 ---
