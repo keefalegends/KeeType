@@ -116,6 +116,13 @@ onUnmounted(() => {
           isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'
         ]"
       >
+      <!-- macOS traffic light dots (Neumorph Glass theme) -->
+      <div v-if="theme === 'theme-neumorph-glass'" class="flex items-center gap-1.5 mb-6 px-1">
+        <span class="w-2.5 h-2.5 rounded-full bg-[#ff5f56] inline-block shadow-sm"></span>
+        <span class="w-2.5 h-2.5 rounded-full bg-[#ffbd2e] inline-block shadow-sm"></span>
+        <span class="w-2.5 h-2.5 rounded-full bg-[#27c93f] inline-block shadow-sm"></span>
+      </div>
+
       <!-- Logo inside sidebar -->
       <div class="sidebar-logo">
         <span
@@ -383,6 +390,12 @@ onUnmounted(() => {
                         <div class="theme-preview" style="background: #181320; border-color: #c084fc;"></div>
                         <span class="theme-name">Lavender Haze</span>
                         <span v-if="theme === 'theme-lavender'" class="theme-check">✓</span>
+                      </button>
+
+                      <button @click="theme = 'theme-neumorph-glass'" class="theme-btn" :class="theme === 'theme-neumorph-glass' ? 'theme-btn--active' : ''">
+                        <div class="theme-preview" style="background: #f0f3f8; border-color: #0f172a; border-radius: 4px;"></div>
+                        <span class="theme-name">Neumorph Glass</span>
+                        <span v-if="theme === 'theme-neumorph-glass'" class="theme-check">✓</span>
                       </button>
 
                     </div>

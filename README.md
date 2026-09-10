@@ -40,6 +40,7 @@ Inspired by [Monkeytype](https://monkeytype.com) · Crafted by [keefalegends](ht
 | **Serika Dark** | Charcoal & yellow (Monkeytype-inspired) |
 | **Darling** | Bubbly pastel pink |
 | **Lavender Haze** | Deep purple, soft lilac, fuchsia accent |
+| **Neumorph Glass** | Frosted glass, soft neumorphic cards, macOS dots, keycap active word |
 
 ### 🔊 Typing Sound
 - Simulated mechanical keyboard sounds built with Web Audio API

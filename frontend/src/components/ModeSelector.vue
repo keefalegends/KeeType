@@ -21,7 +21,7 @@ const wordOptions = [8, 25, 50, 100]
 </script>
 
 <template>
-  <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 text-sm select-none transition-opacity duration-300"
+  <div class="mode-selector-capsule flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 text-sm select-none transition-all duration-300"
        :class="isActive ? 'opacity-0 pointer-events-none' : 'opacity-100'">
 
     <!-- Language Selector -->
