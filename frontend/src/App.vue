@@ -116,13 +116,6 @@ onUnmounted(() => {
           isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'
         ]"
       >
-      <!-- macOS traffic light dots (Neumorph Glass theme) -->
-      <div v-if="theme === 'theme-neumorph-glass'" class="flex items-center gap-1.5 mb-6 px-1">
-        <span class="w-2.5 h-2.5 rounded-full bg-[#ff5f56] inline-block shadow-sm"></span>
-        <span class="w-2.5 h-2.5 rounded-full bg-[#ffbd2e] inline-block shadow-sm"></span>
-        <span class="w-2.5 h-2.5 rounded-full bg-[#27c93f] inline-block shadow-sm"></span>
-      </div>
-
       <!-- Logo inside sidebar -->
       <div class="sidebar-logo">
         <span
@@ -247,6 +240,13 @@ onUnmounted(() => {
         class="absolute top-8 left-10 transition-opacity duration-300 z-20"
         :class="isActive ? 'opacity-0 pointer-events-none' : 'opacity-100'"
       >
+        <!-- macOS traffic light dots across all themes -->
+        <div class="flex items-center gap-1.5 mb-2.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#ff5f56] inline-block shadow-sm"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-[#ffbd2e] inline-block shadow-sm"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-[#27c93f] inline-block shadow-sm"></span>
+        </div>
+
         <h1 class="text-2xl font-bold tracking-tight">
           <span 
             :class="{
