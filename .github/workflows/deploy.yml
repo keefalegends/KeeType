@@ -22,6 +22,7 @@ jobs:
             cd ${{ secrets.VPS_PROJECT_PATH }}
             git fetch origin main
             git reset --hard origin/main
+            docker rm -f keetype-frontend keetype-backend 2>/dev/null || true
             docker compose build --no-cache frontend
-            docker compose up -d --force-recreate
+            docker compose up -d
             docker image prune -f
