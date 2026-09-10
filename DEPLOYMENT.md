@@ -1,6 +1,6 @@
 # 🚀 VPS Deployment & GitHub Actions Guide
 
-Panduan cara memasang KeeType di VPS menggunakan Docker & Docker Compose, serta mengaktifkan Auto-Deploy otomatis via GitHub Actions.
+Panduan cara memasang KeeType di VPS menggunakan Docker, Caddy Reverse Proxy, & Docker Compose, serta mengaktifkan Auto-Deploy otomatis via GitHub Actions.
 
 ---
 
@@ -20,11 +20,33 @@ sudo apt update && sudo apt install -y docker.io docker-compose-plugin git
 
 # Pastikan Docker jalan
 sudo systemctl enable --now docker
+
+# Buat external network web_proxy jika belum ada (digunakan Caddy Proxy)
+docker network create web_proxy || true
 ```
 
 ---
 
-## 📥 Step 2: Clone Repository & Setup Folder
+## 🔒 Step 2: Konfigurasi Caddyfile di VPS
+
+Di VPS (folder Caddy, misal `~/caddy/Caddyfile`), tambahkan blok berikut untuk `keetype.my.id`:
+
+```caddy
+keetype.my.id {
+    # Forward ke container keetype-frontend, port 80 (internal Docker network web_proxy)
+    reverse_proxy keetype-frontend:80
+}
+
+www.keetype.my.id {
+    redir https://keetype.my.id{uri} permanent
+}
+```
+
+> ℹ️ **Catatan**: Container `keetype-frontend` sudah menyertakan Nginx internal yang secara otomatis memproxy request `/api/` ke `keetype-backend:8000`. Jadi Caddy hanya perlu memproxy `keetype-frontend:80`.
+
+---
+
+## 📥 Step 3: Clone Repository & Setup Folder
 
 ```bash
 # Buat folder projek
@@ -37,7 +59,7 @@ git clone https://github.com/keefalegends/KeeType.git .
 
 ---
 
-## 🏃 Step 3: Run Aplikasi Pertama Kali
+## 🏃 Step 4: Run Aplikasi Pertama Kali
 
 Jalankan command ini di folder `/var/www/keetype`:
 
@@ -45,13 +67,13 @@ Jalankan command ini di folder `/var/www/keetype`:
 docker compose up -d --build
 ```
 
-Aplikasi KeeType langsung jalan di `http://<YOUR_VPS_IP>` 🎉
+Aplikasi KeeType langsung terhubung ke Caddy via network `web_proxy` dan HTTPS aktif otomatis di `https://keetype.my.id` 🎉
 
 > ℹ️ **Catatan Database**: File database SQLite tersimpan di `/var/www/keetype/backend/database/database.sqlite`. Rebuild container Docker **tidak akan pernah menghapus data leaderboard**.
 
 ---
 
-## 🔐 Step 4: Setup Secrets di GitHub Actions
+## 🔐 Step 5: Setup Secrets di GitHub Actions
 
 Buka Repo GitHub lu ➔ **Settings** ➔ **Secrets and variables** ➔ **Actions** ➔ **New repository secret**.
 
